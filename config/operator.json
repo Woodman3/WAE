@@ -1,0 +1,11 @@
+{
+  "Amiya":{
+    "id":1,
+    "attack_type":"Magic",
+    "health":500,
+    "attack_speed":1,
+    "damage":100,
+    "armor":50,
+    "magic_resist":0.1
+  }
+}
