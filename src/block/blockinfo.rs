@@ -37,8 +37,8 @@ fn construct_block_info(info:&BlockInfo)->u64{
 }
 pub fn construct_block_info_from_json(json_path:&str)->Result<Vec<u64>>{
     let mut r =vec![0;super::VEC_LEN];
-    let map_path=json_path.to_owned()+"block.json";
-    let content = std::fs::read_to_string(map_path)?;
+    let path=json_path.to_owned()+"block.json";
+    let content = std::fs::read_to_string(path)?;
     let j:Value = serde_json::from_str(&content)?;
     // println!("{:?}\n",j);
     for (_key,value) in j["Block"].as_object().unwrap() {
