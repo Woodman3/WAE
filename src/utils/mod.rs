@@ -1,6 +1,6 @@
-pub mod configloader;
+pub mod config;
 
-pub fn get_short_type_name<T>()->&'static str{
+pub fn get_short_type_name<'a, T>()->&'a str{
     let tn=std::any::type_name::<T>();
 
     if let Some(index) = tn.rfind(":")  {
