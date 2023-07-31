@@ -1,9 +1,12 @@
+#![allow(non_snake_case)]
+#![allow(unused)]
+#![allow(dead_code)]
 // pub mod map;
 // pub mod block;
 pub mod unit;
 pub mod utils;
 pub mod timeline;
-// pub mod demo;
+pub mod demo;
 pub mod frame;
 pub mod calculator;
 fn main() {
@@ -13,8 +16,9 @@ fn main() {
     // let v = utils::configloader::construct_info_from_json::<unit::UnitInfo>("/home/archer/workspace/BEC/config/enemy.json","",).unwrap();
     // println!("{:?}",v);
     // demo::fun();
-    let c=utils::config::Config::new("/home/archer/workspace/BEC/config/").unwrap();
-    let mut Ca = calculator::Calculator::new(&c).unwrap();
-    Ca.to_end();
-    println!("{:?}",Ca.route);
+    // let c=utils::config::Config::new("/home/archer/workspace/BEC/config/").unwrap();
+    // let c=utils::config::Config::new("C:/Users/Aureliano/workspace/BEC/config/").unwrap();
+    // let mut Ca = calculator::Calculator::new(&c).unwrap();
+    // Ca.to_end();
+    demo::fun();
 }

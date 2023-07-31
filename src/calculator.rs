@@ -40,19 +40,38 @@ impl Calculator{
     /// an event is place event or enemy comeout or something happen like fire rain
     /// mosttime is happen in an specify time but sometime it happen after somethine has happen
     /// it can't be skip
-    fn event(&self,f: &mut Frame){
+    fn event(&mut self,f: &mut Frame){
         let time_stamp = self.frame_vec.len();
-        for (time,e) in self.time_line.iter(){
-            if *time != time_stamp{
-                break;
-            }else{
-                self.event_vec[*e].happen(f,self);
+        while self.time_line.len()!=0{
+            if let Some((time,e)) = self.time_line.pop_front(){
+                if time != time_stamp{
+                    if time < time_stamp{
+                        println!("Some event not happened before,this event has drop");
+                        continue;
+                    }else {
+                        break;
+                    }
+                }else{
+                    self.event_vec[e].happen(f,self);
+                }
             }
         }
-        println!("{:?}",f);
+        // for (time,e) in self.time_line.iter(){
+        //     if *time != time_stamp{
+        //         if *time < time_stamp{
+        //             println!("Some event not happened before,this event has drop");
+        //             continue;
+        //         }else {
+        //             break;
+        //         }
+        //     }else{
+        //         self.event_vec[*e].happen(f,self);
+        //     }
+        // }
     }
     pub fn new(c:&Config)->Result<Calculator>{
         use crate::timeline::hostile::EnemyPlaceEvent;
+        use crate::unit::enemy::Enemy;
         let mut event_vec = Vec::<Box::<dyn Event>>::new(); 
         let mut time_line = VecDeque::<(usize,usize)>::new();        
         let time_remain:i64=c.hostile["time_remain"].as_i64().unwrap();
@@ -73,8 +92,13 @@ impl Calculator{
             let e:EnemyPlaceEvent=serde_json::from_value(v.clone())?;
             event_vec.push(Box::new(e));
         }
+        let mut frame_vec=Vec::<Frame>::new();
+        frame_vec.push(Frame{
+            enemy_position:Vec::<(f64,f64)>::new(),
+            enemy_set:Vec::<Enemy>::new()
+        });
         Ok(Calculator{
-            frame_vec:Vec::<Frame>::new(),
+            frame_vec,
             star:-1,
             time_line,
             event_vec,
@@ -83,13 +107,13 @@ impl Calculator{
         })
     }
     pub fn to_end(&mut self){
-        println!("start");
         while self.next() {
+
         }
+        println!("{:?}",self.frame_vec.last());
     }
 
     // fn enemy_move(&self,f:mut &Frame){
-    //
     // }
 }
 

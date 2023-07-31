@@ -27,6 +27,7 @@ struct Cat{
 //         Box::new(self.clone())
 //     }
 // }
+#[test]
 pub fn fun(){
     // let mut v=Vec::<Box<dyn A>>::new();
     // let c=Cat{v:3};
@@ -50,4 +51,10 @@ pub fn fun(){
     // };
     // let v=Vec::<Box<dyn Event>>::new();
     // v.push(Box::new(e1));
+    let mut a=0;
+    let v = vec![3,2,5,4];
+    for i in 0..v.len(){
+        a+=i;
+        println!("{:?}",v[i]);
+    }
 }
