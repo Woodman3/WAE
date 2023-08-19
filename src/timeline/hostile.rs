@@ -1,3 +1,4 @@
+use std::rc::Rc;
 // use std::collections::HashMap;
 use serde::Deserialize;
 // use serde_json::Value;
@@ -7,14 +8,17 @@ use crate::calculator::Calculator;
 // type Result<T> = std::result::Result<T,Box<dyn std::error::Error>>;
 #[derive(Deserialize,Debug)]
 pub struct EnemyPlaceEvent{
-    enemy_id:u64,
+    enemy_key:String,
     enemy_route:usize
 }
 impl Event for EnemyPlaceEvent{
-    fn happen<'a>(&self,f:&'a mut Frame,c:&'a Calculator) ->&'a Frame{
+    fn happen(&self,f:&mut Frame,c:&Calculator)
+    {
         let (x,y)=c.route[self.enemy_route][0];
-        f.enemy_position.push((x,y));
-        f
+        let mut e=c.enemy_initial.get(self.enemy_key.as_str()).unwrap().clone();
+        e.route=Some(Rc::clone(&c.route[self.enemy_route]));
+        e.location=(x,y);
+        f.enemy_set.push(e);
     }
 }
 

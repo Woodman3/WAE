@@ -1,60 +1,35 @@
-// use crate::timeline::Event;
-// trait A{
-//     fn f(&self);
-//     fn c(&self)->Box<dyn A>;
-// }
-#[derive(Clone)]
-struct Dog{
-    v:i32
-}
-struct Cat{
-    v:i32
-}
+use std::rc::Rc;
+use std::cell::{Cell,RefCell};
+use serde::de::Unexpected::Option;
 
-// impl A for Dog {
-//     fn f(&self){
-//         println!("I'm a Dog ,id {}",self.v);
+// #[derive(Clone)]
+// struct A {
+//     v: Option<Rc<i32>>,
+// }
+// struct B {
+//     v: A,
+//     i: Rc<i32>,
+// }
+// impl B {
+//     pub fn new(i: i32) -> B {
+//         B {
+//             v: A { v: None },
+//             i:Rc::new(i),
+//         }
 //     }
-//     fn c(&self)->Box<dyn A>{
-//         Box::new(self.clone())
+//     pub fn t(&mut self) {
+//         self.v.v = Some(Rc::clone(&self.i));
 //     }
 // }
-// impl A for Cat {
-//     fn f(&self){
-//         println!("I'm a Cat ,id {}",self.v);
-//     }
-//     fn c(&self)->Box<dyn A>{
-//         Box::new(self.clone())
-//     }
-// }
-#[test]
-pub fn fun(){
-    // let mut v=Vec::<Box<dyn A>>::new();
-    // let c=Cat{v:3};
-    // v.push(Box::new(d));
-    // v.push(Box::new(c));
-    // if let Some(e)=v.last(){
-    //     let f =e.c();
-    //     v.push(f);
-    // }
-    // for a in &v{
-    //     a.f();
-    // }
-    // for a in v.iter(){
-    //     // a.f();
-    //     println!("{}",a.v);
-    // }
-
-    // let e1=crate::timeline::hostile::EnemyPlaceEvent{
-    //     enemy_id:32,
-    //     enemy_route:26
-    // };
-    // let v=Vec::<Box<dyn Event>>::new();
-    // v.push(Box::new(e1));
-    let mut a=0;
-    let v = vec![3,2,5,4];
-    for i in 0..v.len(){
-        a+=i;
-        println!("{:?}",v[i]);
+pub fn fun() {
+    use std::option::Option;
+    let a=Rc::new(vec![1,2,3]);
+    let b=Some(Rc::clone(&a));
+    // let b:Option<Rc::<Vec::<i32>>>=None;
+    if let Some(ve)=b{
+        if let Some(v) = ve.get(1){
+            println!("{v}");
+        }
     }
+
 }

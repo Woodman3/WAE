@@ -2,9 +2,9 @@ pub mod enemy;
 use serde::{Serialize,Deserialize};
 #[derive(Debug,Clone,Serialize,Deserialize)]
 pub struct UnitInfo {
+    name:String,
     attack_type:String,
     health:i64,
-    // move_speed:u64,
     attack_speed:i64,
     damage:i64,
     armor:i64,

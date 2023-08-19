@@ -1,3 +1,7 @@
+use std::error::Error;
+use std::fs::File;
+use std::io::BufReader;
+use std::path::Path;
 use serde_json::Value;
 use serde::Deserialize;
 
@@ -21,12 +25,19 @@ pub fn construct_info_from_json<T:for<'a> Deserialize<'a>>(json_path:&str,point:
 }
 #[derive(Debug)]
 pub struct Config{
-    pub hostile:Value
+    pub hostile:Value,
+    pub enemy:Value
 }
 impl Config{
-    pub fn new(json_path:&str)->Result<Config>{
-        let content:String = std::fs::read_to_string(json_path.to_owned()+"hostile.json")?;
-        let binding = serde_json::from_str::<Value>(&content)?;
-        Ok(Config{hostile:binding})
+    pub fn new<P:AsRef<Path>>(path:P)->Result<Config>{
+        let file = File::open(path.as_ref().join("hostile.json"))?;
+        let reader = BufReader::new(file);
+        let hostile=serde_json::from_reader(reader)?;
+        let file = File::open(path.as_ref().join("enemy.json"))?;
+        let reader = BufReader::new(file);
+        let enemy=serde_json::from_reader(reader)?;
+        // let content:String = std::fs::read_to_string(json_path.to_owned()+"hostile.json")?;
+        // let hostile_binding = serde_json::from_str::<Value>(&content)?;
+        Ok(Config{hostile,enemy})
     }
 }
