@@ -1,6 +1,7 @@
 use serde_json::Value;
 use std::rc::Rc;
 use std::fmt;
+use crate::utils::math;
 #[derive(Debug,Clone)]
 pub struct Enemy{
     info:super::UnitInfo,
@@ -40,6 +41,7 @@ impl Enemy {
             }
         }
     }
+
 }
 
 impl fmt::Display for Enemy{

@@ -4,6 +4,8 @@ use crate::utils::config::Config;
 use crate::unit;
 use std::collections::{VecDeque,HashMap};
 use std::rc::Rc;
+use log::trace;
+
 type Result<T> = std::result::Result<T,Box<dyn std::error::Error>>;
 /// calculate
 #[derive(Debug)]
@@ -92,8 +94,8 @@ impl Calculator{
     pub fn to_end(&mut self){
         while self.next() {
             if let Some(f)=self.frame_vec.last(){
-                println!("{}",f);
-
+                // println!("{}",f);
+                trace!("{}",f);
             }
         }
     }

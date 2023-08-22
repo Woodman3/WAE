@@ -1,4 +1,6 @@
 pub mod config;
+pub mod math;
+use std::ops::{Add, Mul, Sub};
 
 pub fn get_short_type_name<'a, T>()->&'a str{
     let tn=std::any::type_name::<T>();
@@ -10,3 +12,5 @@ pub fn get_short_type_name<'a, T>()->&'a str{
     } 
     tn 
 }
+
+

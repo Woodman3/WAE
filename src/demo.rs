@@ -1,7 +1,7 @@
 use std::rc::Rc;
 use std::cell::{Cell,RefCell};
 use serde::de::Unexpected::Option;
-
+use std::ops;
 // #[derive(Clone)]
 // struct A {
 //     v: Option<Rc<i32>>,
@@ -21,15 +21,20 @@ use serde::de::Unexpected::Option;
 //         self.v.v = Some(Rc::clone(&self.i));
 //     }
 // }
-pub fn fun() {
-    use std::option::Option;
-    let a=Rc::new(vec![1,2,3]);
-    let b=Some(Rc::clone(&a));
-    // let b:Option<Rc::<Vec::<i32>>>=None;
-    if let Some(ve)=b{
-        if let Some(v) = ve.get(1){
-            println!("{v}");
-        }
-    }
 
+pub fn fun() {
+    // use std::option::Option;
+    // let a=Rc::new(vec![1,2,3]);
+    // let b=Some(Rc::clone(&a));
+    // // let b:Option<Rc::<Vec::<i32>>>=None;
+    // if let Some(ve)=b{
+    //     if let Some(v) = ve.get(1){
+    //         println!("{v}");
+    //     }
+    // }
+    // let a=(1,3);
+    // // let c:(i32)=(1);
+    // let b=(3,4);
+    // let c=mul2d!(a,b);
+    // println!("{:?}",c);
 }

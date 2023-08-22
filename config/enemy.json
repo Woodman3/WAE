@@ -1,6 +1,6 @@
 {
   "Dog":{
-    "move_speed":100,
+    "move_speed":1,
     "UnitInfo":{
       "name": "Dog",
       "attack_type":"Magic",
@@ -12,7 +12,7 @@
     }
   },
   "Slug":{
-    "move_speed":100,
+    "move_speed":0.5,
     "UnitInfo":{
       "name": "Slug",
       "attack_type":"Magic",

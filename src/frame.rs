@@ -12,8 +12,6 @@ impl Frame {
     pub fn step(&mut self,t:f64){
         for mut e in self.enemy_set.iter_mut(){
             e.calculate_vector();
-        }
-        for mut e in self.enemy_set.iter_mut(){
             e.step(t)
         }
     }
