@@ -32,9 +32,15 @@ pub fn fun() {
     //         println!("{v}");
     //     }
     // }
-    // let a=(1,3);
-    // // let c:(i32)=(1);
-    // let b=(3,4);
-    // let c=mul2d!(a,b);
-    // println!("{:?}",c);
+    let mut v=vec![1,2,3];
+    for i in 0..v.len(){
+        if i==1{
+        }
+    }
+    v.remove(0);
+    if let Some(i) = v.get(0){
+        println!("{i}");
+    }else{
+        println!("fuck");
+    }
 }

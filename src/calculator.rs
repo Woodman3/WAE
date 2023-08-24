@@ -47,7 +47,7 @@ impl Calculator{
     pub fn process_frame(&mut self,f: &mut Frame)
     {
         self.event(f);
-        f.step(0.001);
+        f.step(0.1);
     }
     pub fn new(c:&Config)->Result<Calculator>{
         use crate::timeline::hostile::EnemyPlaceEvent;

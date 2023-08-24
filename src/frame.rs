@@ -1,6 +1,7 @@
-use crate::unit::enemy;
 use crate::unit::enemy::Enemy;
+use crate::unit::marco;
 use std::fmt;
+use log::info;
 
 #[derive(Debug,Clone)]
 pub struct Frame{
@@ -10,9 +11,14 @@ pub struct Frame{
 
 impl Frame {
     pub fn step(&mut self,t:f64){
-        for mut e in self.enemy_set.iter_mut(){
-            e.calculate_vector();
-            e.step(t)
+        for mut i in 0..self.enemy_set.len(){
+            self.enemy_set[i].calculate_vector();
+            self.enemy_set[i].step(t);
+            if(self.enemy_set[i].die_code==marco::INTO_END){
+                self.enemy_set.remove(i);
+                info!("An enemy has enter to blue point");
+
+            }
         }
     }
 

@@ -6,10 +6,12 @@ use crate::utils::math;
 pub struct Enemy{
     info:super::UnitInfo,
     pub location:(f64,f64),/// -1 mean haven't place
-    move_speed:u32,
+    pub target:(f64,f64),
+    move_speed:f64,
     component_x:f64,///compoment of vector
     component_y:f64,
     route_stage:usize,
+    pub die_code:u32,/// 0 mean haven't die
     // route:Option<&'a Vec<Vec<(f64,f64)>>>
     pub route:Option<Rc<Vec<(f64,f64)>>>
 }
@@ -17,29 +19,40 @@ pub struct Enemy{
 impl Enemy {
     /// t is 1/fps it mean time interval
     pub fn step(&mut self,t:f64){
-        self.location.0+=self.move_speed as f64 *self.component_x *t;
-        self.location.1+=self.move_speed as f64 *self.component_y *t;
+        let mut new=self.location.clone();
+        new.0+=self.move_speed as f64 *self.component_x *t;
+        new.1+=self.move_speed as f64 *self.component_y *t;
+        let distance = math::distance_from_segment_to_point(&self.location,&new,&self.target);
+        if(distance<=super::marco::MIN_DISTANCE){
+            self.route_stage+=1;
+            if let Some(route) = &self.route{
+                if let Some(target) = route.get(self.route_stage){
+                    self.target=target.clone();
+                }else{
+                    self.die_code=super::marco::INTO_END;
+                }
+            }
+        }
+        self.location=new;
     }
     pub fn new(v:&Value)->Enemy{
         Enemy{
             info:serde_json::from_value::<super::UnitInfo>(v["UnitInfo"].clone()).unwrap(),
-            location:(-1 as f64,-1 as f64),
-            move_speed:serde_json::from_value::<u32>(v["move_speed"].clone()).unwrap(),
+            location:(-1f64,-1f64),
+            target:(-1f64,-1f64),
+            move_speed:serde_json::from_value::<f64>(v["move_speed"].clone()).unwrap(),
             route_stage:1,
-            component_x:0 as f64,
-            component_y:0 as f64,
+            component_x:0f64,
+            component_y:0f64,
+            die_code:0,
             route:None
         }
     }
     pub fn calculate_vector(&mut self){
-        if let Some(route) = &self.route{
-            if let Some((end_x,end_y)) = route.get(self.route_stage){
-                let (delta_x,delta_y)=(self.location.0-end_x,self.location.1-end_y);
-                let theta = delta_y.atan2(delta_x);
-                self.component_x=theta.cos();
-                self.component_y=theta.sin();
-            }
-        }
+        let (delta_x,delta_y)=crate::sub2d!(self.target,self.location);
+        let theta = delta_y.atan2(delta_x);
+        self.component_x=theta.cos();
+        self.component_y=theta.sin();
     }
 
 }
@@ -48,8 +61,10 @@ impl fmt::Display for Enemy{
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f,"\
 location:{},{}
-component_x:{} component_y:{} ",self.location.0,self.location.1,
-        self.component_x,self.component_y)
+component_x:{} component_y:{}
+target:{},{}",self.location.0,self.location.1,
+        self.component_x,self.component_y,
+        self.target.0,self.target.1)
     }
 
 }

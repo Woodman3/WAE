@@ -14,10 +14,10 @@ pub struct EnemyPlaceEvent{
 impl Event for EnemyPlaceEvent{
     fn happen(&self,f:&mut Frame,c:&Calculator)
     {
-        let (x,y)=c.route[self.enemy_route][0];
         let mut e=c.enemy_initial.get(self.enemy_key.as_str()).unwrap().clone();
         e.route=Some(Rc::clone(&c.route[self.enemy_route]));
-        e.location=(x,y);
+        e.location=c.route[self.enemy_route][0];
+        e.target=c.route[self.enemy_route][1];
         f.enemy_set.push(e);
     }
 }

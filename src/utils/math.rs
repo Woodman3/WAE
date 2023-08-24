@@ -1,3 +1,4 @@
+#[macro_export]
 macro_rules! add2d {
     () => {};
     // (($($a:expr),*),($($b:expr),*)) => {
@@ -7,12 +8,14 @@ macro_rules! add2d {
         ($a.0+$b.0,$a.1+$b.1)
     }
 }
+#[macro_export]
 macro_rules! sub2d {
     () => {};
     ($a:expr,$b:expr)=>{
         ($a.0-$b.0,$a.1-$b.1)
     }
 }
+#[macro_export]
 macro_rules! mul2d {
     () => {};
     ($a:expr,$b:expr)=>{
@@ -20,7 +23,7 @@ macro_rules! mul2d {
     }
 }
 ///we define A is start_point,B is end_point,P is target_point in short
-pub fn distance_from_segment_to_point(A:(f64,f64),B:(f64,f64),P:(f64,f64))->f64{
+pub fn distance_from_segment_to_point(A:&(f64,f64),B:&(f64,f64),P:&(f64,f64))->f64{
     let AB =sub2d!(B,A);
     let AP = sub2d!(P,A);
     let r=mul2d!(AB,AP)/mul2d!(AB,AB);
