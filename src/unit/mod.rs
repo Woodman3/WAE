@@ -1,15 +1,16 @@
 pub mod enemy;
-pub mod marco;
-use serde::{Serialize,Deserialize};
-#[derive(Debug,Clone,Serialize,Deserialize)]
+pub mod operator;
+pub mod code;
+use serde::{Deserialize, Serialize};
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UnitInfo {
-    name:String,
-    attack_type:String,
-    health:i64,
-    attack_speed:i64,
-    damage:i64,
-    armor:i64,
-    magic_resist:f64,
+    name: String,
+    attack_type: String,
+    health: i64,
+    attack_speed: i64,
+    damage: i64,
+    armor: i64,
+    magic_resist: f64,
 }
 // #[derive(Debug)]
 // pub enum Attacktype {
@@ -21,7 +22,7 @@ pub struct UnitInfo {
 // #[derive(Debug)]
 // pub struct Enemy {
 //     // info:Info,
-//     pub x:f64, 
+//     pub x:f64,
 //     pub y:f64,
 // }
 // impl Enemy {

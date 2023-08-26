@@ -1,7 +1,8 @@
-use std::rc::Rc;
-use std::cell::{Cell,RefCell};
 use serde::de::Unexpected::Option;
+use std::cell::{Cell, RefCell};
 use std::ops;
+use std::rc::Rc;
+use crate::scope::Scope;
 // #[derive(Clone)]
 // struct A {
 //     v: Option<Rc<i32>>,
@@ -21,7 +22,16 @@ use std::ops;
 //         self.v.v = Some(Rc::clone(&self.i));
 //     }
 // }
+#[derive(Debug)]
+struct A {
+    pub v: i32,
+}
 
+impl A {
+    fn f(&mut self){
+        self.v+=1;
+    }
+}
 pub fn fun() {
     // use std::option::Option;
     // let a=Rc::new(vec![1,2,3]);
@@ -32,15 +42,14 @@ pub fn fun() {
     //         println!("{v}");
     //     }
     // }
-    let mut v=vec![1,2,3];
-    for i in 0..v.len(){
-        if i==1{
+    let mut s = Scope::Rect(vec![(1.0,2.0)]);
+    match &mut s {
+        Scope::Rect(r) => {
+            for (x,y) in r.iter_mut(){
+                std::mem::swap(x,y);
+            }
+            println!("{:?}",r[0]);
         }
-    }
-    v.remove(0);
-    if let Some(i) = v.get(0){
-        println!("{i}");
-    }else{
-        println!("fuck");
+        Scope::Circle(_) => {}
     }
 }
