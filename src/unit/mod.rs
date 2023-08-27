@@ -1,6 +1,8 @@
 pub mod enemy;
 pub mod operator;
 pub mod code;
+pub mod scope;
+
 use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UnitInfo {

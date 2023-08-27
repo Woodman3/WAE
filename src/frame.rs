@@ -1,5 +1,6 @@
 use crate::unit::enemy::Enemy;
 use crate::unit::code;
+use crate::unit::operator::Operator;
 use log::info;
 use std::fmt;
 use crate::calculator::Calculator;
@@ -8,6 +9,8 @@ use crate::calculator::Calculator;
 pub struct Frame {
     pub timestamp: u64,
     pub enemy_set: Vec<Enemy>,
+    pub operator_deploy:Vec<Operator>,
+    pub operator_undeploy:Vec<Operator>,
 }
 
 impl Frame {

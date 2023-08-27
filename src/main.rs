@@ -10,7 +10,6 @@ pub mod frame;
 pub mod timeline;
 pub mod unit;
 pub mod utils;
-mod scope;
 
 fn main() {
     env_logger::init();

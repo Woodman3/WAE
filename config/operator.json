@@ -1,11 +1,18 @@
 {
   "Amiya":{
-    "id":1,
-    "attack_type":"Magic",
-    "health":500,
-    "attack_speed":1,
-    "damage":100,
-    "armor":50,
-    "magic_resist":0.1
+    "UnitInfo":{
+      "name": "Amiya",
+      "attack_type":"Magic",
+      "health":1500,
+      "attack_speed":1,
+      "damage":100,
+      "armor":100,
+      "magic_resist":0.1
+    },
+    "Scope":[
+      [-0.5,1.5,2.5,-1.5],
+      [2.5,0.5,3.5,-0.5]
+    ],
+    "re_deploy":60.0
   }
 }

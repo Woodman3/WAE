@@ -5,6 +5,7 @@ use crate::utils::config::Config;
 use log::trace;
 use std::collections::{HashMap, VecDeque};
 use std::rc::Rc;
+use crate::unit::operator::Operator;
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 /// calculate
@@ -74,6 +75,8 @@ impl Calculator {
         frame_vec.push(Frame {
             timestamp: 0,
             enemy_set: Vec::<Enemy>::new(),
+            operator_deploy:Vec::<Operator>::new(),
+            operator_undeploy:Vec::<Operator>::new(),
         });
         let mut enemy_initial = HashMap::<String, unit::enemy::Enemy>::new();
         for (key, v) in c.enemy.as_object().unwrap() {
