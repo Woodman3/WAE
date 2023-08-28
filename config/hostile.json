@@ -1,11 +1,11 @@
 {
-  "time_remain":720,
-  "event":[
-    {
+  "time_remain":900,
+  "event":{
+    "PlaceDog":{
       "enemy_key":"Dog",
       "enemy_route":0
     }
-  ],
+  },
   "route":[
     [
       [1,0],
@@ -17,6 +17,8 @@
     ]
   ],
   "timeline":[
-    [1,0]
+    [1,"PlaceDog"],
+    [20,"PlaceDog"],
+    [40,"PlaceDog"]
   ]
 }

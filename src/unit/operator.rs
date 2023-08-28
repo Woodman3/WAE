@@ -6,10 +6,10 @@ type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 #[derive(Debug,Clone)]
 pub struct Operator{
     info:super::UnitInfo,
-    location:(u32,u32),
+    pub location:(u32,u32),
     attack_range:Scope,
-    re_deploy:f32,
-    toward:Toward,
+    pub re_deploy:f32,
+    pub toward:Toward,
 }
 
 impl Operator {

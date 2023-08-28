@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use crate::unit::enemy::Enemy;
 use crate::unit::code;
 use crate::unit::operator::Operator;
@@ -9,8 +10,8 @@ use crate::calculator::Calculator;
 pub struct Frame {
     pub timestamp: u64,
     pub enemy_set: Vec<Enemy>,
-    pub operator_deploy:Vec<Operator>,
-    pub operator_undeploy:Vec<Operator>,
+    pub operator_deploy:HashMap<String,Operator>,
+    pub operator_undeploy:HashMap<String,Operator>,
 }
 
 impl Frame {

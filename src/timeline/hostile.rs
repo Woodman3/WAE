@@ -16,8 +16,8 @@ impl Event for EnemyPlaceEvent {
         let mut e = c
             .enemy_initial
             .get(self.enemy_key.as_str())
-            .unwrap()
-            .clone();
+            .cloned()
+            .unwrap();
         e.route = Some(Rc::clone(&c.route[self.enemy_route]));
         e.location = c.route[self.enemy_route][0];
         e.target = c.route[self.enemy_route][1];
