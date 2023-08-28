@@ -2,6 +2,7 @@ use crate::utils::math;
 use serde_json::Value;
 use std::fmt;
 use std::rc::Rc;
+type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 #[derive(Debug, Clone)]
 pub struct Enemy {
     info: super::UnitInfo,
@@ -38,18 +39,18 @@ impl Enemy {
         }
         self.location = new;
     }
-    pub fn new(v: &Value) -> Enemy {
-        Enemy {
-            info: serde_json::from_value::<super::UnitInfo>(v["UnitInfo"].clone()).unwrap(),
+    pub fn new(v: &Value) -> Result<Enemy> {
+        Ok(Enemy {
+            info: serde_json::from_value::<super::UnitInfo>(v["UnitInfo"].clone())?,
             location: (-1f64, -1f64),
             target: (-1f64, -1f64),
-            move_speed: serde_json::from_value::<f64>(v["move_speed"].clone()).unwrap(),
+            move_speed: serde_json::from_value::<f64>(v["move_speed"].clone())?,
             route_stage: 1,
             component_x: 0f64,
             component_y: 0f64,
             die_code: 0,
             route: None,
-        }
+        })
     }
     pub fn calculate_vector(&mut self) {
         let (delta_x, delta_y) = crate::sub2d!(self.target, self.location);

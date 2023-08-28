@@ -30,17 +30,21 @@ pub fn construct_info_from_json<T: for<'a> Deserialize<'a>>(
 pub struct Config {
     pub hostile: Value,
     pub enemy: Value,
+    pub operator :Value,
 }
 impl Config {
     pub fn new<P: AsRef<Path>>(path: P) -> Result<Config> {
-        let file = File::open(path.as_ref().join("hostile.json"))?;
-        let reader = BufReader::new(file);
+        let mut file = File::open(path.as_ref().join("hostile.json"))?;
+        let mut reader = BufReader::new(file);
         let hostile = serde_json::from_reader(reader)?;
-        let file = File::open(path.as_ref().join("enemy.json"))?;
-        let reader = BufReader::new(file);
+        file = File::open(path.as_ref().join("enemy.json"))?;
+        reader = BufReader::new(file);
         let enemy = serde_json::from_reader(reader)?;
+        file = File::open(path.as_ref().join("operator.json"))?;
+        reader = BufReader::new(file);
+        let operator= serde_json::from_reader(reader)?;
         // let content:String = std::fs::read_to_string(json_path.to_owned()+"hostile.json")?;
         // let hostile_binding = serde_json::from_str::<Value>(&content)?;
-        Ok(Config { hostile, enemy })
+        Ok(Config { hostile, enemy,operator })
     }
 }

@@ -1,10 +1,11 @@
 use std::mem::swap;
 
-#[derive(Clone)]
+#[derive(Clone,Debug)]
 pub enum Scope{
     Rect(Vec<((f64,f64),(f64,f64))>),//from left-up to right-down,the default toward is East
     Circle((f64,f64,f64))//first and second is coordinate of circle ,third is radius
 }
+#[derive(Debug,Clone)]
 pub enum Toward{
     North,
     South,

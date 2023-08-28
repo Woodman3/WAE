@@ -1,11 +1,12 @@
 use crate::frame::Frame;
 use crate::timeline::Event;
 use crate::unit;
+use crate::unit::operator::Operator;
 use crate::utils::config::Config;
 use log::trace;
+use serde_json::from_value;
 use std::collections::{HashMap, VecDeque};
 use std::rc::Rc;
-use crate::unit::operator::Operator;
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 /// calculate
@@ -46,20 +47,21 @@ impl Calculator {
     }
     pub fn process_frame(&mut self, f: &mut Frame) {
         self.event(f);
-        f.step(self,0.01);
+        f.step(self, 0.01);
     }
     pub fn new(c: &Config) -> Result<Calculator> {
         use crate::timeline::hostile::EnemyPlaceEvent;
         use crate::unit::enemy::Enemy;
+        use serde_json::from_value;
         let mut event_vec = Vec::<Box<dyn Event>>::new();
         let mut time_line = VecDeque::<(usize, usize)>::new();
-        let time_remain: i64 = c.hostile["time_remain"].as_i64().unwrap();
+        let time_remain: i64 = from_value(c.hostile["time_remain"].clone())?;
         let mut route = Vec::<Rc<Vec<(f64, f64)>>>::new();
-        let temp: Vec<Vec<u64>> = serde_json::from_value(c.hostile["timeline"].clone()).unwrap();
+        let temp: Vec<Vec<u64>> = from_value(c.hostile["timeline"].clone())?;
         for v in temp {
             time_line.push_back((v[0] as usize, v[1] as usize));
         }
-        let temp: Vec<Vec<Vec<f64>>> = serde_json::from_value(c.hostile["route"].clone()).unwrap();
+        let temp: Vec<Vec<Vec<f64>>> = from_value(c.hostile["route"].clone())?;
         for v in temp {
             let mut r = Vec::<(f64, f64)>::new();
             for c in v {
@@ -68,19 +70,23 @@ impl Calculator {
             route.push(Rc::new(r));
         }
         for v in c.hostile["event"].as_array().unwrap() {
-            let e: EnemyPlaceEvent = serde_json::from_value(v.clone())?;
+            let e: EnemyPlaceEvent = from_value(v.clone())?;
             event_vec.push(Box::new(e));
         }
         let mut frame_vec = Vec::<Frame>::new();
+        let mut operator_deploy = HashMap::<String, Operator>::new();
+        for (key, v) in c.operator.as_object().unwrap() {
+            operator_deploy.insert(key.clone(), Operator::new(v)?);
+        }
         frame_vec.push(Frame {
             timestamp: 0,
             enemy_set: Vec::<Enemy>::new(),
-            operator_deploy:Vec::<Operator>::new(),
-            operator_undeploy:Vec::<Operator>::new(),
+            operator_deploy: Vec::<Operator>::new(),
+            operator_undeploy: Vec::<Operator>::new(),
         });
         let mut enemy_initial = HashMap::<String, unit::enemy::Enemy>::new();
         for (key, v) in c.enemy.as_object().unwrap() {
-            enemy_initial.insert(key.clone(), Enemy::new(v));
+            enemy_initial.insert(key.clone(), Enemy::new(v)?);
         }
         Ok(Calculator {
             frame_vec,
@@ -96,9 +102,10 @@ impl Calculator {
         while self.next() {
             if let Some(f) = self.frame_vec.last() {
                 // println!("{}",f);
-                trace!("{}", f);
+                trace!("{:?}", f.operator_undeploy);
             }
         }
+
     }
     /// an event is place event or enemy comeout or something happen like fire rain
     /// mosttime is happen in an specify time but sometime it happen after somethine has happen

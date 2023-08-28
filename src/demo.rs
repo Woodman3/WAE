@@ -42,7 +42,7 @@ pub fn fun() {
     //         println!("{v}");
     //     }
     // }
-    let mut s = Scope::Rect(vec![(1.0,2.0)]);
+    let mut s = Scope::Rect(vec![((1.2,1.3),(2.3,4.2))]);
     match &mut s {
         Scope::Rect(r) => {
             for (x,y) in r.iter_mut(){
