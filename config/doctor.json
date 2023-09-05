@@ -1,5 +1,17 @@
 {
   "event": {
+    "DeployAmiya": {
+      "operator_key": "Amiya",
+      "location": [1,2],
+      "toward": "South"
+    },
+    "RetreatAmiya": {
+      "operator_key": "Amiya"
+    }
 
-  }
+  },
+  "timeline": [
+    [10,"Deploy","Amiya",1,2,"South"],
+    [30,"Retreat","Amiya"]
+  ]
 }

@@ -1,5 +1,5 @@
 {
-  "time_remain":900,
+  "time_remain":50,
   "event":{
     "PlaceDog":{
       "enemy_key":"Dog",
@@ -17,8 +17,8 @@
     ]
   ],
   "timeline":[
-    [1,"PlaceDog"],
-    [20,"PlaceDog"],
-    [40,"PlaceDog"]
+    [1,"Place","Dog",0],
+    [20,"Place","Dog",0],
+    [40,"Place","Dog",0]
   ]
 }

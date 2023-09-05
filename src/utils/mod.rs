@@ -1,5 +1,6 @@
 pub mod config;
 pub mod math;
+pub mod error;
 use std::ops::{Add, Mul, Sub};
 
 pub fn get_short_type_name<'a, T>() -> &'a str {

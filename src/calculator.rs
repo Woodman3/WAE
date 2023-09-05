@@ -1,13 +1,15 @@
 use crate::frame::Frame;
-use crate::timeline::Event;
+use crate::timeline::{Event,EventWithTime, read_doctor_timeline};
 use crate::unit;
 use crate::unit::operator::Operator;
 use crate::utils::config::Config;
-use log::{trace, warn};
+use log::{info, trace, warn};
 use serde_json::from_value;
 use std::collections::{HashMap, VecDeque};
+use std::fs::read;
 use std::mem::forget;
 use std::rc::Rc;
+use crate::timeline::doctor::OperatorDeployEvent;
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 /// calculate
@@ -19,8 +21,8 @@ pub struct Calculator {
     star: i8,
     /// first element refer to time
     /// second element refer to event vector
-    time_line: VecDeque<(u64,String)>,
-    event_set: HashMap<String,Box<dyn Event>>,
+    time_line: VecDeque<EventWithTime>,
+    event_set: Vec<Rc<dyn Event>>,
     pub route: Vec<Rc<Vec<(f64, f64)>>>,
     time_remain: i64,
     pub enemy_initial: HashMap<String, unit::enemy::Enemy>,
@@ -54,14 +56,12 @@ impl Calculator {
         use crate::timeline::hostile::EnemyPlaceEvent;
         use crate::unit::enemy::Enemy;
         use serde_json::from_value;
-        let mut event_set = HashMap::<String,Box<dyn Event>>::new();
-        let mut time_line = VecDeque::<(u64, String)>::new();
+        let (mut time_line,event_set)=read_doctor_timeline(c)?;
+        time_line.make_contiguous().sort_by(|a,b|{
+            a.time_stamp.cmp(&b.time_stamp)
+        });
         let time_remain: i64 = from_value(c.hostile["time_remain"].clone())?;
         let mut route = Vec::<Rc<Vec<(f64, f64)>>>::new();
-        // let temp: Vec<Vec<u64>> = from_value(c.hostile["timeline"].clone())?;
-        for v in c.hostile["timeline"].as_array().unwrap() {
-            time_line.push_back((from_value::<u64>(v[0].clone())?, from_value::<String>(v[1].clone())?));
-        }
         let temp: Vec<Vec<Vec<f64>>> = from_value(c.hostile["route"].clone())?;
         for v in temp {
             let mut r = Vec::<(f64, f64)>::new();
@@ -70,10 +70,7 @@ impl Calculator {
             }
             route.push(Rc::new(r));
         }
-        for (k,v) in c.hostile["event"].as_object().unwrap() {
-            let e: EnemyPlaceEvent = from_value(v.clone())?;
-            event_set.insert(k.clone(),Box::new(e));
-        }
+        let t=read_doctor_timeline(c).unwrap();
         let mut frame_vec = Vec::<Frame>::new();
         let mut operator_undeploy = HashMap::<String, Operator>::new();
         for (key, v) in c.operator.as_object().unwrap() {
@@ -114,9 +111,9 @@ impl Calculator {
     fn event(&mut self, f: &mut Frame) {
         let time_stamp = f.timestamp;
         while self.time_line.len() != 0 {
-            if let Some((time, e)) = self.time_line.front() {
-                if *time != time_stamp {
-                    if *time < time_stamp {
+            if let Some(et) = self.time_line.front() {
+                if et.time_stamp != time_stamp {
+                    if et.time_stamp < time_stamp {
                         warn!("Some event not happened before,this event has drop");
                         self.time_line.pop_front();
                         continue;
@@ -124,7 +121,7 @@ impl Calculator {
                         break;
                     }
                 } else {
-                    self.event_set[e].happen(f, self);
+                    et.e.happen(f, self);
                     self.time_line.pop_front();
                 }
             }

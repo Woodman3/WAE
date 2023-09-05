@@ -1,12 +1,13 @@
 use std::rc::Rc;
 // use std::collections::HashMap;
-use serde::Deserialize;
+use serde_json::Value;
 // use serde_json::Value;
 use super::Event;
 use crate::calculator::Calculator;
 use crate::frame::Frame;
-// type Result<T> = std::result::Result<T,Box<dyn std::error::Error>>;
-#[derive(Deserialize, Debug)]
+use crate::utils::error::ConfigParseError;
+type Result<T> = std::result::Result<T,Box<dyn std::error::Error>>;
+#[derive(Debug)]
 pub struct EnemyPlaceEvent {
     enemy_key: String,
     enemy_route: usize,
@@ -22,6 +23,17 @@ impl Event for EnemyPlaceEvent {
         e.location = c.route[self.enemy_route][0];
         e.target = c.route[self.enemy_route][1];
         f.enemy_set.push(e);
+    }
+}
+
+impl EnemyPlaceEvent{
+    pub fn new(v:&Value)->Result<EnemyPlaceEvent>{
+        let enemy_key=String::from(v[2].as_str().ok_or(ConfigParseError("Enemy key can't translate to str in timeline".into()))?);
+        let enemy_route=v[3].as_u64().ok_or(ConfigParseError("Enemy route can't translate to u64 in timeline".into()))? as usize;
+        Ok(EnemyPlaceEvent{
+            enemy_key,
+            enemy_route
+        })
     }
 }
 
