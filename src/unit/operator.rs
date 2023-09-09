@@ -28,5 +28,4 @@ impl Operator {
             toward:Toward::East,
         })
     }
-
 }

@@ -10,17 +10,13 @@ pub mod frame;
 pub mod timeline;
 pub mod unit;
 pub mod utils;
+mod map;
 
 fn main() {
     env_logger::init();
-    // demo::fun();
+    demo::fun();
     // let c=utils::config::Config::new("/home/archer/workspace/BEC/config/").unwrap();
     let c=utils::config::Config::new("C:/Users/Aureliano/workspace/BEC/config").unwrap();
     let mut Ca = calculator::Calculator::new(&c).unwrap();
     Ca.to_end();
-    // for v in c.hostile["timeline"].as_array().unwrap() {
-    //     println!("{:?}",serde_json::from_value::<u64>(v[0].clone()).unwrap());
-    //
-    // }
-    // println!("{:?}",c.hostile["timeline"]);
 }

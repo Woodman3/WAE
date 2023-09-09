@@ -1,37 +1,42 @@
+use std::cell::RefCell;
 use std::collections::HashMap;
 use crate::unit::enemy::Enemy;
 use crate::unit::code;
 use crate::unit::operator::Operator;
-use log::info;
+use log::{info, trace};
 use std::fmt;
+use std::rc::Rc;
 use crate::calculator::Calculator;
-
-#[derive(Debug, Clone)]
+use crate::map;
+#[derive(Debug)]
 pub struct Frame {
     pub timestamp: u64,
-    pub enemy_set: Vec<Enemy>,
+    pub enemy_set: Vec<Rc<RefCell<Enemy>>>,
     pub operator_deploy:HashMap<String,Operator>,
     pub operator_undeploy:HashMap<String,Operator>,
+    pub map:map::Map,
 }
 
 impl Frame {
     pub fn step(&mut self,c:&mut Calculator, t: f64) {
-        // for mut i in 0..self.enemy_set.len() {
-        //     self.enemy_set[i].calculate_vector();
-        //     self.enemy_set[i].step(t);
-        //     if (self.enemy_set[i].die_code == marco::INTO_END) {
-        //         info!("An enemy has enter to blue point");
-        //     }
-        // }
-        self.enemy_set.iter_mut().for_each(|e| {
-            e.calculate_vector();
-            e.step(t);
-            if (e.die_code == code::INTO_END) {
+        for mut e in &self.enemy_set {
+            let mut eb=e.borrow_mut();
+            eb.calculate_vector();
+            eb.step(t);
+            if eb.die_code == code::INTO_END {
                 info!("An enemy has enter to blue point");
             }
         }
-        );
-        self.enemy_set.retain(|e| e.die_code!=code::INTO_END);
+        // self.enemy_set.iter_mut().for_each(|e| {
+        //     e.calculate_vector();
+        //     e.step(t);
+        //     if (e.die_code == code::INTO_END) {
+        //         info!("An enemy has enter to blue point");
+        //     }
+        // }
+        // );
+        self.enemy_set.retain(|e| e.borrow().die_code!=code::INTO_END);
+        self.map.update_enemy_map(self.enemy_set.clone());
     }
 }
 
@@ -47,8 +52,23 @@ enemy info:",
             enemy_len = self.enemy_set.len()
         )?;
         for e in self.enemy_set.iter() {
-            writeln!(f, "{}", e)?;
+            writeln!(f, "{}", e.borrow())?;
         }
         write!(f, "")
+    }
+}
+impl Clone for Frame{
+    fn clone(&self) -> Self {
+        let mut enemy_set=Vec::<Rc<RefCell<Enemy>>>::new();
+        for e in &self.enemy_set{
+            enemy_set.push(Rc::new(RefCell::clone(&e)));
+        }
+        Frame{
+            timestamp:self.timestamp,
+            enemy_set,
+            operator_deploy:self.operator_deploy.clone(),
+            operator_undeploy:self.operator_undeploy.clone(),
+            map:self.map.clone()
+        }
     }
 }

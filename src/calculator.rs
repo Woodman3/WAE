@@ -1,21 +1,25 @@
+use std::cell::RefCell;
 use crate::frame::Frame;
 use crate::timeline::{Event,EventWithTime, read_doctor_timeline};
 use crate::unit;
 use crate::unit::operator::Operator;
 use crate::utils::config::Config;
+use crate::map;
 use log::{info, trace, warn};
 use serde_json::from_value;
 use std::collections::{HashMap, VecDeque};
 use std::fs::read;
 use std::mem::forget;
 use std::rc::Rc;
+use serde::de::Unexpected::Map;
 use crate::timeline::doctor::OperatorDeployEvent;
+use crate::unit::enemy::Enemy;
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 /// calculate
 #[derive(Debug)]
 pub struct Calculator {
-    frame_vec: Vec<Frame>,
+    pub frame_vec: Vec<Frame>,
     /// star in the battle we will get
     /// -1 mean battle haven't end
     star: i8,
@@ -25,11 +29,11 @@ pub struct Calculator {
     event_set: Vec<Rc<dyn Event>>,
     pub route: Vec<Rc<Vec<(f64, f64)>>>,
     time_remain: i64,
-    pub enemy_initial: HashMap<String, unit::enemy::Enemy>,
+    pub enemy_initial: HashMap<String, Enemy>,
 }
 
 impl Calculator {
-    fn next(&mut self) -> bool {
+    pub fn next(&mut self) -> bool {
         if self.star != -1 {
             return false;
         }
@@ -78,9 +82,10 @@ impl Calculator {
         }
         frame_vec.push(Frame {
             timestamp: 0,
-            enemy_set: Vec::<Enemy>::new(),
+            enemy_set: Vec::<Rc::<RefCell::<Enemy>>>::new(),
             operator_deploy: HashMap::<String,Operator>::new(),
             operator_undeploy,
+            map:map::Map::new(&c.map)?,
         });
         let mut enemy_initial = HashMap::<String, unit::enemy::Enemy>::new();
         for (key, v) in c.enemy.as_object().unwrap() {
@@ -99,8 +104,7 @@ impl Calculator {
     pub fn to_end(&mut self) {
         while self.next() {
             if let Some(f) = self.frame_vec.last() {
-                // println!("{}",f);
-                trace!("{}", f);
+                // trace!("{}", f);
             }
         }
 

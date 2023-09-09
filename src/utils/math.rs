@@ -1,3 +1,4 @@
+use std::ops::{Add, Mul, Sub};
 #[macro_export]
 macro_rules! add2d {
     () => {};
@@ -37,4 +38,15 @@ pub fn distance_from_segment_to_point(A: &(f64, f64), B: &(f64, f64), P: &(f64, 
         let AC = (r * AB.0, r * AB.1);
         mul2d!(AC, AC).sqrt()
     }
+}
+
+pub fn distance_p2p<T,T2>(A:&(T,T),B:&(T2,T2))->f64
+where  T:Into<f64>+Copy,
+       T2:Into<f64>+Copy
+{
+    let a=(A.0.into(),A.1.into());
+    let b=(B.0.into(),B.1.into());
+    let AB=sub2d!(b,a);
+    let d=mul2d!(AB,AB);
+    d.sqrt()
 }

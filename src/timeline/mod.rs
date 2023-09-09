@@ -23,20 +23,6 @@ pub struct EventWithTime{
     pub e:Rc<dyn Event>
 }
 
-// pub fn new_event_set(c:&Config)->Result<HashMap<String,Box<dyn Event>>>{
-//     use hostile::EnemyPlaceEvent;
-//     let mut event_set = HashMap::<String,Box<dyn Event>>::new();
-//     for (k,v) in c.hostile["event"].as_object().unwrap() {
-//         let e: EnemyPlaceEvent = from_value(v.clone())?;
-//         event_set.insert(k.clone(),Box::new(e));
-//     }
-//     for (k,v) in c.doctor["event"].as_object().unwrap() {
-//         let e: OperatorDeployEvent = OperatorDeployEvent::new(v)?;
-//         event_set.insert(k.clone(),Box::new(e));
-//     }
-//     Ok(event_set)
-// }
-
 pub fn read_doctor_timeline(c:&Config)->Result<(VecDeque<EventWithTime>,Vec<Rc<dyn Event>>)>{
     use crate::unit::scope::Toward;
     let mut time_line = VecDeque::<EventWithTime>::new();

@@ -1,7 +1,9 @@
+use std::cell::{Ref, RefCell};
 use std::rc::Rc;
 use serde_json::Value::String;
 use crate::utils::error;
 use crate::utils::error::{ConfigParseError};
+use crate::utils::math::distance_p2p;
 
 struct A{
     v:i32,
@@ -12,16 +14,9 @@ impl A {
 }
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 pub fn fun(){
-    // use std::option::Option;
-    // let a=Rc::new(vec![1,2,3]);
-    // let b=Some(Rc::clone(&a));
-    // // let b:Option<Rc::<Vec::<i32>>>=None;
-    // if let Some(ve)=b{
-    //     if let Some(v) = ve.get(1){
-    //         println!("{v}");
-    //     }
-    // }
-    let mut a1=A{v:2};
-    let a2=Rc::new(&a1);
-    println!("{},{}",a1.v,a2.v);
+    // let mut a=Rc::new(RefCell::new(3));
+    // let a=Rc::new(RefCell::new(3));
+    // let b=Rc::new(RefCell::clone(&a));
+    // *a.borrow_mut()=4;
+    // println!("{}",b.borrow());
 }

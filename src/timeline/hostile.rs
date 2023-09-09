@@ -1,3 +1,4 @@
+use std::cell::{Ref, RefCell};
 use std::rc::Rc;
 // use std::collections::HashMap;
 use serde_json::Value;
@@ -22,7 +23,7 @@ impl Event for EnemyPlaceEvent {
         e.route = Some(Rc::clone(&c.route[self.enemy_route]));
         e.location = c.route[self.enemy_route][0];
         e.target = c.route[self.enemy_route][1];
-        f.enemy_set.push(e);
+        f.enemy_set.push(Rc::new(RefCell::new(e)));
     }
 }
 
