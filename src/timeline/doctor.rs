@@ -4,7 +4,7 @@ use super::Event;
 use crate::calculator::Calculator;
 use crate::frame::Frame;
 use crate::unit::operator::Operator;
-use crate::unit::scope::Toward;
+use crate::unit::scope::{Scope, Toward};
 use crate::utils::error::ConfigParseError;
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 #[derive(Debug,Clone)]
@@ -21,20 +21,6 @@ pub struct OperatorRetreatEvent{
 impl OperatorDeployEvent{
     pub fn new(v:&Value)->Result<OperatorDeployEvent>{
         use serde_json::from_value;
-        // let location:(u32,u32)=(from_value::<u32>(v["location"][0].clone())?,from_value::<u32>(v["location"][1].clone())?);
-        // let t =from_value::<String>(v["toward"].clone())?;
-        // let toward = match t.as_str() {
-        //     "South" => {Toward::South}
-        //     "West" =>{Toward::West}
-        //     "North" => {Toward::North}
-        //     "East" => {Toward::East}
-        //     _ => {Toward::East}
-        // };
-        // Ok(OperatorDeployEvent{
-        //     operator_key:from_value(v["operator_key"].clone())?,
-        //     location,
-        //     toward
-        // })
         let location:(u32,u32)=(from_value::<u32>(v[3].clone())?,from_value::<u32>(v[4].clone())?);
         let t =from_value::<String>(v[5].clone())?;
         let toward = match t.as_str() {
@@ -55,8 +41,10 @@ impl OperatorDeployEvent{
 impl Event for OperatorDeployEvent {
     fn happen(&self, f: &mut Frame, c: &Calculator) {
         let mut o :Operator=f.operator_undeploy.remove(&self.operator_key).unwrap();
-        o.toward=self.toward.clone();
         o.location=self.location;
+        let width=f.map.width;
+        let heigh = f.map.height;
+
         f.operator_deploy.insert(self.operator_key.clone(),o);
     }
 }
