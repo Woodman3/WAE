@@ -37,6 +37,9 @@ impl Frame {
         // );
         self.enemy_set.retain(|e| e.borrow().die_code!=code::INTO_END);
         self.map.update_enemy_map(self.enemy_set.clone());
+        for o in self.operator_deploy.iter_mut(){
+            o.1.search(&self.map,self.timestamp);
+        }
     }
 }
 

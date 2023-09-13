@@ -1,3 +1,4 @@
+use std::cell::RefCell;
 use crate::utils::math;
 use serde_json::Value;
 use std::fmt;
@@ -18,6 +19,11 @@ pub struct Enemy {
     /// 0 mean haven't die
     // route:Option<&'a Vec<Vec<(f64,f64)>>>
     pub route: Option<Rc<Vec<(f64, f64)>>>,
+}
+#[derive(Debug)]
+pub struct EnemyWithPriority{
+    pub enemy:Rc<RefCell<Enemy>>,
+    pub time_stamp:u64,
 }
 
 impl Enemy {

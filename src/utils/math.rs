@@ -1,10 +1,61 @@
 use std::ops::{Add, Mul, Sub};
+pub struct Point{
+    x:f64,
+    y:f64
+}
+#[derive(Clone,Debug)]
+pub struct Grid{
+    pub row:i64,
+    pub col:i64
+}
+#[derive(Clone,Debug)]
+pub struct GridRect {
+    pub ul:Grid,
+    pub dr:Grid
+}
+
+impl From<(i64,i64)> for Grid{
+    fn from(value: (i64, i64)) -> Self {
+        Grid{row:value.0,col:value.1}
+    }
+}
+
+impl From<(Grid, Grid)> for GridRect {
+    fn from(value: (Grid, Grid)) -> Self {
+        GridRect{
+            ul:value.0,
+            dr:value.1
+        }
+    }
+}
+impl From<(i64,i64,i64,i64)> for GridRect{
+    fn from(value: (i64, i64, i64, i64)) -> Self {
+        GridRect{
+            ul:Grid::from((value.0,value.1)),
+            dr:Grid::from((value.2,value.3))
+        }
+    }
+}
+
+impl Into<(i64,i64)> for Grid{
+    fn into(self) -> (i64, i64) {
+        (self.row,self.col)
+    }
+}
+impl Into<(Grid,Grid)> for GridRect{
+    fn into(self) -> (Grid, Grid) {
+        (self.ul,self.dr)
+    }
+}
+impl Into<(i64,i64,i64,i64)> for GridRect{
+    fn into(self) -> (i64, i64, i64, i64) {
+        (self.ul.row,self.ul.col,self.dr.row,self.dr.col)
+    }
+}
+
 #[macro_export]
 macro_rules! add2d {
     () => {};
-    // (($($a:expr),*),($($b:expr),*)) => {
-    //    ($($a+$b),*)
-    // };
     ($a:expr,$b:expr) => {
         ($a.0 + $b.0, $a.1 + $b.1)
     };

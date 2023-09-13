@@ -104,7 +104,9 @@ impl Calculator {
     pub fn to_end(&mut self) {
         while self.next() {
             if let Some(f) = self.frame_vec.last() {
-                // trace!("{}", f);
+                if f.timestamp%10==0{
+                    trace!("{}", f);
+                }
             }
         }
 

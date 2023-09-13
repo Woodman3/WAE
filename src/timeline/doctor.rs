@@ -46,6 +46,7 @@ impl Event for OperatorDeployEvent {
         let width=f.map.width;
         let heigh = f.map.height;
         o.search_scope=o.attack_scope.clone();
+        o.search_scope.apply_toward(&self.toward);
         o.search_scope.apply_loc(loc,f.map.width,f.map.height);
         f.operator_deploy.insert(self.operator_key.clone(),o);
     }
