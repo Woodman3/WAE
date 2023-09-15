@@ -31,7 +31,7 @@ impl Map {
     pub fn update_enemy_map(&mut self,enemy_set:Vec<Rc<RefCell<Enemy>>>) {
         for er in enemy_set {
             let e = er.borrow();
-            let center = e.location;
+            let center:(f64,f64)= e.location.into();
             let ul = (center.0 as u32, center.1 as u32);
             // no boundary check because enemy location might be legal
             let ur = (ul.0, ul.1 + 1);

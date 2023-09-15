@@ -2,8 +2,12 @@ pub mod enemy;
 pub mod operator;
 pub mod code;
 pub mod scope;
+mod bullet;
 
+use std::fmt::Debug;
 use serde::{Deserialize, Serialize};
+use crate::utils::math::Point;
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UnitInfo {
     name: String,
@@ -14,6 +18,10 @@ pub struct UnitInfo {
     armor: i64,
     magic_resist: f64,
 }
+
+pub trait Unit:Debug{
+    fn get_loc(&self)->Point;
+}
 // #[derive(Debug)]
 // pub enum Attacktype {
 //     Physical,
@@ -21,37 +29,4 @@ pub struct UnitInfo {
 //     Real,
 // }
 
-// #[derive(Debug)]
-// pub struct Enemy {
-//     // info:Info,
-//     pub x:f64,
-//     pub y:f64,
-// }
-// impl Enemy {
-//     pub fn get_position(&self)->f64 {
-//         self.y
-//     }
-// }
-// #[derive(Debug)]
-// struct Operator {
-//     name:String,
-//     info:EnityInfo,
-//     x:u64,
-//     y:u64,
-// }
-// pub trait Enity {
-//     fn get_position(&self)->f64;
-// }
-// impl Enity for Enemy{
-//     fn get_position(&self)->f64
-//     {
-//         self.x
-//     }
-// }
-// impl Enity for Operator{
-//     fn get_position(&self)->f64
-//     {
-//         self.x
-//     }
-// }
-//
+

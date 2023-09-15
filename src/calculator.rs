@@ -14,6 +14,7 @@ use std::rc::Rc;
 use serde::de::Unexpected::Map;
 use crate::timeline::doctor::OperatorDeployEvent;
 use crate::unit::enemy::Enemy;
+use crate::utils::math::Point;
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 /// calculate
@@ -27,7 +28,7 @@ pub struct Calculator {
     /// second element refer to event vector
     time_line: VecDeque<EventWithTime>,
     event_set: Vec<Rc<dyn Event>>,
-    pub route: Vec<Rc<Vec<(f64, f64)>>>,
+    pub route: Vec<Rc<Vec<Point>>>,
     time_remain: i64,
     pub enemy_initial: HashMap<String, Enemy>,
 }
@@ -65,12 +66,12 @@ impl Calculator {
             a.time_stamp.cmp(&b.time_stamp)
         });
         let time_remain: i64 = from_value(c.hostile["time_remain"].clone())?;
-        let mut route = Vec::<Rc<Vec<(f64, f64)>>>::new();
+        let mut route = Vec::<Rc<Vec<Point>>>::new();
         let temp: Vec<Vec<Vec<f64>>> = from_value(c.hostile["route"].clone())?;
         for v in temp {
-            let mut r = Vec::<(f64, f64)>::new();
+            let mut r = Vec::<Point>::new();
             for c in v {
-                r.push((c[0], c[1]));
+                r.push((c[0], c[1]).into());
             }
             route.push(Rc::new(r));
         }
@@ -134,6 +135,4 @@ impl Calculator {
         }
     }
 
-    // fn enemy_move(&self,f:mut &Frame){
-    // }
 }

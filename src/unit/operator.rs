@@ -50,7 +50,7 @@ impl Operator {
                                 time_stamp
                             }
                         );
-                        info!("in {time_stamp},we have search a enemy")
+                        info!("in {time_stamp},we have search a enemy in :{:?}",e.borrow().location)
                     }
                 }
             }

@@ -1,7 +1,8 @@
 use std::ops::{Add, Mul, Sub};
+#[derive(Clone,Copy,Debug)]
 pub struct Point{
-    x:f64,
-    y:f64
+    pub x:f64,
+    pub y:f64
 }
 #[derive(Clone,Debug)]
 pub struct Grid{
@@ -53,6 +54,38 @@ impl Into<(i64,i64,i64,i64)> for GridRect{
     }
 }
 
+impl Into<(f64,f64)> for Point{
+    fn into(self) -> (f64, f64) {
+        (self.x,self.y)
+    }
+}
+impl From<(f64,f64)> for Point{
+    fn from(value: (f64, f64)) -> Self {
+        Point{x:value.0,y:value.1}
+    }
+}
+impl Add for Point {
+    type Output = Self;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        (self.x+rhs.x,self.y+rhs.y).into()
+    }
+}
+impl Sub for Point {
+    type Output = Self;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        (self.x-rhs.x,self.y-rhs.y).into()
+    }
+}
+
+impl Mul for Point {
+    type Output = f64;
+
+    fn mul(self, rhs: Self) -> Self::Output {
+        self.x*rhs.x+self.y*rhs.y
+    }
+}
 #[macro_export]
 macro_rules! add2d {
     () => {};
@@ -75,19 +108,32 @@ macro_rules! mul2d {
     };
 }
 ///we define A is start_point,B is end_point,P is target_point in short
-pub fn distance_from_segment_to_point(A: &(f64, f64), B: &(f64, f64), P: &(f64, f64)) -> f64 {
-    let AB = sub2d!(B, A);
-    let AP = sub2d!(P, A);
-    let r = mul2d!(AB, AP) / mul2d!(AB, AB);
+pub fn distance_from_segment_to_point(A: Point, B: Point, P: Point) -> f64 {
+    // let AB = sub2d!(B, A);
+    // let AP = sub2d!(P, A);
+    // let r = mul2d!(AB, AP) / mul2d!(AB, AB);
+    // if r >= 1.0 {
+    //     let BP = sub2d!(P, B);
+    //     mul2d!(BP, BP).sqrt()
+    // } else if r <= 0.0 {
+    //     let AP = sub2d!(P, A);
+    //     mul2d!(AP, AP).sqrt()
+    // } else {
+    //     let AC = (r * AB.0, r * AB.1);
+    //     mul2d!(AC, AC).sqrt()
+    // }
+    let AB = B-A;
+    let AP = P-A;
+    let r = (AB*AP)/(AB*AB);
     if r >= 1.0 {
-        let BP = sub2d!(P, B);
-        mul2d!(BP, BP).sqrt()
+        let BP = P-B;
+        (BP*BP).sqrt()
     } else if r <= 0.0 {
-        let AP = sub2d!(P, A);
-        mul2d!(AP, AP).sqrt()
+        let AP = P-A;
+        (AP*AP).sqrt()
     } else {
-        let AC = (r * AB.0, r * AB.1);
-        mul2d!(AC, AC).sqrt()
+        let AC:Point = (r * AB.x, r * AB.y).into();
+        (AC*AC).sqrt()
     }
 }
 
