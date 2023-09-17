@@ -2,10 +2,12 @@ pub mod enemy;
 pub mod operator;
 pub mod code;
 pub mod scope;
-mod bullet;
+pub mod bullet;
 
 use std::fmt::Debug;
 use serde::{Deserialize, Serialize};
+use crate::frame::Frame;
+use crate::unit::bullet::Bullet;
 use crate::utils::math::Point;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -21,6 +23,7 @@ pub struct UnitInfo {
 
 pub trait Unit:Debug{
     fn get_loc(&self)->Point;
+    fn be_hit(&mut self,b:&Bullet,f:&mut Frame);
 }
 // #[derive(Debug)]
 // pub enum Attacktype {

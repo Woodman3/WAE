@@ -9,7 +9,7 @@ use std::rc::Rc;
 
 const ENEMY_TOUCH_SIZE: f64 = 0.3;
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
-#[derive(Debug)]
+#[derive(Debug,Clone)]
 pub struct Map {
     pub width: u32,
     pub height: u32,
@@ -88,10 +88,7 @@ impl Map {
             }
         }
     }
-}
-
-impl Clone for Map {
-    fn clone(&self) -> Self {
+    pub fn deep_clone(&self)->Self{
         let width=self.width;
         let height=self.height;
         let enemy = vec![vec![Vec::<Rc<RefCell<Enemy>>>::new();width as usize];height as usize];

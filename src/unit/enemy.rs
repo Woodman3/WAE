@@ -3,8 +3,10 @@ use crate::utils::math;
 use serde_json::Value;
 use std::fmt;
 use std::rc::Rc;
+use crate::frame::Frame;
+use crate::unit::bullet::Bullet;
 use crate::unit::Unit;
-use crate::utils::math::Point;
+use crate::utils::math::{Point, to_target};
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 #[derive(Debug, Clone)]
@@ -20,7 +22,7 @@ pub struct Enemy {
     /// 0 mean haven't die
     pub route: Option<Rc<Vec<Point>>>,
 }
-#[derive(Debug)]
+#[derive(Debug,Clone)]
 pub struct EnemyWithPriority{
     pub enemy:Rc<RefCell<Enemy>>,
     pub time_stamp:u64,
@@ -29,9 +31,10 @@ pub struct EnemyWithPriority{
 impl Enemy {
     /// t is 1/fps it mean time interval
     pub fn step(&mut self, t: f64) {
-        let mut new = self.location.clone();
-        new.x += self.move_speed * self.direction.x * t;
-        new.y += self.move_speed * self.direction.y * t;
+        // let mut new = self.location.clone();
+        // new.x += self.move_speed * self.direction.x * t;
+        // new.y += self.move_speed * self.direction.y * t;
+        let (direction,new) = to_target(self.location,self.target,self.move_speed,t);
         let distance = math::distance_from_segment_to_point(self.location, new, self.target);
         if (distance <= super::code::MIN_DISTANCE) {
             self.route_stage += 1;
@@ -43,6 +46,7 @@ impl Enemy {
                 }
             }
         }
+        self.direction=direction;
         self.location = new;
     }
     pub fn new(v: &Value) -> Result<Enemy> {
@@ -57,11 +61,11 @@ impl Enemy {
             route: None,
         })
     }
-    pub fn calculate_vector(&mut self) {
-        let delta = self.target-self.location;
-        let theta = delta.y.atan2(delta.x);
-        self.direction=(theta.cos(),theta.sin()).into();
-    }
+    // pub fn calculate_direction(&mut self) {
+    //     let delta = self.target-self.location;
+    //     let theta = delta.y.atan2(delta.x);
+    //     self.direction=(theta.cos(),theta.sin()).into();
+    // }
 }
 
 impl fmt::Display for Enemy {
@@ -86,4 +90,8 @@ impl Unit for Enemy{
     fn get_loc(&self) -> Point {
         self.location
     }
+    fn be_hit(&mut self, b: &Bullet, f: &mut Frame) {
+        
+    }
+         
 }

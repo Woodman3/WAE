@@ -13,6 +13,7 @@ use std::mem::forget;
 use std::rc::Rc;
 use serde::de::Unexpected::Map;
 use crate::timeline::doctor::OperatorDeployEvent;
+use crate::unit::bullet::Bullet;
 use crate::unit::enemy::Enemy;
 use crate::utils::math::Point;
 
@@ -43,8 +44,7 @@ impl Calculator {
             return false;
         }
         self.time_remain -= 1;
-        if let Some(f) = self.frame_vec.last() {
-            let mut f = f.clone();
+        if let Some(mut f) = self.frame_vec.pop() {
             f.timestamp += 1;
             self.process_frame(&mut f);
             self.frame_vec.push(f);
@@ -87,6 +87,7 @@ impl Calculator {
             operator_deploy: HashMap::<String,Operator>::new(),
             operator_undeploy,
             map:map::Map::new(&c.map)?,
+            bullet_set:Vec::<Bullet>::new(),
         });
         let mut enemy_initial = HashMap::<String, unit::enemy::Enemy>::new();
         for (key, v) in c.enemy.as_object().unwrap() {

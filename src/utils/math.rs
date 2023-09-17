@@ -147,3 +147,16 @@ where  T:Into<f64>+Copy,
     let d=mul2d!(AB,AB);
     d.sqrt()
 }
+
+pub fn to_target(location:Point,target:Point,move_speed:f64,t:f64)->(Point,Point){
+    let direction=calculate_direction(target,location);
+    let mut new = location.clone();
+    new.x += move_speed * direction.x * t;
+    new.y += move_speed * direction.y * t;
+    (direction,new)
+}
+fn calculate_direction(target:Point,location:Point)->Point {
+    let delta = target-location;
+    let theta = delta.y.atan2(delta.x);
+    (theta.cos(),theta.sin()).into()
+}

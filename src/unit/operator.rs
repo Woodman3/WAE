@@ -9,7 +9,7 @@ use crate::unit::enemy::{Enemy, EnemyWithPriority};
 use crate::utils::math::GridRect;
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
-#[derive(Debug)]
+#[derive(Debug,Clone)]
 pub struct Operator{
     info:super::UnitInfo,
     pub location:(u32,u32),
@@ -56,10 +56,7 @@ impl Operator {
             }
         }
     }
-}
-
-impl Clone for Operator {
-    fn clone(&self) -> Self {
+    pub fn deep_clone(&self)->Self{
         Operator{
             info:self.info.clone(),
             location:self.location,
