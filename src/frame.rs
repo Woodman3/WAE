@@ -7,6 +7,7 @@ use crate::unit::bullet::Bullet;
 use log::{info, trace};
 use std::fmt;
 use std::rc::Rc;
+use env_logger::builder;
 use crate::calculator::Calculator;
 use crate::map;
 #[derive(Debug,Clone)]
@@ -41,7 +42,23 @@ impl Frame {
         for o in self.operator_deploy.iter_mut(){
             o.1.search(&self.map,self.timestamp);
         }
+        // for b in self.bullet_set.iter_mut(){
+        //     b.step(t);
+        //     if b.distance<= code::BULLET_HIT_DISTANCE{
+        //         b.target.get_mut().be_hit(b,self);
+        //     }
+        // }
+        self.bullet_set.iter_mut().for_each(|b| b.step(t));
+        // let f=|&b| b.distance<=code::BULLET_HIT_DISTANCE;
+        let bv:Vec<Bullet>=self.bullet_set.iter().filter(|&b| b.distance<=code::BULLET_HIT_DISTANCE).cloned().collect();
+        for b in bv{
+            let mut u=b.target.borrow_mut();
+            u.be_hit(&b,self);
+        }
+        self.bullet_set.retain(|b| b.distance>code::BULLET_HIT_DISTANCE);
+
     }
+    // Todo
     pub fn deep_clone(&self)->Self{
         let mut enemy_set=Vec::<Rc<RefCell<Enemy>>>::new();
         for e in &self.enemy_set{

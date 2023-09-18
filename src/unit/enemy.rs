@@ -2,6 +2,7 @@ use std::cell::RefCell;
 use crate::utils::math;
 use serde_json::Value;
 use std::fmt;
+use std::ops::Deref;
 use std::rc::Rc;
 use crate::frame::Frame;
 use crate::unit::bullet::Bullet;
@@ -85,6 +86,7 @@ target:{},{}",
         )
     }
 }
+
 
 impl Unit for Enemy{
     fn get_loc(&self) -> Point {
