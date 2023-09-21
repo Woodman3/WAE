@@ -1,5 +1,5 @@
 {
-  "time_remain":50,
+  "time_remain":100,
   "event":{
     "PlaceDog":{
       "enemy_key":"Dog",

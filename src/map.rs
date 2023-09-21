@@ -29,6 +29,7 @@ impl Map {
         })
     }
     pub fn update_enemy_map(&mut self,enemy_set:Vec<Rc<RefCell<Enemy>>>) {
+        self.enemy.iter_mut().for_each(|v| v.iter_mut().for_each(|v| v.clear()));
         for er in enemy_set {
             let e = er.borrow();
             let center:(f64,f64)= e.location.into();

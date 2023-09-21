@@ -64,6 +64,11 @@ impl From<(f64,f64)> for Point{
         Point{x:value.0,y:value.1}
     }
 }
+impl From<(u32,u32)> for Point{
+    fn from(value: (u32,u32)) -> Self {
+        Point{x:value.0 as f64,y:value.1 as f64}
+    }
+}
 impl Add for Point {
     type Output = Self;
 
@@ -120,7 +125,7 @@ pub fn distance_from_segment_to_point(A: Point, B: Point, P: Point) -> f64 {
     //     mul2d!(AP, AP).sqrt()
     // } else {
     //     let AC = (r * AB.0, r * AB.1);
-    //     mul2d!(AC, AC).sqrt()
+    //     mul2d!(AC, AC).sqrt() // this error!
     // }
     let AB = B-A;
     let AP = P-A;
@@ -133,7 +138,8 @@ pub fn distance_from_segment_to_point(A: Point, B: Point, P: Point) -> f64 {
         (AP*AP).sqrt()
     } else {
         let AC:Point = (r * AB.x, r * AB.y).into();
-        (AC*AC).sqrt()
+        let CP=AP-AC;
+        (CP*CP).sqrt()
     }
 }
 
@@ -148,11 +154,12 @@ where  T:Into<f64>+Copy,
     d.sqrt()
 }
 
-pub fn to_target(location:Point,target:Point,move_speed:f64,t:f64)->(Point,Point){
+pub fn to_target(location:Point,target:Point,move_speed:f64)->(Point,Point){
+    use crate::calculator::PERIOD;
     let direction=calculate_direction(target,location);
     let mut new = location.clone();
-    new.x += move_speed * direction.x * t;
-    new.y += move_speed * direction.y * t;
+    new.x += move_speed * direction.x * PERIOD;
+    new.y += move_speed * direction.y * PERIOD;
     (direction,new)
 }
 fn calculate_direction(target:Point,location:Point)->Point {

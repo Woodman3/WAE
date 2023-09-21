@@ -14,16 +14,41 @@ use crate::utils::math::Point;
 pub struct UnitInfo {
     name: String,
     attack_type: String,
-    health: i64,
-    attack_speed: i64,
-    damage: i64,
-    armor: i64,
+    health: f64,
+    attack_speed: f64,
+    damage: f64,
+    armor: f64,
     magic_resist: f64,
+    attack_time:f64,
+}
+#[derive(Debug,Clone)]
+pub struct UnitStage{
+    attack_type: String,
+    health: f64,
+    attack_speed: f64,
+    damage: f64,
+    armor: f64,
+    magic_resist: f64,
+    attack_time:f64,
 }
 
 pub trait Unit:Debug{
     fn get_loc(&self)->Point;
     fn be_hit(&mut self,b:&Bullet,f:&mut Frame);
+}
+
+impl From<UnitInfo> for UnitStage {
+    fn from(value: UnitInfo) -> Self {
+        UnitStage{
+            attack_time:value.attack_time,
+            health:value.health,
+            attack_speed:value.attack_speed,
+            damage:value.damage,
+            armor:value.armor,
+            magic_resist:value.magic_resist,
+            attack_type:value.attack_type,
+        }
+    }
 }
 // #[derive(Debug)]
 // pub enum Attacktype {

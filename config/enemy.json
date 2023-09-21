@@ -8,7 +8,8 @@
       "attack_speed":1,
       "damage":100,
       "armor":50,
-      "magic_resist":0.1
+      "magic_resist":0.1,
+      "attack_time":0.1
     }
   },
   "Slug":{
@@ -20,7 +21,8 @@
       "attack_speed":1,
       "damage":100,
       "armor":50,
-      "magic_resist":0.1
+      "magic_resist":0.1,
+      "attack_time":0.3
     }
   }
 }

@@ -21,34 +21,24 @@ pub struct Frame {
 }
 
 impl Frame {
-    pub fn step(&mut self,c:&mut Calculator, t: f64) {
-        for mut e in &self.enemy_set {
+    pub fn step(&mut self,c:&mut Calculator) {
+        for mut e in self.enemy_set.iter() {
             let mut eb=e.borrow_mut();
-            eb.step(t);
+            eb.step();
             if eb.die_code == code::INTO_END {
                 info!("An enemy has enter to blue point");
             }
         }
-        // self.enemy_set.iter_mut().for_each(|e| {
-        //     e.calculate_vector();
-        //     e.step(t);
-        //     if (e.die_code == code::INTO_END) {
-        //         info!("An enemy has enter to blue point");
-        //     }
-        // }
-        // );
         self.enemy_set.retain(|e| e.borrow().die_code!=code::INTO_END);
         self.map.update_enemy_map(self.enemy_set.clone());
-        for o in self.operator_deploy.iter_mut(){
-            o.1.search(&self.map,self.timestamp);
-        }
         // for b in self.bullet_set.iter_mut(){
         //     b.step(t);
         //     if b.distance<= code::BULLET_HIT_DISTANCE{
         //         b.target.get_mut().be_hit(b,self);
         //     }
         // }
-        self.bullet_set.iter_mut().for_each(|b| b.step(t));
+        self.operator_step();
+        self.bullet_set.iter_mut().for_each(|b| b.step());
         // let f=|&b| b.distance<=code::BULLET_HIT_DISTANCE;
         let bv:Vec<Bullet>=self.bullet_set.iter().filter(|&b| b.distance<=code::BULLET_HIT_DISTANCE).cloned().collect();
         for b in bv{
@@ -56,7 +46,19 @@ impl Frame {
             u.be_hit(&b,self);
         }
         self.bullet_set.retain(|b| b.distance>code::BULLET_HIT_DISTANCE);
-
+        self.enemy_set.retain(|e| e.borrow().die_code!=code::DIE);
+    }
+    fn operator_step(&mut self){
+        for (key,o) in self.operator_deploy.iter_mut(){
+            o.search(&self.map,self.timestamp);
+            if o.target.weak_count()!=0{
+                o.attack(&mut self.bullet_set);
+            }else if o.enemy_find.len()!=0{
+                o.enemy_find.sort();
+                o.target=Rc::downgrade(&o.enemy_find[0].enemy);
+                o.attack(&mut self.bullet_set);
+            }
+        }
     }
     // Todo
     pub fn deep_clone(&self)->Self{

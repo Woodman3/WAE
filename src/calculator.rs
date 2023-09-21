@@ -17,6 +17,7 @@ use crate::unit::bullet::Bullet;
 use crate::unit::enemy::Enemy;
 use crate::utils::math::Point;
 
+pub(crate) static PERIOD:f64=0.0166;
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 /// calculate
 #[derive(Debug)]
@@ -55,7 +56,7 @@ impl Calculator {
     }
     pub fn process_frame(&mut self, f: &mut Frame) {
         self.event(f);
-        f.step(self, 0.01);
+        f.step(self);
     }
     pub fn new(c: &Config) -> Result<Calculator> {
         use crate::timeline::hostile::EnemyPlaceEvent;
@@ -117,11 +118,10 @@ impl Calculator {
     /// mosttime is happen in an specify time but sometime it happen after somethine has happen
     /// it can't be skip
     fn event(&mut self, f: &mut Frame) {
-        let time_stamp = f.timestamp;
         while self.time_line.len() != 0 {
             if let Some(et) = self.time_line.front() {
-                if et.time_stamp != time_stamp {
-                    if et.time_stamp < time_stamp {
+                if et.time_stamp != f.timestamp {
+                    if et.time_stamp < f.timestamp {
                         warn!("Some event not happened before,this event has drop");
                         self.time_line.pop_front();
                         continue;
