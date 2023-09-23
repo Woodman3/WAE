@@ -1,10 +1,11 @@
+use std::iter::once;
 use std::ops::{Add, Mul, Sub};
 #[derive(Clone,Copy,Debug)]
 pub struct Point{
     pub x:f64,
     pub y:f64
 }
-#[derive(Clone,Debug)]
+#[derive(Clone,Debug,Copy)]
 pub struct Grid{
     pub row:i64,
     pub col:i64
@@ -38,6 +39,15 @@ impl From<(i64,i64,i64,i64)> for GridRect{
     }
 }
 
+impl From<Point> for Grid{
+    fn from(value: Point) -> Self {
+        Grid{
+            row:value.y as i64,
+            col:value.x as i64,
+        }
+    }
+}
+
 impl Into<(i64,i64)> for Grid{
     fn into(self) -> (i64, i64) {
         (self.row,self.col)
@@ -67,6 +77,11 @@ impl From<(f64,f64)> for Point{
 impl From<(u32,u32)> for Point{
     fn from(value: (u32,u32)) -> Self {
         Point{x:value.0 as f64,y:value.1 as f64}
+    }
+}
+impl From<Grid> for Point{
+    fn from(value: Grid) -> Self {
+        Point{x:value.col as f64 + 0.5,y:value.row as f64 +0.5}
     }
 }
 impl Add for Point {

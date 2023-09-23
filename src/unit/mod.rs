@@ -12,44 +12,47 @@ use crate::utils::math::Point;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UnitInfo {
-    name: String,
-    attack_type: String,
+    damage_type: String,
     health: f64,
     attack_speed: f64,
     damage: f64,
     armor: f64,
     magic_resist: f64,
     attack_time:f64,
+    block_num:u32,
+    attack_type:String,
 }
-#[derive(Debug,Clone)]
-pub struct UnitStage{
-    attack_type: String,
-    health: f64,
-    attack_speed: f64,
-    damage: f64,
-    armor: f64,
-    magic_resist: f64,
-    attack_time:f64,
-}
+// #[derive(Debug,Clone)]
+// pub struct UnitStage{
+//     damage_type: String,
+//     health: f64,
+//     attack_speed: f64,
+//     damage: f64,
+//     armor: f64,
+//     magic_resist: f64,
+//     attack_time:f64,
+//     block_num:u32,
+// }
 
 pub trait Unit:Debug{
     fn get_loc(&self)->Point;
     fn be_hit(&mut self,b:&Bullet,f:&mut Frame);
 }
 
-impl From<UnitInfo> for UnitStage {
-    fn from(value: UnitInfo) -> Self {
-        UnitStage{
-            attack_time:value.attack_time,
-            health:value.health,
-            attack_speed:value.attack_speed,
-            damage:value.damage,
-            armor:value.armor,
-            magic_resist:value.magic_resist,
-            attack_type:value.attack_type,
-        }
-    }
-}
+// impl From<UnitInfo> for UnitStage {
+//     fn from(value: UnitInfo) -> Self {
+//         UnitStage{
+//             attack_time:value.attack_time,
+//             health:value.health,
+//             attack_speed:value.attack_speed,
+//             damage:value.damage,
+//             armor:value.armor,
+//             magic_resist:value.magic_resist,
+//             damage_type:value.damage_type,
+//             block_num:value.block_num,
+//         }
+//     }
+// }
 // #[derive(Debug)]
 // pub enum Attacktype {
 //     Physical,

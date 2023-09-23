@@ -1,28 +1,32 @@
 {
   "Dog":{
+    "name": "Dog",
     "move_speed":1,
     "UnitInfo":{
-      "name": "Dog",
-      "attack_type":"Magic",
+      "damage_type":"Magic",
       "health":500,
       "attack_speed":1,
       "damage":100,
       "armor":50,
       "magic_resist":0.1,
-      "attack_time":0.1
+      "attack_time":0.1,
+      "block_num":1,
+      "attack_type": "Melee"
     }
   },
   "Slug":{
+    "name": "Slug",
     "move_speed":0.5,
     "UnitInfo":{
-      "name": "Slug",
-      "attack_type":"Magic",
+      "damage_type":"Magic",
       "health":500,
       "attack_speed":1,
       "damage":100,
       "armor":50,
       "magic_resist":0.1,
-      "attack_time":0.3
+      "attack_time":0.3,
+      "block_num":1,
+      "attack_type": "Melee"
     }
   }
 }

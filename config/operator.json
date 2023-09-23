@@ -1,19 +1,54 @@
 {
-  "Amiya":{
-    "UnitInfo":{
-      "name": "Amiya",
-      "attack_type":"Magic",
-      "health":1500,
-      "attack_speed":1,
-      "damage":100,
-      "armor":100,
-      "magic_resist":0.1,
-      "attack_time":0.2
+  "Amiya": {
+    "name": "Amiya",
+    "UnitInfo": {
+      "damage_type": "Magic",
+      "health": 1500,
+      "attack_speed": 1,
+      "damage": 100,
+      "armor": 100,
+      "magic_resist": 0.1,
+      "attack_time": 0.2,
+      "block_num":1,
+      "attack_type": "Ranged"
     },
-    "attack_range":[
-      [-1,0,1,2],
-      [0,3,0,3]
+    "attack_range": [
+      [
+        -1,
+        0,
+        1,
+        2
+      ],
+      [
+        0,
+        3,
+        0,
+        3
+      ]
     ],
-    "re_deploy":60.0
+    "re_deploy": 60.0
+  },
+  "Skadi": {
+    "name": "Skadi",
+    "UnitInfo": {
+      "damage_type": "Physical",
+      "health": 2000,
+      "attack_speed": 1.2,
+      "damage": 300,
+      "armor": 200,
+      "magic_resist": 0.1,
+      "attack_time": 0.1,
+      "block_num":1,
+      "attack_type": "Melee"
+    },
+    "attack_range": [
+      [
+        0,
+        0,
+        1,
+        0
+      ]
+    ],
+    "re_deploy": 45
   }
 }

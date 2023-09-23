@@ -1,3 +1,4 @@
+use std::arch::x86_64::_bzhi_u32;
 use crate::frame::Frame;
 use crate::mul2d;
 use crate::unit::enemy::Enemy;
@@ -6,6 +7,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::cell::RefCell;
 use std::rc::Rc;
+use crate::unit::operator::Operator;
 
 const ENEMY_TOUCH_SIZE: f64 = 0.3;
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
@@ -15,17 +17,20 @@ pub struct Map {
     pub height: u32,
     pub layout: Vec<Vec<u64>>,
     pub enemy: Vec<Vec<Vec<Rc<RefCell<Enemy>>>>>,
+    pub operator:Vec<Vec<Option<String>>>
 }
 impl Map {
     pub fn new(v: &Value) -> Result<Map> {
         let width= serde_json::from_value(v["width"].clone())?;
         let height=serde_json::from_value(v["height"].clone())?;
         let enemy = vec![vec![Vec::<Rc<RefCell<Enemy>>>::new();width as usize];height as usize];
+        let operator =vec![vec![None;width as usize];height as usize];
         Ok(Map {
             width,
             height,
             layout: serde_json::from_value::<Vec<Vec<u64>>>(v["layout"].clone())?,
             enemy,
+            operator,
         })
     }
     pub fn update_enemy_map(&mut self,enemy_set:Vec<Rc<RefCell<Enemy>>>) {
@@ -97,7 +102,8 @@ impl Map {
             width,
             height,
             layout:self.layout.clone(),
-            enemy
+            enemy,
+            operator:self.operator.clone(),
         }
     }
 }

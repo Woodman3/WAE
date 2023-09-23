@@ -6,16 +6,18 @@ use std::fmt;
 use std::ops::Deref;
 use std::rc::Rc;
 use log::{trace, warn};
+use crate::calculator::ENEMY_IDENTIFIER;
 use crate::frame::Frame;
 use crate::unit::bullet::Bullet;
-use crate::unit::{Unit, UnitStage};
-use crate::utils::math::{Point, to_target};
+use crate::unit::{Unit, UnitInfo};
+use crate::utils::math::{Grid, Point, to_target};
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 #[derive(Debug, Clone)]
 pub struct Enemy {
+    pub name:String,
     info: super::UnitInfo,
-    stage:super::UnitStage,
+    pub stage:super::UnitInfo,
     pub location: Point,
     /// -1 mean haven't place
     pub target: Point,
@@ -25,6 +27,8 @@ pub struct Enemy {
     pub die_code: u32,
     /// 0 mean haven't die
     pub route: Option<Rc<Vec<Point>>>,
+    be_block:Option<String>,
+    pub identifier:u64,
 }
 #[derive(Debug,Clone)]
 pub struct EnemyWithPriority{
@@ -54,24 +58,25 @@ impl Enemy {
     }
     pub fn new(v: &Value) -> Result<Enemy> {
         let info = serde_json::from_value::<super::UnitInfo>(v["UnitInfo"].clone())?;
-        let stage:super::UnitStage=info.clone().into();
-        Ok(Enemy {
-            info,
-            stage,
-            location: (-1f64, -1f64).into(),
-            target: (-1f64, -1f64).into(),
-            move_speed: serde_json::from_value::<f64>(v["move_speed"].clone())?,
-            route_stage: 1,
-            direction:(0.0,0.0).into(),
-            die_code: 0,
-            route: None,
-        })
+        let stage=info.clone();
+        unsafe {
+            ENEMY_IDENTIFIER += 1;
+            Ok(Enemy {
+                name:serde_json::from_value(v["name"].clone())?,
+                info,
+                stage,
+                location: (-1f64, -1f64).into(),
+                target: (-1f64, -1f64).into(),
+                move_speed: serde_json::from_value::<f64>(v["move_speed"].clone())?,
+                route_stage: 1,
+                direction: (0.0, 0.0).into(),
+                die_code: 0,
+                route: None,
+                be_block: None,
+                identifier: ENEMY_IDENTIFIER,
+            })
+        }
     }
-    // pub fn calculate_direction(&mut self) {
-    //     let delta = self.target-self.location;
-    //     let theta = delta.y.atan2(delta.x);
-    //     self.direction=(theta.cos(),theta.sin()).into();
-    // }
 }
 
 impl fmt::Display for Enemy {
@@ -123,6 +128,14 @@ impl Unit for Enemy{
     }
          
 }
+
+impl PartialEq<Self> for Enemy {
+    fn eq(&self, other: &Self) -> bool {
+        self.identifier==other.identifier
+    }
+}
+
+impl Eq for Enemy{}
 
 impl Eq for EnemyWithPriority {}
 
