@@ -6,7 +6,7 @@ use crate::utils::math::distance_p2p;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::cell::RefCell;
-use std::rc::Rc;
+use std::rc::{Rc, Weak};
 use crate::unit::operator::Operator;
 
 const ENEMY_TOUCH_SIZE: f64 = 0.3;
@@ -16,14 +16,14 @@ pub struct Map {
     pub width: u32,
     pub height: u32,
     pub layout: Vec<Vec<u64>>,
-    pub enemy: Vec<Vec<Vec<Rc<RefCell<Enemy>>>>>,
+    pub enemy: Vec<Vec<Vec<Weak<RefCell<Enemy>>>>>,
     pub operator:Vec<Vec<Option<String>>>
 }
 impl Map {
     pub fn new(v: &Value) -> Result<Map> {
         let width= serde_json::from_value(v["width"].clone())?;
         let height=serde_json::from_value(v["height"].clone())?;
-        let enemy = vec![vec![Vec::<Rc<RefCell<Enemy>>>::new();width as usize];height as usize];
+        let enemy = vec![vec![Vec::<Weak<RefCell<Enemy>>>::new();width as usize];height as usize];
         let operator =vec![vec![None;width as usize];height as usize];
         Ok(Map {
             width,
@@ -43,53 +43,53 @@ impl Map {
             let ur = (ul.0, ul.1 + 1);
             let dl = (ul.0 + 1, ul.1);
             let dr = (dl.0, ur.1);
-            self.enemy[(ul.1)as usize][(ul.0)as usize].push(er.clone());
+            self.enemy[(ul.1)as usize][(ul.0)as usize].push(Rc::downgrade(&er));
             // up-left point
             if ul.0 != 0 && ul.1 != 0 {
                 if distance_p2p(&center, &ul) <= ENEMY_TOUCH_SIZE {
-                    self.enemy[(ul.1-1) as usize][(ul.0-1) as usize].push(er.clone());
+                    self.enemy[(ul.1-1) as usize][(ul.0-1) as usize].push(Rc::downgrade(&er));
                 }
             }
             // up-right point
             if ur.0 != self.width && ur.1 != 0{
                 if distance_p2p(&center, &ur) <= ENEMY_TOUCH_SIZE{
-                    self.enemy[(ur.1-1)as usize][(ur.0)as usize].push(er.clone());
+                    self.enemy[(ur.1-1)as usize][(ur.0)as usize].push(Rc::downgrade(&er));
                 }
             }
             // down-left point
             if dl.0 != 0 && dl.1 != self.height {
                 if distance_p2p(&center, &dl) <= ENEMY_TOUCH_SIZE{
-                    self.enemy[(dl.1)as usize][(dl.0-1)as usize].push(er.clone());
+                    self.enemy[(dl.1)as usize][(dl.0-1)as usize].push(Rc::downgrade(&er));
                 }
             }
             // down-right point
             if dr.0 != self.width && dr.1 != self.height {
                 if distance_p2p(&center, &dr) <= ENEMY_TOUCH_SIZE{
-                    self.enemy[(dr.1)as usize][(dr.0)as usize].push(er.clone());
+                    self.enemy[(dr.1)as usize][(dr.0)as usize].push(Rc::downgrade(&er));
                 }
             }
             // up point
             if ul.1!=0{
                 if center.1-ul.1 as f64 <= ENEMY_TOUCH_SIZE{
-                    self.enemy[(ul.1-1)as usize][(ul.0)as usize].push(er.clone());
+                    self.enemy[(ul.1-1)as usize][(ul.0)as usize].push(Rc::downgrade(&er));
                 }
             }
             // down point
             if dl.1!=self.height{
                 if dl.1 as f64 -center.1<= ENEMY_TOUCH_SIZE{
-                    self.enemy[(dl.1)as usize][(dl.0)as usize].push(er.clone());
+                    self.enemy[(dl.1)as usize][(dl.0)as usize].push(Rc::downgrade(&er));
                 }
             }
             // left point
             if ul.0!=0{
                 if center.0-ul.0 as f64 <=ENEMY_TOUCH_SIZE{
-                    self.enemy[(ul.1)as usize][(ul.0-1)as usize].push(er.clone());
+                    self.enemy[(ul.1)as usize][(ul.0-1)as usize].push(Rc::downgrade(&er));
                 }
             }
             // right point
             if ur.0!=self.width{
                 if ur.0 as f64 -center.0<=ENEMY_TOUCH_SIZE{
-                    self.enemy[(ur.1)as usize][(ur.0)as usize].push(er.clone());
+                    self.enemy[(ur.1)as usize][(ur.0)as usize].push(Rc::downgrade(&er));
                 }
             }
         }
@@ -97,7 +97,7 @@ impl Map {
     pub fn deep_clone(&self)->Self{
         let width=self.width;
         let height=self.height;
-        let enemy = vec![vec![Vec::<Rc<RefCell<Enemy>>>::new();width as usize];height as usize];
+        let enemy = vec![vec![Vec::<Weak<RefCell<Enemy>>>::new();width as usize];height as usize];
         Map{
             width,
             height,

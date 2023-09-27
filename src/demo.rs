@@ -9,6 +9,7 @@ use crate::utils::math::{distance_p2p, Grid, Point};
 // use crate::unit::scope::Scope;
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
+#[derive(Clone)]
 struct B{
     v:i32
 }
@@ -20,17 +21,15 @@ struct A{
 }
 
 pub fn fun(){
-    let a=(1.0,1.0);
-    let b=(3.0,4.0);
-    let c =crate::mul2d!(a,b);
-    let A:Point=a.into();
-    let B:Point=b.into();
-    let C=A*B;
-    print!("{:?} {:?}",c,C);
-
+    // let mut a=A{v:vec![B{v:1},B{v:2}]};
+    // let v:Vec<B> =a.v.iter().cloned().collect();
+    // for b in v.iter(){
+    //     b.f(&mut a);
+    // }
+    let a=Rc::new(2);
+    let b=Rc::downgrade(&a);
+    if let Some(t)=b.upgrade(){
+        println!("{t}");
+    }
 }
 
-// let mut v=vec![1,2,3,4];
-// let v2:Vec<i32>=v.iter().filter(|&x| x%2!=0).cloned().collect();
-// v.retain(|&x| x%2==0);
-// print!("{:?}",v2);

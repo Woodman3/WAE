@@ -1,5 +1,5 @@
 use std::cell::RefCell;
-use crate::frame::Frame;
+use crate::frame::{Frame, OperatorRef};
 use crate::timeline::{Event,EventWithTime, read_doctor_timeline};
 use crate::unit;
 use crate::unit::operator::Operator;
@@ -79,14 +79,14 @@ impl Calculator {
         }
         let t=read_doctor_timeline(c).unwrap();
         let mut frame_vec = Vec::<Frame>::new();
-        let mut operator_undeploy = HashMap::<String, Operator>::new();
+        let mut operator_undeploy = HashMap::<String, OperatorRef>::new();
         for (key, v) in c.operator.as_object().unwrap() {
-            operator_undeploy.insert(key.clone(), Operator::new(v)?);
+            operator_undeploy.insert(key.clone(), Rc::new(RefCell::new(Operator::new(v)?)));
         }
         frame_vec.push(Frame {
             timestamp: 0,
             enemy_set: Vec::<Rc::<RefCell::<Enemy>>>::new(),
-            operator_deploy: HashMap::<String,Operator>::new(),
+            operator_deploy: HashMap::<String,OperatorRef>::new(),
             operator_undeploy,
             map:map::Map::new(&c.map)?,
             bullet_set:Vec::<Bullet>::new(),

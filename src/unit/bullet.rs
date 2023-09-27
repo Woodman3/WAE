@@ -4,6 +4,7 @@ use env_logger::builder;
 use std::cell::RefCell;
 use std::f64::MAX;
 use std::rc::Rc;
+use crate::unit::damage::Damage;
 
 #[derive(Clone, Debug)]
 pub struct Bullet {
@@ -12,8 +13,7 @@ pub struct Bullet {
     location: Point,
     move_speed: f64,
     pub distance: f64,
-    pub attack_type: String,
-    pub damage: f64,
+    pub damage:Damage,
 }
 
 impl Bullet {
@@ -24,15 +24,17 @@ impl Bullet {
         self.location=new;
     }
     pub fn new(target: Rc<RefCell<dyn Unit>>, location: Point, move_speed: f64,
-    attack_type:String,damage:f64) -> Self {
+    damage_type:String,damage:f64) -> Self {
         Bullet {
             target,
             direction: (0.0, 0.0).into(),
             location,
             move_speed,
             distance: f64::MAX,
-            attack_type,
-            damage
+            damage:Damage{
+                value:damage,
+                damage_type,
+            }
         }
     }
 }

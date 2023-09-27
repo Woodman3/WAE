@@ -4,12 +4,15 @@ use crate::utils::math;
 use serde_json::Value;
 use std::fmt;
 use std::ops::Deref;
-use std::rc::Rc;
-use log::{trace, warn};
-use crate::calculator::ENEMY_IDENTIFIER;
+use std::rc::{Rc, Weak};
+use log::{error, trace, warn};
+use crate::calculator::{ENEMY_IDENTIFIER, PERIOD};
 use crate::frame::Frame;
 use crate::unit::bullet::Bullet;
 use crate::unit::{Unit, UnitInfo};
+use crate::unit::code::DIE;
+use crate::unit::damage::Damage;
+use crate::unit::operator::Operator;
 use crate::utils::math::{Grid, Point, to_target};
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
@@ -20,34 +23,31 @@ pub struct Enemy {
     pub stage:super::UnitInfo,
     pub location: Point,
     /// -1 mean haven't place
-    pub target: Point,
+    pub next_point: Point,
     move_speed: f64,
     direction:Point,
     route_stage: usize,
     pub die_code: u32,
     /// 0 mean haven't die
     pub route: Option<Rc<Vec<Point>>>,
-    be_block:Option<String>,
+    pub be_block:Weak<RefCell<Operator>>,
     pub identifier:u64,
 }
 #[derive(Debug,Clone)]
 pub struct EnemyWithPriority{
-    pub enemy:Rc<RefCell<Enemy>>,
+    pub enemy:Weak<RefCell<Enemy>>,
     pub time_stamp:u64,
 }
 impl Enemy {
     /// t is 1/fps it mean time interval
     pub fn step(&mut self) {
-        // let mut new = self.location.clone();
-        // new.x += self.move_speed * self.direction.x * t;
-        // new.y += self.move_speed * self.direction.y * t;
-        let (direction,new) = to_target(self.location,self.target,self.move_speed);
-        let distance = math::distance_from_segment_to_point(self.location, new, self.target);
-        if (distance <= super::code::MIN_DISTANCE) {
+        let (direction,new) = to_target(self.location, self.next_point, self.move_speed);
+        let distance = math::distance_from_segment_to_point(self.location, new, self.next_point);
+        if distance <= super::code::MIN_DISTANCE {
             self.route_stage += 1;
             if let Some(route) = &self.route {
                 if let Some(target) = route.get(self.route_stage) {
-                    self.target = target.clone();
+                    self.next_point = target.clone();
                 } else {
                     self.die_code = super::code::INTO_END;
                 }
@@ -55,6 +55,43 @@ impl Enemy {
         }
         self.direction=direction;
         self.location = new;
+    }
+    pub fn attack(&mut self,bv:&mut Vec<Bullet>){
+        if self.stage.attack_time>0.0{
+            self.stage.attack_time-=PERIOD;
+        }else{
+            match self.stage.attack_type.as_str() {
+                "Melee"=>{
+                    let d=Damage{
+                        value:self.stage.damage,
+                        damage_type:self.stage.damage_type.clone(),
+                    };
+                    // self.target.upgrade().unwrap().borrow_mut().be_damage(&d);
+                }
+                "Ranged"=>{
+                    //todo: ranged enemy
+                    // bv.push(Bullet::new(
+                    //     self.target.upgrade().unwrap(),
+                    //     Point::from(self.location),
+                    //     2f64,
+                    //     self.stage.damage_type.clone(),
+                    //     self.stage.damage,
+                    // ));
+                }
+                _ => {error!("unknown attack_type!")}
+            }
+            self.stage.attack_time=self.info.attack_time;
+        }
+    }
+    pub fn next(&mut self,f:&mut Frame){
+        if self.be_block.weak_count()==0{
+            self.step();
+        }else{
+            self.attack(&mut f.bullet_set);
+            if self.stage.health<=0.0{
+                self.die_code=DIE;
+            }
+        }
     }
     pub fn new(v: &Value) -> Result<Enemy> {
         let info = serde_json::from_value::<super::UnitInfo>(v["UnitInfo"].clone())?;
@@ -66,13 +103,13 @@ impl Enemy {
                 info,
                 stage,
                 location: (-1f64, -1f64).into(),
-                target: (-1f64, -1f64).into(),
+                next_point: (-1f64, -1f64).into(),
                 move_speed: serde_json::from_value::<f64>(v["move_speed"].clone())?,
                 route_stage: 1,
                 direction: (0.0, 0.0).into(),
                 die_code: 0,
                 route: None,
-                be_block: None,
+                be_block: Weak::new(),
                 identifier: ENEMY_IDENTIFIER,
             })
         }
@@ -86,13 +123,12 @@ impl fmt::Display for Enemy {
             "\
 location:{},{}
 component_x:{} component_y:{}
-target:{},{}",
+health:{} ",
             self.location.x,
             self.location.y,
             self.direction.x,
             self.direction.y,
-            self.target.x,
-            self.target.y
+            self.stage.health,
         )
     }
 }
@@ -103,30 +139,33 @@ impl Unit for Enemy{
         self.location
     }
     fn be_hit(&mut self, b: &Bullet, f: &mut Frame) {
-        match b.attack_type.as_str() {
+        self.be_damage(&b.damage);
+    }
+    fn be_damage(&mut self, d: &Damage) {
+        match d.damage_type.as_str() {
             "Magic" =>{
-                let damage=b.damage*(1f64-self.stage.magic_resist);
+                let damage=d.value*(1f64-self.stage.magic_resist);
                 self.stage.health-=damage;
             }
             "Physical"=>{
-                let damage=b.damage-self.stage.armor;
+                let damage=d.value-self.stage.armor;
                 self.stage.health-=damage;
             }
             "Real"=>{
-                self.stage.health-=b.damage;
+                self.stage.health-=d.value;
             }
             _ => {
                 warn!("unknown attack type of bullet ,bullet has been departure");
                 return
             }
+            &_ => {}
         }
-        if self.stage.health<=0f64{
+        if self.stage.health<=0.0{
             self.die_code=super::code::DIE;
             trace!("an enemy has die!");
             return;
         }
     }
-         
 }
 
 impl PartialEq<Self> for Enemy {

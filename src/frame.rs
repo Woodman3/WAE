@@ -10,34 +10,23 @@ use std::rc::Rc;
 use env_logger::builder;
 use crate::calculator::Calculator;
 use crate::map;
+
+pub type OperatorRef =Rc<RefCell<Operator>>;
 #[derive(Debug,Clone)]
 pub struct Frame {
     pub timestamp: u64,
     pub enemy_set: Vec<Rc<RefCell<Enemy>>>,
-    pub operator_deploy:HashMap<String,Operator>,
-    pub operator_undeploy:HashMap<String,Operator>,
+    pub operator_deploy:HashMap<String,OperatorRef>,
+    pub operator_undeploy:HashMap<String,OperatorRef>,
     pub map:map::Map,
     pub bullet_set:Vec<Bullet>,
 }
 
 impl Frame {
     pub fn step(&mut self,c:&mut Calculator) {
-        for mut e in self.enemy_set.iter() {
-            let mut eb=e.borrow_mut();
-            eb.step();
-            if eb.die_code == code::INTO_END {
-                info!("An enemy has enter to blue point");
-            }
-        }
-        self.enemy_set.retain(|e| e.borrow().die_code!=code::INTO_END);
         self.map.update_enemy_map(self.enemy_set.clone());
-        // for b in self.bullet_set.iter_mut(){
-        //     b.step(t);
-        //     if b.distance<= code::BULLET_HIT_DISTANCE{
-        //         b.target.get_mut().be_hit(b,self);
-        //     }
-        // }
         self.operator_step();
+        self.enemy_step();
         self.bullet_set.iter_mut().for_each(|b| b.step());
         // let f=|&b| b.distance<=code::BULLET_HIT_DISTANCE;
         let bv:Vec<Bullet>=self.bullet_set.iter().filter(|&b| b.distance<=code::BULLET_HIT_DISTANCE).cloned().collect();
@@ -49,15 +38,21 @@ impl Frame {
         self.enemy_set.retain(|e| e.borrow().die_code!=code::DIE);
     }
     fn operator_step(&mut self){
-        for (key,o) in self.operator_deploy.iter_mut(){
-            o.search(&self.map,self.timestamp);
-            if o.target.weak_count()!=0{
-                o.attack(&mut self.bullet_set);
-            }else if o.enemy_find.len()!=0{
-                o.enemy_find.sort();
-                o.target=Rc::downgrade(&o.enemy_find[0].enemy);
-                o.attack(&mut self.bullet_set);
-            }
+        let ov=self.operator_deploy.clone();
+        for (key,o) in ov{
+            let mut o=o.borrow_mut();
+            o.next(self);
+        }
+    }
+    fn enemy_step(&mut self){
+        self.enemy_set.retain(|e| e.borrow().die_code!=code::INTO_END);
+        let ve=self.enemy_set.clone();
+        for e in ve{
+            let mut eb=e.borrow_mut();
+            eb.next(self);
+                if eb.die_code == code::INTO_END {
+                    info!("An enemy has enter to blue point");
+                }
         }
     }
     // Todo
@@ -66,13 +61,13 @@ impl Frame {
         for e in &self.enemy_set{
             enemy_set.push(Rc::new(RefCell::clone(&e)));
         }
-        let mut operator_deploy=HashMap::<String,Operator>::new();
+        let mut operator_deploy=HashMap::<String,OperatorRef>::new();
         for (key,o) in self.operator_deploy.iter(){
-            operator_deploy.insert(key.clone(),o.deep_clone());
+            operator_deploy.insert(key.clone(),Rc::new(RefCell::new(o.borrow().deep_clone())));
         }
-        let mut operator_undeploy=HashMap::<String,Operator>::new();
+        let mut operator_undeploy=HashMap::<String,OperatorRef>::new();
         for (key,o) in self.operator_undeploy.iter(){
-            operator_undeploy.insert(key.clone(),o.deep_clone());
+            operator_undeploy.insert(key.clone(),Rc::new(RefCell::new(o.borrow().deep_clone())));
         }
         let mut bullet_set=self.bullet_set.clone();
         Frame{

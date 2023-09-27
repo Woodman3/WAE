@@ -17,6 +17,5 @@ fn main() {
     // let c=utils::config::Config::new("/home/archer/workspace/BEC/config/").unwrap();
     let c=utils::config::Config::new("C:/Users/Aureliano/workspace/BEC/config").unwrap();
     let mut Ca = calculator::Calculator::new(&c).unwrap();
-    // println!("{:?}",Ca.frame_vec[0].operator_undeploy);
     Ca.to_end();
 }
