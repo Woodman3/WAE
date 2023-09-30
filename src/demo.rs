@@ -1,35 +1,29 @@
-use std::cell::{Ref, RefCell};
-use std::mem;
-use std::rc::Rc;
-use serde_json::Value::String;
-use crate::sub2d;
-// use crate::utils::error;
-// use crate::utils::error::{ConfigParseError};
-use crate::utils::math::{distance_p2p, Grid, Point};
-// use crate::unit::scope::Scope;
+use nannou::prelude::*;
 
-type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
-#[derive(Clone)]
-struct B{
-    v:i32
-}
-impl B{
-    fn f(&self,a:&mut A){}
-}
-struct A{
-    v:Vec<B>,
-}
-
+struct Model{}
 pub fn fun(){
-    // let mut a=A{v:vec![B{v:1},B{v:2}]};
-    // let v:Vec<B> =a.v.iter().cloned().collect();
-    // for b in v.iter(){
-    //     b.f(&mut a);
-    // }
-    let a=Rc::new(2);
-    let b=Rc::downgrade(&a);
-    if let Some(t)=b.upgrade(){
-        println!("{t}");
-    }
+    nannou::app(model)
+        .update(update)
+        .simple_window(view)
+        .run();
+}
+fn model(app:&App)->Model{
+    Model{}
+}
+fn update(_app:&App,_model:&mut Model,_update:Update){
+
+}
+fn view(app: &App,_model:& Model, frame: Frame) {
+    let  draw=app.draw();
+    let sin=app.time.sin();
+    let points=(0..=300).map(|i|{
+        let x=i as f32 - 150.0;
+        let point = pt2(x,x.sin())*30.0;
+        (point,STEELBLUE)
+    });
+    draw.polyline()
+        .weight(3.0)
+        .points_colored(points);
+    draw.to_frame(app,&frame).unwrap();
 }
 

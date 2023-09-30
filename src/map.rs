@@ -9,7 +9,7 @@ use std::cell::RefCell;
 use std::rc::{Rc, Weak};
 use crate::unit::operator::Operator;
 
-const ENEMY_TOUCH_SIZE: f64 = 0.3;
+const ENEMY_TOUCH_SIZE: f64 = 0.15;
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 #[derive(Debug,Clone)]
 pub struct Map {

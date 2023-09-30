@@ -100,18 +100,18 @@ impl Operator {
             self.enemy_find.push(EnemyWithPriority{enemy:e,time_stamp});
             c+=1;
         }
-        // info!("in {time_stamp},{} search {c} enemy",self.name);
+        info!("in {time_stamp},{} search {c} enemy",self.name);
     }
     /// try to block enemy
     /// make sure all element in block_vec can be find
     pub fn block(&mut self,f:&mut Frame){
         let loc= self.location;
         for re in f.map.enemy[loc.row as usize][loc.col as usize].iter(){
-            info!("in {},{} block a enemy",f.timestamp,self.name);
             if let Some(re)=re.upgrade(){
                 let mut e =re.borrow_mut();
                 if e.stage.block_num<=self.stage.block_num{
                     e.be_block=Rc::downgrade(&f.operator_deploy[&self.name]);
+                    info!("in {},{} block a enemy",f.timestamp,self.name);
                     self.block_vec.push(Rc::downgrade(&re));
                     self.stage.block_num-=e.stage.block_num;
                 }
@@ -126,34 +126,10 @@ impl Operator {
         });
     }
     pub fn next(&mut self,f:&mut Frame){
-        // self.search(&mut f.map,f.timestamp);
-        // self.block(f);
-        // if let Some(e) = self.target{
+        // if let Some(e)=self.target.upgrade(){
         //     self.attack(&mut f.bullet_set);
-        // }else{
-        //     // first attack block enemy
-        //     if self.block.len()==1{
-        //         self.target=self.block[0].clone();
-        //         self.attack(&mut f.bullet_set);
-        //     }else if self.enemy_find.len()!=0{
-        //         self.enemy_find.sort();
-        //         self.target=self.enemy_find[0].enemy.clone();
-        //         self.attack(&mut f.bullet_set);
-        //     }
+        //     return
         // }
-        // if self.target.weak_count()!=0{
-        //     self.attack(&mut f.bullet_set);
-        // }else if self.enemy_find.len()!=0{
-        //     self.enemy_find.sort();
-        //     // self.target=Rc::downgrade(&self.enemy_find[0].enemy);
-        //     self.target=self.enemy_find[0].enemy.clone();
-        //     self.attack(&mut f.bullet_set);
-        // }
-        // self.block.retain(|e| e.weak_count()!=0);
-        if let Some(e)=self.target.upgrade(){
-            self.attack(&mut f.bullet_set);
-            return
-        }
         self.block(f);
         if self.block_vec.len()!=0{
             self.target=self.block_vec[0].clone();
