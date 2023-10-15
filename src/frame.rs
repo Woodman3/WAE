@@ -27,14 +27,7 @@ impl Frame {
         self.map.update_enemy_map(self.enemy_set.clone());
         self.operator_step();
         self.enemy_step();
-        self.bullet_set.iter_mut().for_each(|b| b.step());
-        // let f=|&b| b.distance<=code::BULLET_HIT_DISTANCE;
-        let bv:Vec<Bullet>=self.bullet_set.iter().filter(|&b| b.distance<=code::BULLET_HIT_DISTANCE).cloned().collect();
-        for b in bv{
-            let mut u=b.target.borrow_mut();
-            u.be_hit(&b,self);
-        }
-        self.bullet_set.retain(|b| b.distance>code::BULLET_HIT_DISTANCE);
+        self.bullet_step();
         self.enemy_set.retain(|e| e.borrow().die_code!=code::DIE);
     }
     fn operator_step(&mut self){
@@ -54,6 +47,15 @@ impl Frame {
                     info!("An enemy has enter to blue point");
                 }
         }
+    }
+    fn bullet_step(&mut self){
+        self.bullet_set.iter_mut().for_each(|b| b.step());
+        let bv:Vec<Bullet>=self.bullet_set.iter().filter(|&b| b.distance<=code::BULLET_HIT_DISTANCE).cloned().collect();
+        for b in bv{
+            let mut u=b.target.borrow_mut();
+            u.be_hit(&b,self);
+        }
+        self.bullet_set.retain(|b| b.distance>code::BULLET_HIT_DISTANCE);
     }
     // Todo
     pub fn deep_clone(&self)->Self{

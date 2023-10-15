@@ -1,6 +1,7 @@
 use std::cell::RefCell;
 use super::scope::{Scope, Toward};
 use std::fmt;
+use std::fmt::{Display, Formatter};
 use std::ptr::write;
 use std::rc::{Rc, Weak};
 use log::{error, info, trace, warn};
@@ -212,5 +213,15 @@ impl Unit for Operator {
             }
             &_ => {}
         }
+    }
+}
+
+impl Display for Operator{
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f,"\
+        attack_time:{}\n\
+        block_num:{}\n",
+        self.stage.attack_time,
+        self.block_vec.len())
     }
 }

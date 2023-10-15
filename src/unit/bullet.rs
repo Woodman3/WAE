@@ -3,6 +3,7 @@ use crate::utils::math::{distance_from_segment_to_point, to_target, Point};
 use env_logger::builder;
 use std::cell::RefCell;
 use std::f64::MAX;
+use std::fmt::{Display, Formatter};
 use std::rc::Rc;
 use crate::unit::damage::Damage;
 
@@ -10,7 +11,7 @@ use crate::unit::damage::Damage;
 pub struct Bullet {
     pub target: Rc<RefCell<dyn Unit>>,
     direction: Point,
-    location: Point,
+    pub location: Point,
     move_speed: f64,
     pub distance: f64,
     pub damage:Damage,
@@ -36,5 +37,13 @@ impl Bullet {
                 damage_type,
             }
         }
+    }
+}
+
+impl Display for Bullet{
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f,"\
+        distance to target:{}\n",
+        self.distance)
     }
 }

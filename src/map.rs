@@ -9,7 +9,7 @@ use std::cell::RefCell;
 use std::rc::{Rc, Weak};
 use crate::unit::operator::Operator;
 
-const ENEMY_TOUCH_SIZE: f64 = 0.15;
+pub const ENEMY_TOUCH_SIZE: f64 = 0.15;
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 #[derive(Debug,Clone)]
 pub struct Map {
@@ -40,9 +40,9 @@ impl Map {
             let center:(f64,f64)= e.location.into();
             let ul = (center.0 as u32, center.1 as u32);
             // no boundary check because enemy location might be legal
-            let ur = (ul.0, ul.1 + 1);
-            let dl = (ul.0 + 1, ul.1);
-            let dr = (dl.0, ur.1);
+            let ur = (ul.0+1, ul.1);
+            let dl = (ul.0, ul.1+1);
+            let dr = (ur.0, dl.1);
             self.enemy[(ul.1)as usize][(ul.0)as usize].push(Rc::downgrade(&er));
             // up-left point
             if ul.0 != 0 && ul.1 != 0 {

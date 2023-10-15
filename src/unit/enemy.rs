@@ -121,11 +121,9 @@ impl fmt::Display for Enemy {
         write!(
             f,
             "\
-location:{},{}
-component_x:{} component_y:{}
-health:{} ",
-            self.location.x,
-            self.location.y,
+            component_x:{} component_y:{}\n\
+            health:{} \n\
+            ",
             self.direction.x,
             self.direction.y,
             self.stage.health,

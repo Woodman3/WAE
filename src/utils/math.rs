@@ -69,6 +69,11 @@ impl Into<(f64,f64)> for Point{
         (self.x,self.y)
     }
 }
+impl Into<(f32,f32)> for Point{
+    fn into(self) -> (f32,f32) {
+        (self.x as f32,self.y as f32)
+    }
+}
 impl From<(f64,f64)> for Point{
     fn from(value: (f64, f64)) -> Self {
         Point{x:value.0,y:value.1}
