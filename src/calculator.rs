@@ -18,7 +18,6 @@ use crate::unit::enemy::Enemy;
 use crate::utils::math::Point;
 
 pub(crate) static PERIOD:f64=0.0166;
-pub(crate) static mut ENEMY_IDENTIFIER:u64=0;
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 /// calculate
 #[derive(Debug)]
@@ -90,6 +89,7 @@ impl Calculator {
             operator_undeploy,
             map:map::Map::new(&c.map)?,
             bullet_set:Vec::<Bullet>::new(),
+            next_id:0,
         });
         let mut enemy_initial = HashMap::<String, unit::enemy::Enemy>::new();
         for (key, v) in c.enemy.as_object().unwrap() {

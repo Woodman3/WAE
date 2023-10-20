@@ -6,8 +6,8 @@ use std::fmt;
 use std::ops::Deref;
 use std::rc::{Rc, Weak};
 use log::{error, trace, warn};
-use crate::calculator::{ENEMY_IDENTIFIER, PERIOD};
-use crate::frame::Frame;
+use crate::calculator::PERIOD;
+use crate::frame::{Frame, OperatorRef};
 use crate::unit::bullet::Bullet;
 use crate::unit::{Unit, UnitInfo};
 use crate::unit::code::DIE;
@@ -31,7 +31,7 @@ pub struct Enemy {
     /// 0 mean haven't die
     pub route: Option<Rc<Vec<Point>>>,
     pub be_block:Weak<RefCell<Operator>>,
-    pub identifier:u64,
+    pub identifier:usize,
 }
 #[derive(Debug,Clone)]
 pub struct EnemyWithPriority{
@@ -56,16 +56,17 @@ impl Enemy {
         self.direction=direction;
         self.location = new;
     }
-    pub fn attack(&mut self,bv:&mut Vec<Bullet>){
+    pub fn attack(&mut self,bv:&mut Vec<Bullet>,o:OperatorRef){
         if self.stage.attack_time>0.0{
             self.stage.attack_time-=PERIOD;
-        }else{
+        }else {
             match self.stage.attack_type.as_str() {
                 "Melee"=>{
                     let d=Damage{
                         value:self.stage.damage,
                         damage_type:self.stage.damage_type.clone(),
                     };
+                    o.borrow_mut().be_damage(&d);
                     // self.target.upgrade().unwrap().borrow_mut().be_damage(&d);
                 }
                 "Ranged"=>{
@@ -84,35 +85,32 @@ impl Enemy {
         }
     }
     pub fn next(&mut self,f:&mut Frame){
-        if self.be_block.weak_count()==0{
-            self.step();
+        if let Some(o)=self.be_block.upgrade(){
+            self.attack(&mut f.bullet_set,o);
         }else{
-            self.attack(&mut f.bullet_set);
-            if self.stage.health<=0.0{
-                self.die_code=DIE;
-            }
+            self.step();
+        }
+        if self.stage.health<=0.0{
+            self.die_code=DIE;
         }
     }
     pub fn new(v: &Value) -> Result<Enemy> {
         let info = serde_json::from_value::<super::UnitInfo>(v["UnitInfo"].clone())?;
         let stage=info.clone();
-        unsafe {
-            ENEMY_IDENTIFIER += 1;
-            Ok(Enemy {
-                name:serde_json::from_value(v["name"].clone())?,
-                info,
-                stage,
-                location: (-1f64, -1f64).into(),
-                next_point: (-1f64, -1f64).into(),
-                move_speed: serde_json::from_value::<f64>(v["move_speed"].clone())?,
-                route_stage: 1,
-                direction: (0.0, 0.0).into(),
-                die_code: 0,
-                route: None,
-                be_block: Weak::new(),
-                identifier: ENEMY_IDENTIFIER,
-            })
-        }
+        Ok(Enemy {
+            name:serde_json::from_value(v["name"].clone())?,
+            info,
+            stage,
+            location: (-1f64, -1f64).into(),
+            next_point: (-1f64, -1f64).into(),
+            move_speed: serde_json::from_value::<f64>(v["move_speed"].clone())?,
+            route_stage: 1,
+            direction: (0.0, 0.0).into(),
+            die_code: 0,
+            route: None,
+            be_block: Weak::new(),
+            identifier: 0,
+        })
     }
 }
 

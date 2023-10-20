@@ -66,6 +66,7 @@ impl Operator {
     }
     /// before call it,you should make sure that map haven't contain empty pointer
     pub fn search(&mut self,m:&Map,time_stamp:u64){
+        self.enemy_find.clear();
         let mut ve=Vec::<Weak<RefCell<Enemy>>>::new();
         for r in self.search_scope.0.iter(){
             for i in r.ul.row..=r.dr.row{
@@ -82,15 +83,6 @@ impl Operator {
                                 ve.push(Rc::downgrade(&e));
                             }
                         }
-                        // if ve.iter().find(|&re|{
-                        //     if let Some(e)=re.upgrade(){
-                        //
-                        //     }else{
-                        //
-                        //     }
-                        // })==None{
-                        //     ve.push(e.clone());
-                        // }
                     }
 
                 }
@@ -106,18 +98,6 @@ impl Operator {
     /// try to block enemy
     /// make sure all element in block_vec can be find
     pub fn block(&mut self,f:&mut Frame){
-        let loc= self.location;
-        for re in f.map.enemy[loc.row as usize][loc.col as usize].iter(){
-            if let Some(re)=re.upgrade(){
-                let mut e =re.borrow_mut();
-                if e.stage.block_num<=self.stage.block_num{
-                    e.be_block=Rc::downgrade(&f.operator_deploy[&self.name]);
-                    info!("in {},{} block a enemy",f.timestamp,self.name);
-                    self.block_vec.push(Rc::downgrade(&re));
-                    self.stage.block_num-=e.stage.block_num;
-                }
-            }
-        }
         self.block_vec.retain(|e|{
             if let Some(e)=e.upgrade(){
                 true
@@ -125,6 +105,26 @@ impl Operator {
                 false
             }
         });
+        let loc= self.location;
+        for re in f.map.enemy[loc.row as usize][loc.col as usize].iter(){
+            if let Some(re)=re.upgrade(){
+                if !self.block_vec.iter().any(|e2| {
+                    if let Some(e2) = e2.upgrade(){
+                        e2==re
+                    }else{
+                        false
+                    }
+                }){
+                    let mut e =re.borrow_mut();
+                    if e.stage.block_num<=self.stage.block_num{
+                        e.be_block=Rc::downgrade(&f.operator_deploy[&self.name]);
+                        info!("in {},{} block a enemy",f.timestamp,self.name);
+                        self.block_vec.push(Rc::downgrade(&re));
+                        self.stage.block_num-=e.stage.block_num;
+                    }
+                }
+            }
+        }
     }
     pub fn next(&mut self,f:&mut Frame){
         // if let Some(e)=self.target.upgrade(){
@@ -220,8 +220,14 @@ impl Display for Operator{
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(f,"\
         attack_time:{}\n\
-        block_num:{}\n",
+        block_num:{}\n\
+        block_vec_len:{}\n\
+        enemy_find:{}\n\
+        ",
         self.stage.attack_time,
-        self.block_vec.len())
+        self.stage.block_num,
+        self.block_vec.len(),
+        self.enemy_find.len()
+        )
     }
 }

@@ -20,6 +20,7 @@ pub struct Frame {
     pub operator_undeploy:HashMap<String,OperatorRef>,
     pub map:map::Map,
     pub bullet_set:Vec<Bullet>,
+    pub next_id:usize,
 }
 
 impl Frame {
@@ -79,6 +80,7 @@ impl Frame {
             operator_undeploy,
             map:self.map.deep_clone(),
             bullet_set,
+            next_id:self.next_id,
         }
     }
 }

@@ -4,7 +4,7 @@
     "move_speed":1,
     "UnitInfo":{
       "damage_type":"Magic",
-      "health":500,
+      "health":2000,
       "attack_speed":1,
       "damage":100,
       "armor":50,

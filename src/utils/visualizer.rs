@@ -55,15 +55,17 @@ fn paint_frame(f:&Frame,painter:Painter){
             if l!=0{
                 let pos=Pos2::from([(i as f32)*BLOCK_SIZE+5.0,(j as f32)*BLOCK_SIZE+5.0]);
                 painter.circle_filled(pos,3.0,Color32::BROWN);
-                println!("{l}") ;
             }
         }
     }
+
 }
 fn paint_info(f:&Frame,ui:&mut Ui){
     // let text=RichText("a text".into());
     let mut info =egui::text::LayoutJob::default() ;
     let text_format=TextFormat::default();
+    let text = format!("time_stamp:{}\n",f.timestamp);
+    info.append(text.as_str(),0.0,text_format.clone());
     for e in f.enemy_set.iter(){
         let e=e.borrow();
         let text = format!("{e}\n");

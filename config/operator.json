@@ -38,7 +38,7 @@
       "armor": 200,
       "magic_resist": 0.1,
       "attack_time": 0.1,
-      "block_num":1,
+      "block_num":2,
       "attack_type": "Melee"
     },
     "attack_range": [
