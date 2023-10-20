@@ -1,0 +1,22 @@
+{
+  "Operator": {
+    "Skadi": {
+      "skill1": {
+        "restore_type":"Auto",
+        "trigger_type": "Manual",
+        "effect": [
+          {
+            "change_type": "Absolute",
+            "change_class":"AttackSpeed",
+            "value": 20
+          },
+          {
+            "change_type": "Relative",
+            "change_class":"AttackPower",
+            "value": 0.2
+          }
+        ]
+      }
+    }
+  }
+}
