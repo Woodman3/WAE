@@ -2,7 +2,7 @@
   "Dog":{
     "name": "Dog",
     "move_speed":1,
-    "UnitInfo":{
+    "info":{
       "damage_type":"Magic",
       "health":2000,
       "attack_speed":1,
@@ -17,7 +17,7 @@
   "Slug":{
     "name": "Slug",
     "move_speed":0.5,
-    "UnitInfo":{
+    "info":{
       "damage_type":"Magic",
       "health":500,
       "attack_speed":1,

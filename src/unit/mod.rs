@@ -12,7 +12,7 @@ use crate::unit::bullet::Bullet;
 use crate::unit::damage::Damage;
 use crate::utils::math::Point;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize,Default, Deserialize)]
 pub struct UnitInfo {
     damage_type: String,
     health: f64,

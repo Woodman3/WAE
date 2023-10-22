@@ -3,11 +3,14 @@ use serde::Deserialize;
 pub(super) enum ChangeType{
     Absolute,
     Relative,
+    None
 }
 #[derive(Deserialize,Debug)]
 pub(super) enum ChangeClass{
-    AttackSpeed,
-    AttackPower,
+    ASPD,
+    ATK,
+    DEF,
+    MaxHP,
 }
 #[derive(Deserialize,Debug)]
 pub(super) struct Effect{

@@ -34,6 +34,7 @@ pub struct Config {
     pub doctor:Value,
     pub map:Value,
     pub skill:Value,
+    pub demo:Value,
 }
 impl Config {
     pub fn new<P: AsRef<Path>>(path: P) -> Result<Config> {
@@ -55,9 +56,11 @@ impl Config {
         file = File::open(path.as_ref().join("skill.json"))?;
         reader = BufReader::new(file);
         let skill= serde_json::from_reader(reader)?;
-
+        file = File::open(path.as_ref().join("demo.json"))?;
+        reader = BufReader::new(file);
+        let demo= serde_json::from_reader(reader)?;
         // let content:String = std::fs::read_to_string(json_path.to_owned()+"hostile.json")?;
         // let hostile_binding = serde_json::from_str::<Value>(&content)?;
-        Ok(Config { hostile, enemy,operator,doctor,map,skill})
+        Ok(Config { hostile, enemy,operator,doctor,map,skill,demo})
     }
 }

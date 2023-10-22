@@ -6,6 +6,7 @@ use std::fmt;
 use std::ops::Deref;
 use std::rc::{Rc, Weak};
 use log::{error, trace, warn};
+use serde::Deserialize;
 use crate::calculator::PERIOD;
 use crate::frame::{Frame, OperatorRef};
 use crate::unit::bullet::Bullet;
@@ -16,21 +17,29 @@ use crate::unit::operator::Operator;
 use crate::utils::math::{Grid, Point, to_target};
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone,Default,Deserialize)]
+#[serde(default)]
 pub struct Enemy {
     pub name:String,
-    info: super::UnitInfo,
-    pub stage:super::UnitInfo,
-    pub location: Point,
-    /// -1 mean haven't place
-    pub next_point: Point,
     move_speed: f64,
+    info: super::UnitInfo,
+    #[serde(skip)]
+    pub stage:super::UnitInfo,
+    #[serde(skip)]
+    pub location: Point, /// -1 mean haven't place
+    #[serde(skip)]
+    pub next_point: Point,
+    #[serde(skip)]
     direction:Point,
+    #[serde(skip)]
     route_stage: usize,
-    pub die_code: u32,
-    /// 0 mean haven't die
+    #[serde(skip)]
+    pub die_code: u32, /// 0 mean haven't die
+    #[serde(skip)]
     pub route: Option<Rc<Vec<Point>>>,
+    #[serde(skip)]
     pub be_block:Weak<RefCell<Operator>>,
+    #[serde(skip)]
     pub identifier:usize,
 }
 #[derive(Debug,Clone)]
@@ -95,22 +104,26 @@ impl Enemy {
         }
     }
     pub fn new(v: &Value) -> Result<Enemy> {
-        let info = serde_json::from_value::<super::UnitInfo>(v["UnitInfo"].clone())?;
-        let stage=info.clone();
-        Ok(Enemy {
-            name:serde_json::from_value(v["name"].clone())?,
-            info,
-            stage,
-            location: (-1f64, -1f64).into(),
-            next_point: (-1f64, -1f64).into(),
-            move_speed: serde_json::from_value::<f64>(v["move_speed"].clone())?,
-            route_stage: 1,
-            direction: (0.0, 0.0).into(),
-            die_code: 0,
-            route: None,
-            be_block: Weak::new(),
-            identifier: 0,
-        })
+        // let info = serde_json::from_value::<super::UnitInfo>(v["UnitInfo"].clone())?;
+        // let stage=info.clone();
+        let mut e:Self=serde_json::from_value(v.clone()).unwrap();
+        e.stage=e.info.clone();
+        e.route_stage=1;
+        Ok(e)
+        // Ok(Enemy {
+        //     name:serde_json::from_value(v["name"].clone())?,
+        //     info,
+        //     stage,
+        //     location: (-1f64, -1f64).into(),
+        //     next_point: (-1f64, -1f64).into(),
+        //     move_speed: serde_json::from_value::<f64>(v["move_speed"].clone())?,
+        //     route_stage: 1,
+        //     direction: (0.0, 0.0).into(),
+        //     die_code: 0,
+        //     route: None,
+        //     be_block: Weak::new(),
+        //     identifier: 0,
+        // })
     }
 }
 

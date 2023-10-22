@@ -2,19 +2,24 @@ mod effect;
 use effect::Effect;
 use serde::Deserialize;
 #[derive(Deserialize,Debug)]
-pub enum RestoreType {
+pub enum ChargeType {
     Auto,
     Attack,
-    Hit
+    Hit,
+    Passive,
 }
 #[derive(Deserialize,Debug)]
 pub enum TriggerType{
     Auto,
-    Manual
+    Manual,
+    Passive,
 }
 #[derive(Deserialize,Debug)]
 pub struct Skill{
-    restore_type:RestoreType,
+    charge_type: ChargeType,
     trigger_type:TriggerType,
+    duration:f64,
+    sp_cost:f64,
+    sp_initial:f64,
     effect:Vec<Effect>
 }

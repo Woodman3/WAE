@@ -2,17 +2,39 @@
   "Operator": {
     "Skadi": {
       "skill1": {
-        "restore_type":"Auto",
+        "charge_type":"Auto",
         "trigger_type": "Manual",
+        "duration": 10.0,
+        "sp_cost": 30.0,
+        "sp_initial": 20.0,
         "effect": [
           {
             "change_type": "Absolute",
-            "change_class":"AttackSpeed",
+            "change_class":"ASPD",
             "value": 20
           },
           {
             "change_type": "Relative",
-            "change_class":"AttackPower",
+            "change_class":"ATK",
+            "value": 0.2
+          }
+        ]
+      },
+      "skill2": {
+        "charge_type":"Passive",
+        "trigger_type": "Passive",
+        "duration": 10.0,
+        "sp_cost": 0.0,
+        "sp_initial": 0.0,
+        "effect": [
+          {
+            "change_type": "Absolute",
+            "change_class":"ATK",
+            "value": 20
+          },
+          {
+            "change_type": "Relative",
+            "change_class":"ATK",
             "value": 0.2
           }
         ]

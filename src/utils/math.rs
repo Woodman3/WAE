@@ -1,16 +1,17 @@
 use std::iter::once;
 use std::ops::{Add, Mul, Sub};
-#[derive(Clone,Copy,Debug)]
+use serde::Deserialize;
+#[derive(Clone,Copy,Debug,Default,Deserialize)]
 pub struct Point{
     pub x:f64,
     pub y:f64
 }
-#[derive(Clone,Debug,Copy)]
+#[derive(Clone,Debug,Copy,Default,Deserialize)]
 pub struct Grid{
     pub row:i64,
     pub col:i64
 }
-#[derive(Clone,Debug)]
+#[derive(Clone,Debug,Default,Deserialize)]
 pub struct GridRect {
     pub ul:Grid,
     pub dr:Grid
