@@ -42,7 +42,7 @@ pub struct Enemy {
     #[serde(skip)]
     pub identifier:usize,
 }
-#[derive(Debug,Clone)]
+#[derive(Debug,Clone,Default)]
 pub struct EnemyWithPriority{
     pub enemy:Weak<RefCell<Enemy>>,
     pub time_stamp:u64,
@@ -104,26 +104,10 @@ impl Enemy {
         }
     }
     pub fn new(v: &Value) -> Result<Enemy> {
-        // let info = serde_json::from_value::<super::UnitInfo>(v["UnitInfo"].clone())?;
-        // let stage=info.clone();
-        let mut e:Self=serde_json::from_value(v.clone()).unwrap();
+        let mut e:Self=serde_json::from_value(v.clone())?;
         e.stage=e.info.clone();
         e.route_stage=1;
         Ok(e)
-        // Ok(Enemy {
-        //     name:serde_json::from_value(v["name"].clone())?,
-        //     info,
-        //     stage,
-        //     location: (-1f64, -1f64).into(),
-        //     next_point: (-1f64, -1f64).into(),
-        //     move_speed: serde_json::from_value::<f64>(v["move_speed"].clone())?,
-        //     route_stage: 1,
-        //     direction: (0.0, 0.0).into(),
-        //     die_code: 0,
-        //     route: None,
-        //     be_block: Weak::new(),
-        //     identifier: 0,
-        // })
     }
 }
 

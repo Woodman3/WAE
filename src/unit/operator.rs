@@ -5,6 +5,7 @@ use std::fmt::{Display, Formatter};
 use std::ptr::write;
 use std::rc::{Rc, Weak};
 use log::{error, info, trace, warn};
+use serde::Deserialize;
 use serde_json::Value;
 use crate::calculator::PERIOD;
 use crate::frame::Frame;
@@ -16,19 +17,27 @@ use crate::unit::Unit;
 use crate::utils::math::{Grid, GridRect, Point};
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
-#[derive(Debug,Clone)]
+#[derive(Debug,Clone,Default,Deserialize)]
 pub struct Operator{
     pub name: String,
     pub info:super::UnitInfo,
+    #[serde(skip)]
     pub stage:super::UnitInfo,
+    #[serde(skip)]
     pub location:Grid,
     pub attack_scope: Scope,
+    #[serde(skip)]
     pub search_scope: Scope,
     pub re_deploy:f32,
+    #[serde(skip)]
     pub toward:Toward,
+    #[serde(skip)]
     pub enemy_find:Vec<EnemyWithPriority>,
+    #[serde(skip)]
     pub target:Weak<RefCell<Enemy>>,
+    #[serde(skip)]
     pub block_vec:Vec<Weak<RefCell<Enemy>>>,
+    #[serde(skip)]
     pub die_code: u32,
 }
 
@@ -144,29 +153,32 @@ impl Operator {
         }
     }
     pub fn new(v:&Value)->Result<Operator>{
-        let t=serde_json::from_value::<Vec<Vec<i64>>>(v["attack_range"].clone())?;
-        let mut t2 = Vec::<GridRect>::new();
-        for ve in t {
-            t2.push((GridRect::from((ve[0],ve[1],ve[2],ve[3]))));
-        }
-        let attack_scope= Scope(t2);
-        let search_scope=attack_scope.clone();
-        let info=serde_json::from_value::<super::UnitInfo>(v["UnitInfo"].clone())?;
-        let stage=info.clone();
-        Ok(Operator{
-            name:serde_json::from_value(v["name"].clone())?,
-            info,
-            stage,
-            location:(0,0).into(),
-            attack_scope,
-            search_scope,
-            re_deploy:serde_json::from_value::<f32>(v["re_deploy"].clone())?,
-            toward:Toward::East,
-            enemy_find:Vec::<EnemyWithPriority>::new(),
-            target:Weak::new(),
-            block_vec:Vec::<Weak<RefCell<Enemy>>>::new(),
-            die_code:0,
-        })
+        // let t=serde_json::from_value::<Vec<Vec<i64>>>(v["attack_range"].clone())?;
+        // let mut t2 = Vec::<GridRect>::new();
+        // for ve in t {
+        //     t2.push((GridRect::from((ve[0],ve[1],ve[2],ve[3]))));
+        // }
+        // let attack_scope= Scope(t2);
+        // let search_scope=attack_scope.clone();
+        // let info=serde_json::from_value::<super::UnitInfo>(v["UnitInfo"].clone())?;
+        // let stage=info.clone();
+        // Ok(Operator{
+        //     name:serde_json::from_value(v["name"].clone())?,
+        //     info,
+        //     stage,
+        //     location:(0,0).into(),
+        //     attack_scope,
+        //     search_scope,
+        //     re_deploy:serde_json::from_value::<f32>(v["re_deploy"].clone())?,
+        //     toward:Toward::East,
+        //     enemy_find:Vec::<EnemyWithPriority>::new(),
+        //     target:Weak::new(),
+        //     block_vec:Vec::<Weak<RefCell<Enemy>>>::new(),
+        //     die_code:0,
+        // })
+        let mut o:Operator = serde_json::from_value(v.clone())?;
+        o.stage=o.info.clone();
+        Ok(o)
     }
 
     pub fn deep_clone(&self)->Self{

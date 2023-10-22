@@ -1,7 +1,7 @@
 {
   "Amiya": {
     "name": "Amiya",
-    "UnitInfo": {
+    "info": {
       "damage_type": "Magic",
       "health": 1500,
       "attack_speed": 1,
@@ -12,7 +12,7 @@
       "block_num":1,
       "attack_type": "Ranged"
     },
-    "attack_range": [
+    "attack_scope": [
       [
         -1,
         0,
@@ -30,7 +30,7 @@
   },
   "Skadi": {
     "name": "Skadi",
-    "UnitInfo": {
+    "info": {
       "damage_type": "Physical",
       "health": 2000,
       "attack_speed": 1.2,
@@ -41,7 +41,7 @@
       "block_num":2,
       "attack_type": "Melee"
     },
-    "attack_range": [
+    "attack_scope": [
       [
         0,
         0,

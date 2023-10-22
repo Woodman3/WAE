@@ -1,19 +1,16 @@
 use std::mem::swap;
+use serde::Deserialize;
 use crate::utils::math::GridRect;
 
-#[derive(Clone,Debug)]
-// pub enum Scope{
-//     Rect(Vec<((i32,i32),(i32,i32))>),//from left-up to right-down,the default toward is East
-//     Circle((f64,f64,f64))//first and second is coordinate of circle ,third is radius
-// }
-
 ///from left-up to right-down,the default toward is East
+#[derive(Clone,Debug,Default,Deserialize)]
 pub struct Scope(pub Vec<GridRect>);
 
-#[derive(Debug,Clone)]
+#[derive(Debug,Clone,Default)]
 pub enum Toward{
     North,
     South,
+    #[default]
     East,
     West
 }
