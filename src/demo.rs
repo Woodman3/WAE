@@ -10,10 +10,11 @@ use crate::unit::scope::Scope;
 
 #[derive(Default,Deserialize,Debug)]
 struct A{
-    v:i32
+    v:Option<i32>
 }
 
 pub  fn fun(c:&Config){
-    let o:Operator=serde_json::from_value(c.operator["Amiya"].clone()).unwrap();
-    println!("{:?}",o);
+    // let o:Operator=serde_json::from_value(c.operator["Amiya"].clone()).unwrap();
+    let a:A=serde_json::from_value(c.demo["a"].clone()).unwrap();
+    println!("{:?}",a);
 }

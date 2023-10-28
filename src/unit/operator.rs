@@ -10,6 +10,7 @@ use serde_json::Value;
 use crate::calculator::PERIOD;
 use crate::frame::Frame;
 use crate::map::Map;
+use crate::skill::{ChargeType, Skill, TriggerType};
 use crate::unit::bullet::Bullet;
 use crate::unit::damage::Damage;
 use crate::unit::enemy::{Enemy, EnemyWithPriority};
@@ -39,6 +40,8 @@ pub struct Operator{
     pub block_vec:Vec<Weak<RefCell<Enemy>>>,
     #[serde(skip)]
     pub die_code: u32,
+    #[serde(skip)]
+    pub skill:Option<Skill>,
 }
 
 impl Operator {
@@ -68,10 +71,16 @@ impl Operator {
                     _ => {error!("unknown attack_type!")}
                 }
                 self.stage.attack_time=self.info.attack_time;
+                if let Some(skill) =&mut self.skill{
+                    if skill.charge_type==ChargeType::Attack{
+                        skill.sp+=1.0;
+                    }
+                }
             }
         }else{
             self.target=Weak::new();
         }
+
     }
     /// before call it,you should make sure that map haven't contain empty pointer
     pub fn search(&mut self,m:&Map,time_stamp:u64){
@@ -151,6 +160,11 @@ impl Operator {
             self.target=self.enemy_find[0].enemy.clone();
             self.attack(&mut f.bullet_set);
         }
+        if let Some(skill) =&mut self.skill{
+            if skill.charge_type==ChargeType::Auto&&skill.can_charge(){
+                skill.sp+=PERIOD;
+            }
+        }
     }
     pub fn new(v:&Value)->Result<Operator>{
         // let t=serde_json::from_value::<Vec<Vec<i64>>>(v["attack_range"].clone())?;
@@ -224,6 +238,11 @@ impl Unit for Operator {
                 return
             }
             &_ => {}
+        }
+        if let Some(skill) = &mut self.skill{
+            if skill.charge_type==ChargeType::BeHit{
+                skill.sp+=1.0;
+            }
         }
     }
 }

@@ -6,7 +6,8 @@
         "trigger_type": "Manual",
         "duration": 10.0,
         "sp_cost": 30.0,
-        "sp_initial": 20.0,
+        "sp": 20.0,
+        "overcharge": false,
         "effect": [
           {
             "change_type": "Absolute",
@@ -25,7 +26,8 @@
         "trigger_type": "Passive",
         "duration": 10.0,
         "sp_cost": 0.0,
-        "sp_initial": 0.0,
+        "sp": 0.0,
+        "overcharge": false,
         "effect": [
           {
             "change_type": "Absolute",
