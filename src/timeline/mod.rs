@@ -5,7 +5,7 @@ use std::fmt::Debug;
 use std::rc::Rc;
 use crate::utils::config::Config;
 use serde_json::from_value;
-use crate::timeline::doctor::{OperatorDeployEvent, OperatorRetreatEvent};
+use crate::timeline::doctor::{OperatorDeployEvent, OperatorRetreatEvent, OperatorSkillEvent};
 use crate::timeline::hostile::EnemyPlaceEvent;
 use crate::utils::error::ConfigParseError;
 
@@ -35,6 +35,9 @@ pub fn read_doctor_timeline(c:&Config)->Result<(VecDeque<EventWithTime>,Vec<Rc<d
             }
             "Retreat" =>{
                 Rc::new(OperatorRetreatEvent{operator_key:v[2].as_str().ok_or(ConfigParseError("operator key can't translate to str in timeline".into()))?.into()})
+            }
+            "Skill"=>{
+                Rc::new(serde_json::from_value::<OperatorSkillEvent>(v[2].clone())?)
             }
             _ =>{ return Err(ConfigParseError("unknown op in timeline".into()).into())}
         };

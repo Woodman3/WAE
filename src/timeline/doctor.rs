@@ -10,14 +10,19 @@ use crate::utils::error::ConfigParseError;
 use crate::utils::math::Grid;
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
-#[derive(Debug,Clone)]
+#[derive(Debug,Clone,Default)]
 pub struct OperatorDeployEvent{
     operator_key:String,
     location:Grid,
     toward:Toward,
 }
-#[derive(Debug,Deserialize)]
+#[derive(Debug,Deserialize,Default)]
 pub struct OperatorRetreatEvent{
+    pub operator_key:String,
+}
+
+#[derive(Debug,Deserialize,Default)]
+pub struct OperatorSkillEvent{
     pub operator_key:String,
 }
 
@@ -63,5 +68,13 @@ impl Event for OperatorRetreatEvent{
         let o=or.borrow_mut();
         f.map.operator[o.location.row.clone() as usize][o.location.col.clone() as usize]=None;
         f.operator_undeploy.insert(self.operator_key.clone(),Rc::clone(&or));
+    }
+}
+
+impl Event for OperatorSkillEvent{
+    fn happen(&self, f: &mut Frame, c: &Calculator) {
+        if let Some(o)=f.operator_deploy.get(self.operator_key.as_str()){
+
+        }
     }
 }

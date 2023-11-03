@@ -4,6 +4,7 @@ pub mod code;
 pub mod scope;
 pub mod bullet;
 mod damage;
+mod operator_mission;
 
 use std::fmt::Debug;
 use serde::{Deserialize, Serialize};
