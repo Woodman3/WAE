@@ -1,7 +1,7 @@
 use std::rc::Rc;
 use serde::Deserialize;
 use crate::utils::config::Config;
-use crate::skill::Skill;
+use crate::unit::skill::Skill;
 use crate::utils::math::{Point, GridRect, Grid};
 use crate::unit::enemy;
 use crate::unit::enemy::Enemy;
@@ -29,10 +29,16 @@ impl A {
         }
     }
 }
-pub  fn fun(c:&Config){
-    let mut a=A::default();
-    // a.fv.push(Box::new(A::f1));
-    a.fv.push(A::f1);
-    a.fun();
-    println!("{}",a.v);
+fn mymul<T>(x:T,y:T)->T
+where T:std::ops::Mul<Output = T>
+{
+    x*y
+}
+pub fn fun(c:&Config){
+    // let f=std::ops::Mul::mul;
+    let mut a=3.2;
+    let mut b :i32=2;
+    a=mymul(a,3.2);
+    b=mymul(b,2);
+    println!("{},{}",a,b);
 }

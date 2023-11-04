@@ -3,13 +3,15 @@ use std::rc::{Rc, Weak};
 use crate::calculator::PERIOD;
 use crate::frame::Frame;
 use crate::map::Map;
-use crate::skill::ChargeType;
+use crate::unit::skill::ChargeType;
 use crate::unit::bullet::Bullet;
-use crate::unit::damage::Damage;
+use crate::unit::skill::effect::Damage;
 use crate::unit::enemy::{Enemy, EnemyWithPriority};
 use crate::unit::operator::Operator;
+use crate::unit::skill::effect::{ChangeClass, ChangeType};
 use crate::unit::Unit;
 use crate::utils::math::Point;
+use super::skill::effect::Buff;
 
 impl Operator{
     pub fn attack(&mut self,f:&mut Frame){
@@ -20,7 +22,7 @@ impl Operator{
                 match self.stage.attack_type.as_str() {
                     "Melee"=>{
                         let d=Damage{
-                            value:self.stage.damage,
+                            value:self.stage.atk,
                             damage_type:self.stage.damage_type.clone(),
                         };
                         e.borrow_mut().be_damage(&d);
@@ -37,8 +39,8 @@ impl Operator{
                             e,
                             Point::from(self.location),
                             2f64,
-                            self.stage.damage_type.clone(),
-                            self.stage.damage,
+                            self.stage.damage_type,
+                            self.stage.atk,
                         ));
                     }
                     _ => { log::error!("unknown attack_type!")}
@@ -125,5 +127,11 @@ impl Operator{
             self.target=self.enemy_find[0].enemy.clone();
         }
     }
+    //todo
+    pub fn skill(&mut self,f:&mut Frame){
+        if let Some(skill) = &self.skill{
 
+        }
+    }
+    //todo
 }

@@ -10,9 +10,9 @@ use serde_json::Value;
 use crate::calculator::PERIOD;
 use crate::frame::Frame;
 use crate::map::Map;
-use crate::skill::{ChargeType, Skill};
+use crate::unit::skill::{ChargeType, Skill};
 use crate::unit::bullet::Bullet;
-use crate::unit::damage::Damage;
+use crate::unit::skill::effect::Damage;
 use crate::unit::enemy::{Enemy, EnemyWithPriority};
 use crate::unit::Unit;
 use crate::utils::math::{Grid, GridRect, Point};
@@ -43,7 +43,7 @@ pub struct Operator{
     #[serde(skip)]
     pub skill:Option<Skill>,
     #[serde(skip)]
-    pub mission_vec:Vec<fn(&mut Operator,&mut Frame)>
+    mission_vec:Vec<fn(&mut Operator,&mut Frame)>,
 }
 
 impl Operator {
@@ -87,7 +87,7 @@ impl Unit for Operator {
 
     fn be_hit(&mut self, b: &Bullet, f: &mut Frame) {
         self.be_damage(&b.damage);
-        if self.stage.health<=0f64{
+        if self.stage.hp <=0f64{
             self.die_code=super::code::DIE;
             trace!("an enemy has die!");
             return;
@@ -96,23 +96,23 @@ impl Unit for Operator {
 
 
     fn be_damage(&mut self, d: &Damage) {
-        match d.damage_type.as_str() {
-            "Magic" =>{
+        use super::skill::effect::DamageType::*;
+        match d.damage_type {
+            Magic =>{
                 let damage=d.value*(1f64-self.stage.magic_resist);
-                self.stage.health-=damage;
+                self.stage.hp -=damage;
             }
-            "Physical"=>{
-                let damage=d.value-self.stage.armor;
-                self.stage.health-=damage;
+            Physical=>{
+                let damage=d.value-self.stage.def;
+                self.stage.hp -=damage;
             }
-            "Real"=>{
-                self.stage.health-=d.value;
+            Real=>{
+                self.stage.hp -=d.value;
             }
             _ => {
                 warn!("unknown attack type of bullet ,bullet has been departure");
                 return
             }
-            &_ => {}
         }
         if let Some(skill) = &mut self.skill{
             if skill.charge_type==ChargeType::BeHit{

@@ -76,12 +76,12 @@ impl Calculator {
             }
             route.push(Rc::new(r));
         }
-        let t=read_doctor_timeline(c).unwrap();
         let mut frame_vec = Vec::<Frame>::new();
         let mut operator_undeploy = HashMap::<String, OperatorRef>::new();
         for (key, v) in c.operator.as_object().unwrap() {
             operator_undeploy.insert(key.clone(), Rc::new(RefCell::new(Operator::new(v)?)));
         }
+        crate::unit::skill::config_skill(c, &operator_undeploy);
         frame_vec.push(Frame {
             timestamp: 0,
             enemy_set: Vec::<Rc::<RefCell::<Enemy>>>::new(),

@@ -1,19 +1,10 @@
 {
-  "event": {
-    "DeployAmiya": {
-      "operator_key": "Amiya",
-      "location": [1,2],
-      "toward": "South"
-    },
-    "RetreatAmiya": {
-      "operator_key": "Amiya"
-    }
-
+  "skill": {
+    "Skadi": "skill1"
   },
   "timeline": [
     [10,"Deploy","Amiya",1,2,"South"],
     [20,"Deploy","Skadi",2,2,"South"],
     [30,"Retreat","Amiya"]
-
   ]
 }

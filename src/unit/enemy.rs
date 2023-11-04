@@ -12,7 +12,7 @@ use crate::frame::{Frame, OperatorRef};
 use crate::unit::bullet::Bullet;
 use crate::unit::{Unit, UnitInfo};
 use crate::unit::code::DIE;
-use crate::unit::damage::Damage;
+use crate::unit::skill::effect::Damage;
 use crate::unit::operator::Operator;
 use crate::utils::math::{Grid, Point, to_target};
 
@@ -72,7 +72,7 @@ impl Enemy {
             match self.stage.attack_type.as_str() {
                 "Melee"=>{
                     let d=Damage{
-                        value:self.stage.damage,
+                        value:self.stage.atk,
                         damage_type:self.stage.damage_type.clone(),
                     };
                     o.borrow_mut().be_damage(&d);
@@ -99,7 +99,7 @@ impl Enemy {
         }else{
             self.step();
         }
-        if self.stage.health<=0.0{
+        if self.stage.hp <=0.0{
             self.die_code=DIE;
         }
     }
@@ -121,7 +121,7 @@ impl fmt::Display for Enemy {
             ",
             self.direction.x,
             self.direction.y,
-            self.stage.health,
+            self.stage.hp,
         )
     }
 }
@@ -135,25 +135,25 @@ impl Unit for Enemy{
         self.be_damage(&b.damage);
     }
     fn be_damage(&mut self, d: &Damage) {
-        match d.damage_type.as_str() {
-            "Magic" =>{
+        use super::skill::effect::DamageType::*;
+        match d.damage_type {
+            Magic =>{
                 let damage=d.value*(1f64-self.stage.magic_resist);
-                self.stage.health-=damage;
+                self.stage.hp -=damage;
             }
-            "Physical"=>{
-                let damage=d.value-self.stage.armor;
-                self.stage.health-=damage;
+            Physical=>{
+                let damage=d.value-self.stage.def;
+                self.stage.hp -=damage;
             }
-            "Real"=>{
-                self.stage.health-=d.value;
+            Real=>{
+                self.stage.hp -=d.value;
             }
             _ => {
                 warn!("unknown attack type of bullet ,bullet has been departure");
                 return
             }
-            &_ => {}
         }
-        if self.stage.health<=0.0{
+        if self.stage.hp <=0.0{
             self.die_code=super::code::DIE;
             trace!("an enemy has die!");
             return;

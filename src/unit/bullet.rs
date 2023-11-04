@@ -5,7 +5,7 @@ use std::cell::RefCell;
 use std::f64::MAX;
 use std::fmt::{Display, Formatter};
 use std::rc::Rc;
-use crate::unit::damage::Damage;
+use crate::unit::skill::effect::{Damage, DamageType};
 
 #[derive(Clone, Debug)]
 pub struct Bullet {
@@ -25,7 +25,7 @@ impl Bullet {
         self.location=new;
     }
     pub fn new(target: Rc<RefCell<dyn Unit>>, location: Point, move_speed: f64,
-    damage_type:String,damage:f64) -> Self {
+    damage_type:DamageType,damage:f64) -> Self {
         Bullet {
             target,
             direction: (0.0, 0.0).into(),
