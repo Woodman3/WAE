@@ -60,7 +60,7 @@ impl Operator {
     pub fn arrange_mission(&mut self){
         self.mission_vec.push(Self::block);
         self.mission_vec.push(Self::get_target);
-        self.mission_vec.push(Self::attack);
+        self.mission_vec.push(Self::attack_mission);
     }
     pub fn new(v:&Value)->Result<Operator>{
         let mut o:Operator = serde_json::from_value(v.clone())?;

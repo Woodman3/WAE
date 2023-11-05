@@ -1,46 +1,64 @@
 {
-  "Operator": {
-    "Skadi": {
-      "skill1": {
-        "charge_type":"Auto",
-        "trigger_type": "Manual",
-        "duration": 10.0,
-        "sp_cost": 30.0,
-        "sp": 20.0,
-        "overcharge": false,
-        "effect": [
-          {
-            "change_type": "Absolute",
-            "change_class":"ASPD",
-            "value": 20
-          },
-          {
-            "change_type": "Relative",
-            "change_class":"ATK",
-            "value": 0.2
-          }
-        ]
-      },
-      "skill2": {
-        "charge_type":"Passive",
-        "trigger_type": "Passive",
-        "duration": 10.0,
-        "sp_cost": 0.0,
-        "sp": 0.0,
-        "overcharge": false,
-        "effect": [
-          {
-            "change_type": "Absolute",
-            "change_class":"ATK",
-            "value": 20
-          },
-          {
-            "change_type": "Relative",
-            "change_class":"ATK",
-            "value": 0.2
-          }
-        ]
-      }
+  "Skadi": {
+    "skill1": {
+      "charge_type":"Auto",
+      "trigger_type": "Manual",
+      "duration": 10.0,
+      "sp_cost": 30.0,
+      "sp": 20.0,
+      "overcharge": false,
+      "effect": [
+        {
+          "change_type": "DA",
+          "change_class":"ASPD",
+          "value": 20
+        },
+        {
+          "change_type": "DM",
+          "change_class":"ATK",
+          "value": 0.2
+        }
+      ]
+    },
+    "skill2": {
+      "charge_type":"Passive",
+      "trigger_type": "Passive",
+      "duration": 10.0,
+      "sp_cost": 0.0,
+      "sp": 0.0,
+      "overcharge": false,
+      "effect": [
+        {
+          "change_type": "DA",
+          "change_class":"ATK",
+          "value": 20
+        },
+        {
+          "change_type": "DM",
+          "change_class":"ATK",
+          "value": 0.2
+        }
+      ]
+    },
+    "skill3": {
+      "charge_type":"Auto",
+      "trigger_type": "Auto",
+      "duration": 10.0,
+      "sp_cost": 30.0,
+      "sp": 20.0,
+      "overcharge": false,
+      "effect": [
+        {
+          "change_type": "DA",
+          "change_class":"ASPD",
+          "value": 20
+        },
+        {
+          "change_type": "DM",
+          "change_class":"ATK",
+          "value": 0.2
+        }
+      ]
     }
   }
 }

@@ -37,24 +37,26 @@ pub trait Unit:Debug{
 
 impl UnitInfo {
     pub fn be_buff(&mut self,b: Buff){
+        use ChangeType::*;
+        use ChangeClass::*;
         let f=match b.change_type {
-            ChangeType::Absolute => {std::ops::Add::add}
-            ChangeType::Relative => {std::ops::Mul::mul}
+            DA|LA => {std::ops::Add::add}
+            DM|LM => {std::ops::Mul::mul}
         };
         match b.change_class {
-            ChangeClass::ASPD => {
+            ASPD => {
                 self.aspd=f(self.aspd,b.value);
             }
-            ChangeClass::ATK => {
+            ATK => {
                 self.atk=f(self.atk,b.value);
             }
-            ChangeClass::DEF => {
+            DEF => {
                 self.def=f(self.def,b.value);
             }
-            ChangeClass::MaxHP => {
+            MaxHP => {
                 self.max_hp=f(self.max_hp,b.value);
             }
-            ChangeClass::Hp => {
+            Hp => {
                 self.hp=f(self.hp,b.value);
             }
         }

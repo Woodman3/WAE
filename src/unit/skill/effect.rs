@@ -1,8 +1,15 @@
+use std::cmp::Ordering;
 use serde::Deserialize;
-#[derive(Clone,Deserialize,Debug)]
+#[derive(Clone,Deserialize,Debug,PartialEq,Eq,PartialOrd,Ord)]
 pub enum ChangeType{
-    Absolute,
-    Relative,
+    ///directly add
+    DA,
+    ///directly mul
+    DM,
+    ///lastly add
+    LA,
+    ///lastly mul
+    LM,
 }
 #[derive(Clone,Deserialize,Debug)]
 pub enum ChangeClass{
@@ -18,22 +25,23 @@ pub struct Buff{
     pub change_class:ChangeClass,
     pub value:f64,
 }
-
-enum Effect{
+#[derive(Clone,Deserialize,Debug)]
+#[serde(untagged)]
+pub enum Effect{
     Buff(Buff),
     Damage(Damage),
 }
 
-enum ReferType{
-    MySelf,
-    Friend,
-    Friends,
-    Enemy,
-    Enemies,
-}
+// enum ReferType{
+//     MySelf,
+//     Friend,
+//     Friends,
+//     Enemy,
+//     Enemies,
+// }
 
 
-#[derive(Debug,Clone)]
+#[derive(Debug,Clone,Deserialize)]
 pub struct Damage{
     pub value:f64,
     pub damage_type:DamageType,

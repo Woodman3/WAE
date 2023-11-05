@@ -9,6 +9,7 @@ use serde_json::Value;
 use crate::calculator::PERIOD;
 use crate::frame::OperatorRef;
 use crate::unit::operator::Operator;
+use crate::unit::skill::effect::Effect;
 use crate::utils::config::Config;
 
 #[derive(Clone,Deserialize,Debug,Default,PartialEq)]
@@ -38,11 +39,11 @@ pub struct Skill{
     pub sp_cost:f64,
     pub sp:f64,
     overcharge:bool,
-    pub effect:Vec<Buff>
+    pub effect:Vec<Effect>
 }
 pub fn config_skill(c:&Config,os:&HashMap<String, OperatorRef>){
     for (key,skill) in c.doctor["skill"].as_object().unwrap(){
-        if let Some(value) = c.skill["Operator"].get(key).unwrap().get(skill.as_str().unwrap()){
+        if let Some(value) = c.skill.get(key).unwrap().get(skill.as_str().unwrap()){
             if let Some(o) =os.get(key){
                 o.borrow_mut().skill = Some(serde_json::from_value(value.clone()).unwrap());
             } else{
@@ -51,31 +52,16 @@ pub fn config_skill(c:&Config,os:&HashMap<String, OperatorRef>){
         } else{
             warn!("unknown skill name in skill config!,skill name:{}",skill)
         }
-
     }
 }
 impl Skill{
-    // fn step(&mut self){
-    //     if self.can_charge(){
-    //         match self.charge_type {
-    //             ChargeType::Auto => {
-    //                 self.sp+=PERIOD;
-    //             }
-    //             _ =>{}
-    //         }
-    //     }
-    //
-    // }
-    fn ready(&self)->bool{
+    pub fn ready(&self)->bool{
         self.last!=0.0&&self.sp>=self.sp_cost
     }
-    pub fn can_charge(&self)->bool{
-        // if self.sp<self.sp_cost{
-        //     true
-        // }else if self.overcharge{
-        //     true
-        // }
-        // false
-        self.sp<self.sp_cost||self.overcharge
+    pub fn can_charge(&self)->bool{ self.sp<self.sp_cost||self.overcharge }
+    pub fn charge(&mut self,value:f64){
+        if self.can_charge(){
+            self.sp+=value
+        }
     }
 }

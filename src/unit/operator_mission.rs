@@ -1,13 +1,15 @@
 use std::cell::RefCell;
 use std::rc::{Rc, Weak};
+use eframe::egui::Key::P;
 use crate::calculator::PERIOD;
 use crate::frame::Frame;
 use crate::map::Map;
-use crate::unit::skill::ChargeType;
+use crate::unit::skill::{ChargeType, TriggerType};
 use crate::unit::bullet::Bullet;
-use crate::unit::skill::effect::Damage;
+use crate::unit::skill::effect::{Damage, Effect};
 use crate::unit::enemy::{Enemy, EnemyWithPriority};
 use crate::unit::operator::Operator;
+use crate::unit::skill::ChargeType::Auto;
 use crate::unit::skill::effect::{ChangeClass, ChangeType};
 use crate::unit::Unit;
 use crate::utils::math::Point;
@@ -16,47 +18,69 @@ use super::skill::effect::Buff;
 impl Operator{
     pub fn attack(&mut self,f:&mut Frame){
         if let Some(e)=self.target.upgrade(){
-            if self.stage.attack_time>0.0{
-                self.stage.attack_time-=PERIOD;
-            }else{
-                match self.stage.attack_type.as_str() {
-                    "Melee"=>{
-                        let d=Damage{
-                            value:self.stage.atk,
-                            damage_type:self.stage.damage_type.clone(),
-                        };
-                        e.borrow_mut().be_damage(&d);
-                    }
-                    "Ranged"=>{
-                        // bv.push(Bullet::new(
-                        //     e,
-                        //     Point::from(self.location),
-                        //     2f64,
-                        //     self.stage.damage_type.clone(),
-                        //     self.stage.damage,
-                        // ));
-                        f.bullet_set.push(Bullet::new(
-                            e,
-                            Point::from(self.location),
-                            2f64,
-                            self.stage.damage_type,
-                            self.stage.atk,
-                        ));
-                    }
-                    _ => { log::error!("unknown attack_type!")}
+            match self.stage.attack_type.as_str() {
+                "Melee"=>{
+                    let d=Damage{
+                        value:self.stage.atk,
+                        damage_type:self.stage.damage_type.clone(),
+                    };
+                    e.borrow_mut().be_damage(&d);
                 }
-                self.stage.attack_time=self.info.attack_time;
-                if let Some(skill) =&mut self.skill{
-                    if skill.charge_type==ChargeType::Attack{
-                        skill.sp+=1.0;
-                    }
+                "Ranged"=>{
+                    f.bullet_set.push(Bullet::new(
+                        e,
+                        Point::from(self.location),
+                        2f64,
+                        self.stage.damage_type,
+                        self.stage.atk,
+                    ));
                 }
+                _ => { log::error!("unknown attack_type!")}
             }
         }else{
             self.target=Weak::new();
+            self.stage.attack_time=self.info.attack_time;
         }
 
     }
+    pub fn attack_skill(&mut self, f:&mut Frame){
+        if let Some(skill) = &mut self.skill{
+            if self.stage.attack_time>0.0{
+                self.stage.attack_time-=PERIOD;
+            }else{
+                for eff in skill.effect.clone().into_iter(){
+                    self.be_effect(eff);
+                }
+                self.attack(f);
+                self.stage.attack_time=self.info.attack_time;
+            }
+        }else{
+            self.target=Weak::new();
+            self.stage.attack_time=self.info.attack_time;
+        }
+    }
+    pub fn attack_mission(&mut self,f:&mut Frame){
+        // if let Some(skill) = &mut self.skill {
+        //     if skill.ready(){
+        //         self.skill(f);
+        //         return;
+        //     }else{
+        //         if skill.charge_type==Auto{
+        //             skill.charge(PERIOD);
+        //         }
+        //     }
+        // }
+        if self.stage.attack_time>0.0{
+            self.stage.attack_time-=PERIOD;
+        }else{
+            self.stage.attack_time=self.info.attack_time;
+            if let Some(skill) =&mut self.skill{
+                skill.charge(1.0);
+            }
+            self.attack(f);
+        }
+    }
+
     /// before call it,you should make sure that map haven't contain empty pointer
     pub fn search(&mut self,m:&Map,time_stamp:u64){
         self.enemy_find.clear();
@@ -127,11 +151,23 @@ impl Operator{
             self.target=self.enemy_find[0].enemy.clone();
         }
     }
-    //todo
-    pub fn skill(&mut self,f:&mut Frame){
-        if let Some(skill) = &self.skill{
-
+    fn be_effect(&mut self,e:Effect){
+       match e{
+           Effect::Buff(b) => {
+               self.stage.be_buff(b);
+           }
+           Effect::Damage(d) => {
+               self.be_damage(&d);
+           }
+       }
+    }
+    fn buff_skill(&mut self,f :&mut Frame){
+        if let Some(skill)=&mut self.skill{
+            if skill.ready(){
+                for eff in skill.effect.clone().into_iter(){
+                    self.be_effect(eff);
+                }
+            }
         }
     }
-    //todo
 }
