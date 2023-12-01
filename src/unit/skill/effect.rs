@@ -25,11 +25,13 @@ pub struct Buff{
     pub change_class:ChangeClass,
     pub value:f64,
 }
-#[derive(Clone,Deserialize,Debug)]
+#[derive(Clone,Deserialize,Debug,Default)]
 #[serde(untagged)]
 pub enum Effect{
     Buff(Buff),
     Damage(Damage),
+    #[default]
+    None,
 }
 
 // enum ReferType{

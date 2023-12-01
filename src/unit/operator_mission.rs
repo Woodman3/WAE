@@ -4,12 +4,12 @@ use eframe::egui::Key::P;
 use crate::calculator::PERIOD;
 use crate::frame::Frame;
 use crate::map::Map;
-use crate::unit::skill::{ChargeType, TriggerType};
-use crate::unit::bullet::Bullet;
+use crate::unit::skill::skill_type::{ChargeType,TriggerType,AttackType};
 use crate::unit::skill::effect::{Damage, Effect};
+use crate::unit::skill::AttackSkill;
+use crate::unit::bullet::Bullet;
 use crate::unit::enemy::{Enemy, EnemyWithPriority};
 use crate::unit::operator::Operator;
-use crate::unit::skill::ChargeType::Auto;
 use crate::unit::skill::effect::{ChangeClass, ChangeType};
 use crate::unit::Unit;
 use crate::utils::math::Point;
@@ -159,6 +159,7 @@ impl Operator{
            Effect::Damage(d) => {
                self.be_damage(&d);
            }
+           _ => {}
        }
     }
     fn buff_skill(&mut self,f :&mut Frame){
