@@ -12,7 +12,7 @@ use crate::frame::{Frame, OperatorRef};
 use crate::unit::bullet::Bullet;
 use crate::unit::{Unit, UnitInfo};
 use crate::unit::code::DIE;
-use crate::unit::skill::effect::Damage;
+use crate::unit::skill::effect::FixedDamage;
 use crate::unit::operator::Operator;
 use crate::utils::math::{Grid, Point, to_target};
 
@@ -71,7 +71,7 @@ impl Enemy {
         }else {
             match self.stage.attack_type.as_str() {
                 "Melee"=>{
-                    let d=Damage{
+                    let d= FixedDamage {
                         value:self.stage.atk,
                         damage_type:self.stage.damage_type.clone(),
                     };
@@ -134,7 +134,7 @@ impl Unit for Enemy{
     fn be_hit(&mut self, b: &Bullet, f: &mut Frame) {
         self.be_damage(&b.damage);
     }
-    fn be_damage(&mut self, d: &Damage) {
+    fn be_damage(&mut self, d: &FixedDamage) {
         use super::skill::effect::DamageType::*;
         match d.damage_type {
             Magic =>{

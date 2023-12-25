@@ -9,7 +9,6 @@ use crate::unit::{enemy, Unit};
 use crate::unit::enemy::Enemy;
 use crate::unit::operator::Operator;
 use crate::unit::scope::Scope;
-use crate::unit::skill::effect::Effect;
 // impl DirectSkill {
 //     fn schedule(&self,f:Frame){
 //

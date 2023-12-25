@@ -11,7 +11,7 @@ use crate::calculator::PERIOD;
 use crate::frame::Frame;
 use crate::map::Map;
 use crate::unit::skill::Skill;
-use crate::unit::skill::effect::Damage;
+use crate::unit::skill::effect::FixedDamage;
 use crate::unit::skill::skill_type::{AttackType,ChargeType};
 use crate::unit::bullet::Bullet;
 use crate::unit::enemy::{Enemy, EnemyWithPriority};
@@ -96,7 +96,7 @@ impl Unit for Operator {
     }
 
 
-    fn be_damage(&mut self, d: &Damage) {
+    fn be_damage(&mut self, d: &FixedDamage) {
         use super::skill::effect::DamageType::*;
         match d.damage_type {
             Magic =>{

@@ -1,0 +1,24 @@
+{
+  "Skadi": {
+    "skill1": {
+      "charge_type":"Auto",
+      "trigger_type": "Manual",
+      "schedule_type": "PreEmptive",
+      "duration": 10.0,
+      "sp_cost": 30.0,
+      "sp": 20.0,
+      "overcharge": false,
+      "skill_entity": {
+        "type": "ToEnemySkill",
+        "effect": {
+          "type": "Damage",
+          "change": {
+            "change_type": "DM",
+            "change_class":"ATK"
+          }
+        },
+        "attack_type": "Melee"
+      }
+    }
+  }
+}

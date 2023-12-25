@@ -19,6 +19,22 @@ pub enum ChangeClass{
     MaxHP,
     Hp,
 }
+
+#[derive(Deserialize,Debug,Clone)]
+pub(crate) struct Change{
+    pub(super) change_type:ChangeType,
+    pub(super) change_class:ChangeClass,
+}
+
+#[derive(Default,Deserialize,Debug,Clone)]
+pub(crate) enum TargetType{
+    Operator,
+    Enemy,
+    #[default]
+    MySelf,
+    Friend,
+}
+
 #[derive(Clone,Deserialize,Debug)]
 pub struct Buff{
     pub change_type:ChangeType,
@@ -26,29 +42,27 @@ pub struct Buff{
     pub value:f64,
 }
 #[derive(Clone,Deserialize,Debug,Default)]
-#[serde(untagged)]
-pub enum Effect{
+#[serde(tag="type")]
+pub(crate) enum Effect{
     Buff(Buff),
+    FixedDamage(FixedDamage),
     Damage(Damage),
     #[default]
     None,
 }
 
-// enum ReferType{
-//     MySelf,
-//     Friend,
-//     Friends,
-//     Enemy,
-//     Enemies,
-// }
-
-
 #[derive(Debug,Clone,Deserialize)]
-pub struct Damage{
+pub struct FixedDamage {
     pub value:f64,
     pub damage_type:DamageType,
 }
 
+#[derive(Clone,Deserialize,Debug)]
+pub(crate) struct Damage{
+    #[serde(skip)]//from operator ,don't need to set
+    pub(super) value:f64,
+    pub(super) change:Option<Change>,
+}
 #[derive(Debug,Clone,Copy,Deserialize,Default)]
 pub enum DamageType {
     #[default]

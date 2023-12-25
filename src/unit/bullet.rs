@@ -5,7 +5,7 @@ use std::cell::RefCell;
 use std::f64::MAX;
 use std::fmt::{Display, Formatter};
 use std::rc::Rc;
-use crate::unit::skill::effect::{Damage, DamageType};
+use crate::unit::skill::effect::{FixedDamage, DamageType};
 
 #[derive(Clone, Debug)]
 pub struct Bullet {
@@ -14,7 +14,7 @@ pub struct Bullet {
     pub location: Point,
     move_speed: f64,
     pub distance: f64,
-    pub damage:Damage,
+    pub damage: FixedDamage,
 }
 
 impl Bullet {
@@ -32,7 +32,7 @@ impl Bullet {
             location,
             move_speed,
             distance: f64::MAX,
-            damage:Damage{
+            damage: FixedDamage {
                 value:damage,
                 damage_type,
             }

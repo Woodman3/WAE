@@ -8,18 +8,12 @@
       "sp_cost": 30.0,
       "sp": 20.0,
       "overcharge": false,
-      "effect": [
-        {
-          "change_type": "DA",
-          "change_class":"ASPD",
-          "value": 20
-        },
-        {
+      "skill_entity": {
+        "effect":{
           "change_type": "DM",
-          "change_class":"ATK",
-          "value": 0.2
+          "change_class":"ATK"
         }
-      ]
+      }
     },
     "skill2": {
       "charge_type":"Passive",

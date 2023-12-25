@@ -4,7 +4,7 @@ pub mod skill_schedule;
 
 use std::cell::RefCell;
 use std::collections::HashMap;
-use std::rc::Weak;
+use std::rc::{Rc, Weak};
 use eframe::glow::TIMESTAMP;
 use log::warn;
 use effect::Buff;
@@ -17,6 +17,7 @@ use crate::unit::operator::Operator;
 use crate::unit::skill::effect::Effect;
 use crate::utils::config::Config;
 use skill_type::*;
+use crate::unit::Unit;
 
 #[derive(Clone,Deserialize,Debug,Default)]
 pub struct Skill{
@@ -29,15 +30,28 @@ pub struct Skill{
     pub sp_cost:f64,
     pub sp:f64,
     overcharge:bool,
-    pub effect:Vec<Effect>
+    // pub(crate) effect:Vec<Effect>,
+    skill_entity:SkillEntity,
 }
-#[derive(Default)]
-pub struct AttackSkill {
-    pub target:Weak<RefCell<Enemy>>,
-    pub target_effect:Effect,
-    pub self_effect:Effect,
-    pub attack_type:AttackType,
+#[derive(Deserialize,Debug,Default,Clone)]
+pub(crate) struct ToEnemySkill {
+    #[serde(skip)]
+    pub(crate) target:Weak<RefCell<Enemy>>,
+    pub(crate) effect:Effect,
+    pub(self) attack_type:AttackType,
 }
+
+pub(crate) struct NotDirectSkill{
+}
+
+#[derive(Default,Deserialize,Debug,Clone)]
+#[serde(tag="type")]
+enum SkillEntity{
+    ToEnemySkill(ToEnemySkill),
+    #[default]
+    None,
+}
+
 pub fn config_skill(c:&Config,os:&HashMap<String, OperatorRef>){
     for (key,skill) in c.doctor["skill"].as_object().unwrap(){
         if let Some(value) = c.skill.get(key).unwrap().get(skill.as_str().unwrap()){

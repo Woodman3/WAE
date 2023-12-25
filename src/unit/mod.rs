@@ -10,7 +10,7 @@ use std::fmt::Debug;
 use serde::{Deserialize, Serialize};
 use crate::frame::Frame;
 use crate::unit::bullet::Bullet;
-use skill::effect::Damage;
+use skill::effect::FixedDamage;
 use crate::unit::skill::effect::{ChangeClass, ChangeType, Buff, DamageType};
 use crate::utils::math::Point;
 
@@ -32,7 +32,7 @@ pub struct UnitInfo {
 pub trait Unit:Debug{
     fn get_loc(&self)->Point;
     fn be_hit(&mut self,b:&Bullet,f:&mut Frame);
-    fn be_damage(&mut self,d:&Damage);
+    fn be_damage(&mut self,d:&FixedDamage);
 }
 
 impl UnitInfo {

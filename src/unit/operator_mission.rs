@@ -5,8 +5,8 @@ use crate::calculator::PERIOD;
 use crate::frame::Frame;
 use crate::map::Map;
 use crate::unit::skill::skill_type::{ChargeType,TriggerType,AttackType};
-use crate::unit::skill::effect::{Damage, Effect};
-use crate::unit::skill::AttackSkill;
+use crate::unit::skill::effect::{FixedDamage, Effect};
+use crate::unit::skill::ToEnemySkill;
 use crate::unit::bullet::Bullet;
 use crate::unit::enemy::{Enemy, EnemyWithPriority};
 use crate::unit::operator::Operator;
@@ -20,7 +20,7 @@ impl Operator{
         if let Some(e)=self.target.upgrade(){
             match self.stage.attack_type.as_str() {
                 "Melee"=>{
-                    let d=Damage{
+                    let d= FixedDamage {
                         value:self.stage.atk,
                         damage_type:self.stage.damage_type.clone(),
                     };
@@ -43,22 +43,22 @@ impl Operator{
         }
 
     }
-    pub fn attack_skill(&mut self, f:&mut Frame){
-        if let Some(skill) = &mut self.skill{
-            if self.stage.attack_time>0.0{
-                self.stage.attack_time-=PERIOD;
-            }else{
-                for eff in skill.effect.clone().into_iter(){
-                    self.be_effect(eff);
-                }
-                self.attack(f);
-                self.stage.attack_time=self.info.attack_time;
-            }
-        }else{
-            self.target=Weak::new();
-            self.stage.attack_time=self.info.attack_time;
-        }
-    }
+    // pub fn attack_skill(&mut self, f:&mut Frame){
+    //     if let Some(skill) = &mut self.skill{
+    //         if self.stage.attack_time>0.0{
+    //             self.stage.attack_time-=PERIOD;
+    //         }else{
+    //             for eff in skill.effect.clone().into_iter(){
+    //                 self.be_effect(eff);
+    //             }
+    //             self.attack(f);
+    //             self.stage.attack_time=self.info.attack_time;
+    //         }
+    //     }else{
+    //         self.target=Weak::new();
+    //         self.stage.attack_time=self.info.attack_time;
+    //     }
+    // }
     pub fn attack_mission(&mut self,f:&mut Frame){
         // if let Some(skill) = &mut self.skill {
         //     if skill.ready(){
@@ -156,19 +156,19 @@ impl Operator{
            Effect::Buff(b) => {
                self.stage.be_buff(b);
            }
-           Effect::Damage(d) => {
+           Effect::FixedDamage(d) => {
                self.be_damage(&d);
            }
            _ => {}
        }
     }
-    fn buff_skill(&mut self,f :&mut Frame){
-        if let Some(skill)=&mut self.skill{
-            if skill.ready(){
-                for eff in skill.effect.clone().into_iter(){
-                    self.be_effect(eff);
-                }
-            }
-        }
-    }
+    // fn buff_skill(&mut self,f :&mut Frame){
+    //     if let Some(skill)=&mut self.skill{
+    //         if skill.ready(){
+    //             for eff in skill.effect.clone().into_iter(){
+    //                 self.be_effect(eff);
+    //             }
+    //         }
+    //     }
+    // }
 }

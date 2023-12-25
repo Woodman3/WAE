@@ -53,7 +53,7 @@ impl Config {
         file = File::open(path.as_ref().join("map.json"))?;
         reader = BufReader::new(file);
         let map= serde_json::from_reader(reader)?;
-        file = File::open(path.as_ref().join("skill.json"))?;
+        file = File::open(path.as_ref().join("skill_test.json"))?;
         reader = BufReader::new(file);
         let skill= serde_json::from_reader(reader)?;
         file = File::open(path.as_ref().join("demo.json"))?;
