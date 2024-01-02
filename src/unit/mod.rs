@@ -12,6 +12,7 @@ use crate::frame::Frame;
 use crate::unit::bullet::Bullet;
 use skill::effect::FixedDamage;
 use crate::unit::skill::effect::{ChangeClass, ChangeType, Buff, DamageType};
+use crate::unit::skill::skill_type::AttackType;
 use crate::utils::math::Point;
 
 #[derive(Debug, Clone,Default, Deserialize)]
@@ -26,7 +27,7 @@ pub struct UnitInfo {
     magic_resist: f64,
     attack_time:f64,
     block_num:u32,
-    attack_type:String,
+    attack_type:AttackType,
 }
 
 pub trait Unit:Debug{

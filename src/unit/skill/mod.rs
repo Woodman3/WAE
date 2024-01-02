@@ -30,7 +30,6 @@ pub struct Skill{
     pub sp_cost:f64,
     pub sp:f64,
     overcharge:bool,
-    // pub(crate) effect:Vec<Effect>,
     skill_entity:SkillEntity,
 }
 #[derive(Deserialize,Debug,Default,Clone)]

@@ -18,15 +18,16 @@ use super::skill::effect::Buff;
 impl Operator{
     pub fn attack(&mut self,f:&mut Frame){
         if let Some(e)=self.target.upgrade(){
-            match self.stage.attack_type.as_str() {
-                "Melee"=>{
+            use super::skill::skill_type::AttackType::*;
+            match self.stage.attack_type {
+                Melee=>{
                     let d= FixedDamage {
                         value:self.stage.atk,
                         damage_type:self.stage.damage_type.clone(),
                     };
                     e.borrow_mut().be_damage(&d);
                 }
-                "Ranged"=>{
+                Ranged=>{
                     f.bullet_set.push(Bullet::new(
                         e,
                         Point::from(self.location),

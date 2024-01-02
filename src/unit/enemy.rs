@@ -10,7 +10,7 @@ use serde::Deserialize;
 use crate::calculator::PERIOD;
 use crate::frame::{Frame, OperatorRef};
 use crate::unit::bullet::Bullet;
-use crate::unit::{Unit, UnitInfo};
+use crate::unit::{skill, Unit, UnitInfo};
 use crate::unit::code::DIE;
 use crate::unit::skill::effect::FixedDamage;
 use crate::unit::operator::Operator;
@@ -69,8 +69,9 @@ impl Enemy {
         if self.stage.attack_time>0.0{
             self.stage.attack_time-=PERIOD;
         }else {
-            match self.stage.attack_type.as_str() {
-                "Melee"=>{
+            use skill::skill_type::AttackType::*;
+            match self.stage.attack_type {
+                Melee=>{
                     let d= FixedDamage {
                         value:self.stage.atk,
                         damage_type:self.stage.damage_type.clone(),
@@ -78,7 +79,7 @@ impl Enemy {
                     o.borrow_mut().be_damage(&d);
                     // self.target.upgrade().unwrap().borrow_mut().be_damage(&d);
                 }
-                "Ranged"=>{
+                Ranged=>{
                     //todo: ranged enemy
                     // bv.push(Bullet::new(
                     //     self.target.upgrade().unwrap(),

@@ -19,10 +19,10 @@ pub enum TriggerType{
 }
 #[derive(Clone,Copy,Deserialize,Debug,Default)]
 pub enum ScheduleType{
-    PreEmptive,
-    Immediately,
+    PreEmptive,//抢占式，会打断其他技能的释放，比如拔刀
+    Immediately,//非抢占式，哪怕已经在释放其他技能也会立即释放，比如战术脉唱
     #[default]
-    Delay
+    Delay//非抢占式，会延迟到其他技能释放完毕后再释放，比如强力击
 }
 
 #[derive(Clone,Copy,Deserialize,Debug,Default)]
