@@ -55,7 +55,7 @@ pub fn config_skill(c:&Config,os:&HashMap<String, OperatorRef>){
     for (key,skill) in c.doctor["skill"].as_object().unwrap(){
         if let Some(value) = c.skill.get(key).unwrap().get(skill.as_str().unwrap()){
             if let Some(o) =os.get(key){
-                o.borrow_mut().skill = Some(serde_json::from_value(value.clone()).unwrap());
+                o.borrow_mut().skill.push(serde_json::from_value(value.clone()).unwrap());
             } else{
                 warn!("unknown operator name in skill config!")
             }

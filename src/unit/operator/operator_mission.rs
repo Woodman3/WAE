@@ -75,9 +75,6 @@ impl Operator{
             self.stage.attack_time-=PERIOD;
         }else{
             self.stage.attack_time=self.info.attack_time;
-            if let Some(skill) =&mut self.skill{
-                skill.charge(1.0);
-            }
             self.attack(f);
         }
     }
@@ -163,13 +160,4 @@ impl Operator{
            _ => {}
        }
     }
-    // fn buff_skill(&mut self,f :&mut Frame){
-    //     if let Some(skill)=&mut self.skill{
-    //         if skill.ready(){
-    //             for eff in skill.effect.clone().into_iter(){
-    //                 self.be_effect(eff);
-    //             }
-    //         }
-    //     }
-    // }
 }

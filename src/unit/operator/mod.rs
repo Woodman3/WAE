@@ -43,7 +43,7 @@ pub struct Operator{
     #[serde(skip)]
     pub die_code: u32,
     #[serde(skip)]
-    pub skill:Option<Skill>,
+    pub skill:Vec<Skill>,
     #[serde(skip)]
     mission_vec:Vec<fn(&mut Operator,&mut Frame)>,
 }
@@ -53,13 +53,9 @@ impl Operator {
         for i in 0..self.mission_vec.len(){
             self.mission_vec[i](self,f);
         }
-        if let Some(skill) =&mut self.skill{
-            if skill.charge_type==ChargeType::Auto&&skill.can_charge(){
-                skill.sp+=PERIOD;
-            }
-        }
     }
     pub fn arrange_mission(&mut self){
+        self.generate_default_attack_skill();
         self.mission_vec.push(Self::block);
         self.mission_vec.push(Self::get_target);
         self.mission_vec.push(Self::attack_mission);
@@ -114,11 +110,6 @@ impl Unit for Operator {
             _ => {
                 warn!("unknown attack type of bullet ,bullet has been departure");
                 return
-            }
-        }
-        if let Some(skill) = &mut self.skill{
-            if skill.charge_type==ChargeType::BeHit{
-                skill.sp+=1.0;
             }
         }
     }

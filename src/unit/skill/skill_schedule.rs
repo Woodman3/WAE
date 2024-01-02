@@ -6,7 +6,7 @@ use crate::unit::skill::{Skill, ToEnemySkill};
 use crate::unit::skill::effect::{Effect, FixedDamage};
 use crate::unit::skill::effect::Effect::Damage;
 use crate::unit::skill::skill_type::ChargeType;
-use crate::unit::Unit;
+use crate::unit::{skill, Unit};
 use crate::utils::math::Point;
 
 impl Operator{
@@ -37,7 +37,7 @@ impl Operator{
             self.stage.attack_time=self.info.attack_time;
         }
     }
-    fn generate_default_attack_skill(&mut self){
+    pub(crate) fn generate_default_attack_skill(&mut self){
         let mut s=Skill::default();
         s.duration=self.stage.attack_time;
         let d=super::effect::Damage{
@@ -49,5 +49,9 @@ impl Operator{
             effect:Damage(d),
             attack_type:self.stage.attack_type,
         };
+        s.skill_entity=super::SkillEntity::ToEnemySkill(se);
+        self.skill.push(s);
+    }
+    fn skill(&mut self){
     }
 }
