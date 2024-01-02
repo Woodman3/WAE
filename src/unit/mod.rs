@@ -1,10 +1,9 @@
-pub mod enemy;
-pub mod operator;
+pub(super) mod enemy;
 pub mod code;
 pub mod scope;
 pub mod bullet;
-mod operator_mission;
 pub mod skill;
+pub(super) mod operator;
 
 use std::fmt::Debug;
 use serde::{Deserialize, Serialize};

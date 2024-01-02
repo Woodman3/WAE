@@ -13,12 +13,12 @@ use crate::unit::operator::Operator;
 use crate::unit::skill::effect::{ChangeClass, ChangeType};
 use crate::unit::Unit;
 use crate::utils::math::Point;
-use super::skill::effect::Buff;
+use super::super::skill::effect::Buff;
 
 impl Operator{
     pub fn attack(&mut self,f:&mut Frame){
         if let Some(e)=self.target.upgrade(){
-            use super::skill::skill_type::AttackType::*;
+            use super::super::skill::skill_type::AttackType::*;
             match self.stage.attack_type {
                 Melee=>{
                     let d= FixedDamage {

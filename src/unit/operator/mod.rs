@@ -18,6 +18,7 @@ use crate::unit::enemy::{Enemy, EnemyWithPriority};
 use crate::unit::Unit;
 use crate::utils::math::{Grid, GridRect, Point};
 
+mod operator_mission;
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 #[derive(Debug,Clone,Default,Deserialize)]
 pub struct Operator{
@@ -131,10 +132,10 @@ impl Display for Operator{
         block_vec_len:{}\n\
         enemy_find:{}\n\
         ",
-        self.stage.attack_time,
-        self.stage.block_num,
-        self.block_vec.len(),
-        self.enemy_find.len()
+               self.stage.attack_time,
+               self.stage.block_num,
+               self.block_vec.len(),
+               self.enemy_find.len()
         )
     }
 }
