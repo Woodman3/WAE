@@ -43,7 +43,9 @@ pub struct Operator{
     #[serde(skip)]
     pub die_code: u32,
     #[serde(skip)]
-    pub skill:Vec<Skill>,
+    pub skill_ready:Vec<Skill>,
+    #[serde(skip)]
+    pub skill_block:Vec<Skill>,
     #[serde(skip)]
     mission_vec:Vec<fn(&mut Operator,&mut Frame)>,
 }

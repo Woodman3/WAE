@@ -31,3 +31,9 @@ pub enum AttackType{
     Melee,
     Ranged
 }
+
+pub(super) enum SkillStage{
+    Standby,
+    AnimationBefore(f64),
+    AfterAttack(f64),
+}
