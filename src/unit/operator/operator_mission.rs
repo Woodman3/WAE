@@ -103,10 +103,8 @@ impl Operator{
                 }
             }
         }
-        let mut c=0;
         for e in ve{
             self.enemy_find.push(EnemyWithPriority{enemy:e,time_stamp});
-            c+=1;
         }
     }
     /// try to block enemy

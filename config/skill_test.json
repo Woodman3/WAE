@@ -17,7 +17,8 @@
             "change_class":"ATK"
           }
         },
-        "attack_type": "Melee"
+        "attack_type": "Melee",
+        "target_num": 1
       }
     }
   }

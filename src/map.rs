@@ -1,26 +1,27 @@
 use std::arch::x86_64::_bzhi_u32;
 use crate::frame::Frame;
 use crate::mul2d;
-use crate::unit::enemy::Enemy;
+use crate::unit::enemy::{Enemy, EnemyWithPriority};
 use crate::utils::math::distance_p2p;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::cell::RefCell;
 use std::rc::{Rc, Weak};
 use crate::unit::operator::Operator;
+use crate::unit::scope::Scope;
 
 pub const ENEMY_TOUCH_SIZE: f64 = 0.15;
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 #[derive(Debug,Clone)]
 pub struct Map {
-    pub width: u32,
-    pub height: u32,
-    pub layout: Vec<Vec<u64>>,
-    pub enemy: Vec<Vec<Vec<Weak<RefCell<Enemy>>>>>,
-    pub operator:Vec<Vec<Option<String>>>
+    pub(crate) width: u32,
+    pub(crate) height: u32,
+    pub(crate) layout: Vec<Vec<u64>>,
+    pub(crate) enemy: Vec<Vec<Vec<Weak<RefCell<Enemy>>>>>,
+    pub(crate) operator:Vec<Vec<Option<String>>>
 }
 impl Map {
-    pub fn new(v: &Value) -> Result<Map> {
+    pub(crate) fn new(v: &Value) -> Result<Map> {
         let width= serde_json::from_value(v["width"].clone())?;
         let height=serde_json::from_value(v["height"].clone())?;
         let enemy = vec![vec![Vec::<Weak<RefCell<Enemy>>>::new();width as usize];height as usize];
@@ -33,7 +34,7 @@ impl Map {
             operator,
         })
     }
-    pub fn update_enemy_map(&mut self,enemy_set:Vec<Rc<RefCell<Enemy>>>) {
+    pub(crate) fn update_enemy_map(&mut self,enemy_set:Vec<Rc<RefCell<Enemy>>>) {
         self.enemy.iter_mut().for_each(|v| v.iter_mut().for_each(|v| v.clear()));
         for er in enemy_set {
             let e = er.borrow();
@@ -94,7 +95,7 @@ impl Map {
             }
         }
     }
-    pub fn deep_clone(&self)->Self{
+    pub(crate) fn deep_clone(&self)->Self{
         let width=self.width;
         let height=self.height;
         let enemy = vec![vec![Vec::<Weak<RefCell<Enemy>>>::new();width as usize];height as usize];
@@ -105,5 +106,29 @@ impl Map {
             enemy,
             operator:self.operator.clone(),
         }
+    }
+    pub(crate) fn search(&self,search_scope:&Scope)->Vec<Weak<RefCell<Enemy>>>{
+        let mut ve=Vec::<Weak<RefCell<Enemy>>>::new();
+        for r in search_scope.0.iter(){
+            for i in r.ul.row..=r.dr.row{
+                for j in r.ul.col..=r.ul.col{
+                    for e in self.enemy[i as usize][j as usize].iter(){
+                        if let Some(e) =e.upgrade(){
+                            if !ve.iter().any(|e2|{
+                                if let Some(e2)=e2.upgrade(){
+                                    e2==e
+                                }else{
+                                    false
+                                }
+                            }){
+                                ve.push(Rc::downgrade(&e));
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
+        ve
     }
 }

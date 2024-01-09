@@ -1,6 +1,7 @@
 pub mod effect;
 pub mod skill_type;
 pub mod skill_schedule;
+mod skill_fn;
 
 use std::cell::RefCell;
 use std::collections::HashMap;
@@ -18,6 +19,7 @@ use crate::unit::skill::effect::Effect;
 use crate::utils::config::Config;
 use skill_type::*;
 use crate::unit::Unit;
+use crate::unit::scope::Scope;
 
 #[derive(Clone,Deserialize,Debug,Default)]
 pub struct Skill{
@@ -35,9 +37,11 @@ pub struct Skill{
 #[derive(Deserialize,Debug,Default,Clone)]
 pub(crate) struct ToEnemySkill {
     #[serde(skip)]
-    pub(crate) target:Weak<RefCell<Enemy>>,
+    pub(crate) target:Vec<Weak<RefCell<Enemy>>>,
+    pub(self) target_num:usize,
     pub(crate) effect:Effect,
     pub(self) attack_type:AttackType,
+    pub(self) search_scope:Option<Scope>,
 }
 
 pub(crate) struct NotDirectSkill{
