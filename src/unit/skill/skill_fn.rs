@@ -1,8 +1,9 @@
 use std::cell::RefCell;
+use std::fmt::{Display, Formatter, write};
 use std::rc::Weak;
 use crate::map::Map;
 use crate::unit::enemy::Enemy;
-use crate::unit::skill::ToEnemySkill;
+use crate::unit::skill::{Skill, SkillEntity, ToEnemySkill};
 
 impl ToEnemySkill{
     pub(crate) fn search(&mut self,m:&Map)->bool{
@@ -15,5 +16,26 @@ impl ToEnemySkill{
             }
         }
         self.target.len()!=0
+    }
+}
+
+impl Display for ToEnemySkill{
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f,"\
+        target_find{}\n\
+        ",self.target.len())
+    }
+}
+
+impl Display for Skill{
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f,"\
+        duration:{}\n\
+        last:{}\n\
+        ",self.duration,self.last);
+        match &self.skill_entity {
+            SkillEntity::ToEnemySkill(se) => {write!(f,"{}\n",se)}
+            SkillEntity::None => {write!(f,"")}
+        }
     }
 }

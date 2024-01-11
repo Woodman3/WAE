@@ -57,10 +57,10 @@ impl Operator {
         }
     }
     pub fn arrange_mission(&mut self){
-        self.generate_default_attack_skill();
         self.mission_vec.push(Self::block);
-        self.mission_vec.push(Self::get_target);
-        self.mission_vec.push(Self::attack_mission);
+        // self.mission_vec.push(Self::get_target);
+        // self.mission_vec.push(Self::attack_mission);
+        self.mission_vec.push(Self::skill);
     }
     pub fn new(v:&Value)->Result<Operator>{
         let mut o:Operator = serde_json::from_value(v.clone())?;
@@ -120,15 +120,18 @@ impl Unit for Operator {
 impl Display for Operator{
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(f,"\
-        attack_time:{}\n\
         block_num:{}\n\
         block_vec_len:{}\n\
-        enemy_find:{}\n\
         ",
-               self.stage.attack_time,
                self.stage.block_num,
                self.block_vec.len(),
-               self.enemy_find.len()
-        )
+        )?;
+        for i in 0..self.skill_ready.len(){
+            write!(f,"{i} of ready skill : {}",self.skill_ready[i])?;
+        }
+        for i in 0..self.skill_block.len(){
+            write!(f,"{i} of block skill : {}",self.skill_block[i])?;
+        }
+        write!(f,"")
     }
 }

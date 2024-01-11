@@ -57,6 +57,7 @@ impl Event for OperatorDeployEvent {
         o.search_scope=o.attack_scope.clone();
         o.search_scope.apply_toward(&self.toward);
         o.search_scope.apply_loc(loc,f.map.width,f.map.height);
+        o.generate_default_attack_skill();
         f.operator_deploy.insert(self.operator_key.clone(),Rc::clone(&or));
         f.map.operator[self.location.row as usize][self.location.col as usize]=Some(self.operator_key.clone());
     }

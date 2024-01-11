@@ -64,7 +64,7 @@ impl Operator{
         s.skill_entity=super::SkillEntity::ToEnemySkill(se);
         self.skill_ready.push(s);
     }
-    fn skill(&mut self,f:&mut Frame){
+    pub(crate) fn skill(&mut self,f:&mut Frame){
         self.skill_block.retain_mut(|s| {
             if s.ready(){
                 self.skill_ready.push(std::mem::take(s));
@@ -96,6 +96,7 @@ impl Operator{
         }
         self.skill_ready.retain_mut(|s|{
             if s.last==0.0{
+                s.last=s.duration;
                 self.skill_block.push(std::mem::take(s));
                 return false
             }
