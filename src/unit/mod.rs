@@ -6,7 +6,7 @@ pub mod skill;
 pub(super) mod operator;
 
 use std::fmt::Debug;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use crate::frame::Frame;
 use crate::unit::bullet::Bullet;
 use skill::effect::FixedDamage;

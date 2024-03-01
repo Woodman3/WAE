@@ -4,10 +4,9 @@ use crate::unit::enemy::Enemy;
 use crate::unit::code;
 use crate::unit::operator::Operator;
 use crate::unit::bullet::Bullet;
-use log::{info, trace};
+use log::info;
 use std::fmt;
 use std::rc::Rc;
-use env_logger::builder;
 use crate::calculator::Calculator;
 use crate::map;
 
@@ -24,7 +23,7 @@ pub struct Frame {
 }
 
 impl Frame {
-    pub fn step(&mut self,c:&mut Calculator) {
+    pub fn step(&mut self,_c:&mut Calculator) {
         self.map.update_enemy_map(self.enemy_set.clone());
         self.operator_step();
         self.enemy_step();
@@ -33,7 +32,7 @@ impl Frame {
     }
     fn operator_step(&mut self){
         let ov=self.operator_deploy.clone();
-        for (key,o) in ov{
+        for (_key,o) in ov{
             let mut o=o.borrow_mut();
             o.next(self);
         }
@@ -72,7 +71,7 @@ impl Frame {
         for (key,o) in self.operator_undeploy.iter(){
             operator_undeploy.insert(key.clone(),Rc::new(RefCell::new(o.borrow().deep_clone())));
         }
-        let mut bullet_set=self.bullet_set.clone();
+        let bullet_set=self.bullet_set.clone();
         Frame{
             timestamp:self.timestamp,
             enemy_set,

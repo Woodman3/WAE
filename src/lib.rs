@@ -41,6 +41,6 @@ pub unsafe extern "C" fn get_space()->String{
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn direct(args:String)->u8{
+pub unsafe extern "C" fn direct(_args:String)->u8{
     0
 }

@@ -4,7 +4,6 @@ pub mod math;
 pub mod visualizer;
 mod visualizer_config;
 
-use std::ops::{Add, Mul, Sub};
 
 pub fn get_short_type_name<'a, T>() -> &'a str {
     let tn = std::any::type_name::<T>();

@@ -1,6 +1,5 @@
 use serde::Deserialize;
 use serde_json::Value;
-use std::error::Error;
 use std::fs::File;
 use std::io::BufReader;
 use std::path::Path;

@@ -1,8 +1,6 @@
 use crate::unit::Unit;
 use crate::utils::math::{distance_from_segment_to_point, to_target, Point};
-use env_logger::builder;
 use std::cell::RefCell;
-use std::f64::MAX;
 use std::fmt::{Display, Formatter};
 use std::rc::Rc;
 use crate::unit::skill::effect::{FixedDamage, DamageType};
@@ -20,7 +18,7 @@ pub struct Bullet {
 impl Bullet {
     pub fn step(&mut self) {
         let target_point = self.target.borrow().get_loc();
-        let (direction, new) = to_target(self.location, target_point, self.move_speed);
+        let (_direction, new) = to_target(self.location, target_point, self.move_speed);
         self.distance = distance_from_segment_to_point(self.location, new, target_point);
         self.location=new;
     }

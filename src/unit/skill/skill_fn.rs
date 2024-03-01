@@ -1,8 +1,5 @@
-use std::cell::RefCell;
-use std::fmt::{Display, Formatter, write};
-use std::rc::Weak;
+use std::fmt::{Display, Formatter};
 use crate::map::Map;
-use crate::unit::enemy::Enemy;
 use crate::unit::skill::{Skill, SkillEntity, ToEnemySkill};
 
 impl ToEnemySkill{

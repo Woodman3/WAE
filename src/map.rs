@@ -1,13 +1,8 @@
-use std::arch::x86_64::_bzhi_u32;
-use crate::frame::Frame;
-use crate::mul2d;
-use crate::unit::enemy::{Enemy, EnemyWithPriority};
+use crate::unit::enemy::{Enemy};
 use crate::utils::math::distance_p2p;
-use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::cell::RefCell;
 use std::rc::{Rc, Weak};
-use crate::unit::operator::Operator;
 use crate::unit::scope::Scope;
 
 pub const ENEMY_TOUCH_SIZE: f64 = 0.15;

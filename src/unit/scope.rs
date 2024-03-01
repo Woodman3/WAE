@@ -1,4 +1,3 @@
-use std::mem::swap;
 use serde::Deserialize;
 use crate::utils::math::GridRect;
 
@@ -28,7 +27,7 @@ impl Scope {
                 }
             }
             Toward::South => {
-                /// reflect by y=-x
+                // reflect by y=-x
                 for r in self.0.iter_mut(){
                     r.ul.row=-r.ul.row;
                     r.ul.col=-r.ul.col;
@@ -42,7 +41,7 @@ impl Scope {
             }
             Toward::East => {}
             Toward::West => {
-                /// reflect by origin and then change two point
+                // reflect by origin and then change two point
                 for r in self.0.iter_mut(){
                     r.ul.row=-r.ul.row;
                     r.ul.col=-r.ul.col;
@@ -57,7 +56,7 @@ impl Scope {
     /// if loc is operator,it is row and col
     /// if loc is enemy,it is x and y
     /// this two is invert
-    pub fn apply_loc<T:>(&mut self,loc:((T,T)),width:u32,height:u32)
+    pub fn apply_loc<T:>(&mut self,loc:(T,T),width:u32,height:u32)
     where T:Into<i64>
     {
         let (row,col):(i64,i64)=(loc.0.into(),loc.1.into());

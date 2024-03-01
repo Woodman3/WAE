@@ -2,21 +2,17 @@ use std::cell::RefCell;
 use super::scope::{Scope, Toward};
 use std::fmt;
 use std::fmt::{Display, Formatter};
-use std::ptr::write;
-use std::rc::{Rc, Weak};
-use log::{error, info, trace, warn};
+use std::rc::{Weak};
+use log::{trace, warn};
 use serde::Deserialize;
 use serde_json::Value;
-use crate::calculator::PERIOD;
 use crate::frame::Frame;
-use crate::map::Map;
 use crate::unit::skill::Skill;
 use crate::unit::skill::effect::FixedDamage;
-use crate::unit::skill::skill_type::{AttackType,ChargeType};
 use crate::unit::bullet::Bullet;
 use crate::unit::enemy::{Enemy, EnemyWithPriority};
 use crate::unit::Unit;
-use crate::utils::math::{Grid, GridRect, Point};
+use crate::utils::math::{Grid, Point};
 
 mod operator_mission;
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
@@ -85,7 +81,7 @@ impl Unit for Operator {
         Point::from(self.location)
     }
 
-    fn be_hit(&mut self, b: &Bullet, f: &mut Frame) {
+    fn be_hit(&mut self, b: &Bullet, _f: &mut Frame) {
         self.be_damage(&b.damage);
         if self.stage.hp <=0f64{
             self.die_code=super::code::DIE;

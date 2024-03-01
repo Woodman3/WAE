@@ -3,18 +3,17 @@ use std::cmp::Ordering;
 use crate::utils::math;
 use serde_json::Value;
 use std::fmt;
-use std::ops::Deref;
 use std::rc::{Rc, Weak};
 use log::{error, trace, warn};
 use serde::Deserialize;
 use crate::calculator::PERIOD;
 use crate::frame::{Frame, OperatorRef};
 use crate::unit::bullet::Bullet;
-use crate::unit::{skill, Unit, UnitInfo};
+use crate::unit::{skill, Unit};
 use crate::unit::code::DIE;
 use crate::unit::skill::effect::FixedDamage;
 use crate::unit::operator::Operator;
-use crate::utils::math::{Grid, Point, to_target};
+use crate::utils::math::{Point, to_target};
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 #[derive(Debug, Clone,Default,Deserialize)]
@@ -65,7 +64,7 @@ impl Enemy {
         self.direction=direction;
         self.location = new;
     }
-    pub fn attack(&mut self,bv:&mut Vec<Bullet>,o:OperatorRef){
+    pub fn attack(&mut self,_bv:&mut Vec<Bullet>,o:OperatorRef){
         if self.stage.attack_time>0.0{
             self.stage.attack_time-=PERIOD;
         }else {
@@ -132,7 +131,7 @@ impl Unit for Enemy{
     fn get_loc(&self) -> Point {
         self.location
     }
-    fn be_hit(&mut self, b: &Bullet, f: &mut Frame) {
+    fn be_hit(&mut self, b: &Bullet, _f: &mut Frame) {
         self.be_damage(&b.damage);
     }
     fn be_damage(&mut self, d: &FixedDamage) {

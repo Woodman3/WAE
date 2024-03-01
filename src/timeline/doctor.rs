@@ -4,8 +4,7 @@ use serde_json::Value;
 use super::Event;
 use crate::calculator::Calculator;
 use crate::frame::{Frame, OperatorRef};
-use crate::unit::operator::Operator;
-use crate::unit::scope::{Scope, Toward};
+use crate::unit::scope::{Toward};
 use crate::utils::error::ConfigParseError;
 use crate::utils::math::Grid;
 
@@ -47,13 +46,11 @@ impl OperatorDeployEvent{
     }
 }
 impl Event for OperatorDeployEvent {
-    fn happen(&self, f: &mut Frame, c: &Calculator) {
-        let mut or=f.operator_undeploy.remove(&self.operator_key).unwrap();
+    fn happen(&self, f: &mut Frame, _c: &Calculator) {
+        let or=f.operator_undeploy.remove(&self.operator_key).unwrap();
         let mut o=or.borrow_mut();
         o.location=self.location;
-        let mut loc:(i32,i32)=(self.location.row.try_into().unwrap(),self.location.col.try_into().unwrap());
-        let width=f.map.width;
-        let height = f.map.height;
+        let loc:(i32,i32)=(self.location.row.try_into().unwrap(),self.location.col.try_into().unwrap());
         o.search_scope=o.attack_scope.clone();
         o.search_scope.apply_toward(&self.toward);
         o.search_scope.apply_loc(loc,f.map.width,f.map.height);
@@ -64,8 +61,8 @@ impl Event for OperatorDeployEvent {
 }
 
 impl Event for OperatorRetreatEvent{
-    fn happen(&self, f: &mut Frame, c: &Calculator) {
-        let mut or:OperatorRef=f.operator_deploy.remove(&self.operator_key).unwrap();
+    fn happen(&self, f: &mut Frame, _c: &Calculator) {
+        let or:OperatorRef=f.operator_deploy.remove(&self.operator_key).unwrap();
         let o=or.borrow_mut();
         f.map.operator[o.location.row.clone() as usize][o.location.col.clone() as usize]=None;
         f.operator_undeploy.insert(self.operator_key.clone(),Rc::clone(&or));
@@ -73,8 +70,8 @@ impl Event for OperatorRetreatEvent{
 }
 
 impl Event for OperatorSkillEvent{
-    fn happen(&self, f: &mut Frame, c: &Calculator) {
-        if let Some(o)=f.operator_deploy.get(self.operator_key.as_str()){
+    fn happen(&self, f: &mut Frame, _c: &Calculator) {
+        if let Some(_o)=f.operator_deploy.get(self.operator_key.as_str()){
 
         }
     }

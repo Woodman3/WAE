@@ -5,14 +5,14 @@ use crate::unit;
 use crate::unit::operator::Operator;
 use crate::utils::config::Config;
 use crate::map;
-use log::{info, trace, warn};
-use serde_json::from_value;
+use log::{trace, warn};
+
 use std::collections::{HashMap, VecDeque};
-use std::fs::read;
-use std::mem::forget;
+
+
 use std::rc::Rc;
-use serde::de::Unexpected::Map;
-use crate::timeline::doctor::OperatorDeployEvent;
+
+
 use crate::unit::bullet::Bullet;
 use crate::unit::enemy::Enemy;
 use crate::utils::math::Point;
@@ -59,7 +59,7 @@ impl Calculator {
         f.step(self);
     }
     pub fn new(c: &Config) -> Result<Calculator> {
-        use crate::timeline::hostile::EnemyPlaceEvent;
+        
         use crate::unit::enemy::Enemy;
         use serde_json::from_value;
         let (mut time_line,event_set,last_enemy_time)= read_timeline(c)?;

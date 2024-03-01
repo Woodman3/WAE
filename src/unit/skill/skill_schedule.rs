@@ -5,10 +5,10 @@ use crate::frame::Frame;
 use crate::unit::bullet::Bullet;
 use crate::unit::operator::Operator;
 use crate::unit::skill::{Skill, SkillEntity, ToEnemySkill};
-use crate::unit::skill::effect::{Effect, FixedDamage};
+use crate::unit::skill::effect::{FixedDamage};
 use crate::unit::skill::effect::Effect::Damage;
 use crate::unit::skill::skill_type::ChargeType;
-use crate::unit::{skill, Unit};
+use crate::unit::Unit;
 use crate::unit::enemy::Enemy;
 use crate::utils::math::Point;
 

@@ -1,19 +1,14 @@
 use std::cell::RefCell;
 use std::rc::{Rc, Weak};
-use eframe::egui::Key::P;
 use crate::calculator::PERIOD;
 use crate::frame::Frame;
 use crate::map::Map;
-use crate::unit::skill::skill_type::{ChargeType,TriggerType,AttackType};
 use crate::unit::skill::effect::{FixedDamage, Effect};
-use crate::unit::skill::ToEnemySkill;
 use crate::unit::bullet::Bullet;
 use crate::unit::enemy::{Enemy, EnemyWithPriority};
 use crate::unit::operator::Operator;
-use crate::unit::skill::effect::{ChangeClass, ChangeType};
 use crate::unit::Unit;
 use crate::utils::math::Point;
-use super::super::skill::effect::Buff;
 
 impl Operator{
     pub fn attack(&mut self,f:&mut Frame){
@@ -111,7 +106,7 @@ impl Operator{
     /// make sure all element in block_vec can be find
     pub fn block(&mut self,f:&mut Frame){
         self.block_vec.retain(|e|{
-            if let Some(e)=e.upgrade(){
+            if let Some(_e)=e.upgrade(){
                 true
             }else{
                 false

@@ -1,15 +1,9 @@
-use std::fmt::format;
 use eframe::egui;
 use crate::frame::Frame;
-use eframe::egui::{Context, Painter, pos2, Pos2, Rangef, Rect, Sense, Stroke, TextFormat, Ui, vec2, WidgetText};
-use eframe::egui::ImageData::Color;
-use eframe::egui::MouseWheelUnit::Point;
-use eframe::egui::Shape::Circle;
-use eframe::egui::WidgetText::{LayoutJob, RichText};
-use eframe::epaint::{CircleShape, Color32};
+use eframe::egui::{Context, Painter, pos2, Pos2, Rangef, Rect, Sense, Stroke, TextFormat, Ui, vec2};
+use eframe::epaint::{Color32};
 use crate::calculator::Calculator;
 use super::visualizer_config::*;
-use super::math;
 
 pub struct Visualizer{
     pub c:Calculator,
@@ -34,7 +28,7 @@ fn paint_frame(f:&Frame,painter:Painter){
         y*=BLOCK_SIZE;
         painter.circle_stroke(pos2(x,y), ENEMY_RADIUS, enemy_stroke);
     }
-    for (key,o) in f.operator_deploy.iter(){
+    for (_key,o) in f.operator_deploy.iter(){
         let o =o.borrow();
         let p=super::math::Point::from(o.location);
         let (mut x,mut y):(f32,f32)=p.into();
@@ -83,7 +77,7 @@ fn paint_info(f:&Frame,ui:&mut Ui){
     ui.label(info);
 }
 impl Visualizer{
-    pub fn new(cc: &eframe::CreationContext<'_>,c:Calculator)->Self{
+    pub fn new(_cc: &eframe::CreationContext<'_>,c:Calculator)->Self{
         Self{
             c,
             run:false,
@@ -92,7 +86,7 @@ impl Visualizer{
 
 }
 impl eframe::App for Visualizer{
-    fn update(&mut self, ctx: &Context, frame: &mut eframe::Frame) {
+    fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
         egui::Context::request_repaint(ctx);
         egui::CentralPanel::default().show(ctx,|ui|{
             let r:Rect=[(100.0,100.0).into(),(2000.0,2000.0).into()].into();
