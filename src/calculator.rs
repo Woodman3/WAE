@@ -6,13 +6,8 @@ use crate::unit::operator::Operator;
 use crate::utils::config::Config;
 use crate::map;
 use log::{trace, warn};
-
 use std::collections::{HashMap, VecDeque};
-
-
 use std::rc::Rc;
-
-
 use crate::unit::bullet::Bullet;
 use crate::unit::enemy::Enemy;
 use crate::utils::math::Point;
