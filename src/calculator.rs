@@ -1,6 +1,6 @@
 use std::cell::RefCell;
 use crate::frame::{Frame, OperatorRef};
-use crate::timeline::{Event,EventWithTime, read_doctor_timeline};
+use crate::timeline::{Event, EventWithTime, read_timeline};
 use crate::unit;
 use crate::unit::operator::Operator;
 use crate::utils::config::Config;
@@ -32,16 +32,16 @@ pub struct Calculator {
     event_set: Vec<Rc<dyn Event>>,
     pub route: Vec<Rc<Vec<Point>>>,
     time_remain: i64,
+    /// enemy in initial statement,if we place enemy to map,we will get enemy in it
     pub enemy_initial: HashMap<String, Enemy>,
+    /// time that lase enemy may push,it isn't certainly because some enemy place by time
+    last_enemy_time:u64
 }
 
 impl Calculator {
     pub fn next(&mut self) -> bool {
-        if self.star != -1 {
-            return false;
-        }
-        if self.time_remain == 0 {
-            self.star = 0;
+        if self.has_end(){
+            self.star=-1;
             return false;
         }
         self.time_remain -= 1;
@@ -54,7 +54,7 @@ impl Calculator {
             false
         }
     }
-    pub fn process_frame(&mut self, f: &mut Frame) {
+    fn process_frame(&mut self, f: &mut Frame) {
         self.event(f);
         f.step(self);
     }
@@ -62,7 +62,7 @@ impl Calculator {
         use crate::timeline::hostile::EnemyPlaceEvent;
         use crate::unit::enemy::Enemy;
         use serde_json::from_value;
-        let (mut time_line,event_set)=read_doctor_timeline(c)?;
+        let (mut time_line,event_set,last_enemy_time)= read_timeline(c)?;
         time_line.make_contiguous().sort_by(|a,b|{
             a.time_stamp.cmp(&b.time_stamp)
         });
@@ -103,9 +103,10 @@ impl Calculator {
             route,
             time_remain,
             enemy_initial,
+            last_enemy_time,
         })
     }
-    pub fn to_end(&mut self) {
+    pub fn goto_end(&mut self) {
         while self.next() {
             if let Some(f) = self.frame_vec.last() {
                 if f.timestamp%10==0{
@@ -136,5 +137,7 @@ impl Calculator {
             }
         }
     }
-
+    pub fn has_end(&self)->bool{
+        self.star!=-1||self.time_remain==0
+    }
 }

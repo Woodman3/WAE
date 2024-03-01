@@ -83,6 +83,10 @@ impl Frame {
             next_id:self.next_id,
         }
     }
+
+    pub fn no_enemy(&self)->bool{
+        self.enemy_set.len()==0
+    }
 }
 
 impl fmt::Display for Frame {

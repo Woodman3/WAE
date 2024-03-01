@@ -19,7 +19,7 @@ fn main() {
     env_logger::init();
     // let c=utils::config::Config::new("/home/archer/workspace/BEC/config/").unwrap();
     let c = utils::config::Config::new("C:/Users/Aureliano/workspace/BEC/config").unwrap();
-    // demo::fun(&c);
+    // demo::fun();
     let mut Ca = calculator::Calculator::new(&c).unwrap();
     let mut native_config = eframe::NativeOptions::default();
     native_config.initial_window_size = vec2(1000.0, 500.0).into();

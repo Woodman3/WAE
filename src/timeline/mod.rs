@@ -23,7 +23,7 @@ pub struct EventWithTime{
     pub e:Rc<dyn Event>
 }
 
-pub fn read_doctor_timeline(c:&Config)->Result<(VecDeque<EventWithTime>,Vec<Rc<dyn Event>>)>{
+pub fn read_timeline(c:&Config) ->Result<(VecDeque<EventWithTime>, Vec<Rc<dyn Event>>,u64)>{
     use crate::unit::scope::Toward;
     let mut time_line = VecDeque::<EventWithTime>::new();
     let mut event_set = Vec::<Rc::<dyn Event>>::new();
@@ -44,6 +44,7 @@ pub fn read_doctor_timeline(c:&Config)->Result<(VecDeque<EventWithTime>,Vec<Rc<d
         time_line.push_back(EventWithTime{time_stamp:time,e:Rc::clone(&e)});
         event_set.push(Rc::clone(&e));
     };
+    let mut last_enemy_time:u64=0;
     for v in c.hostile["timeline"].as_array().unwrap() {
         let (time,op) = (from_value::<u64>(v[0].clone())?,from_value::<String>(v[1].clone())?);
         let e:Rc<dyn Event>= match op.as_str() {
@@ -52,9 +53,12 @@ pub fn read_doctor_timeline(c:&Config)->Result<(VecDeque<EventWithTime>,Vec<Rc<d
             }
             _ =>{ return Err(ConfigParseError("unknown op in timeline".into()).into())}
         };
+        if time>last_enemy_time{
+            last_enemy_time=time;
+        }
         time_line.push_back(EventWithTime{time_stamp:time,e:Rc::clone(&e)});
         event_set.push(Rc::clone(&e));
     };
-    Ok((time_line,event_set))
+    Ok((time_line,event_set,last_enemy_time))
 }
 

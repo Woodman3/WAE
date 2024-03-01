@@ -1,5 +1,5 @@
 [package]
-name = "BEC"
+name = "wae"
 version = "0.1.0"
 edition = "2021"
 
@@ -12,3 +12,9 @@ log = "0.4"
 env_logger = "0.10.0"
 #nannou = "0.18.0"
 eframe = "0.23.0"
+
+[lib]
+crate-type=["cdylib"]
+
+[[bin]]
+name="wae"

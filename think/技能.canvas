@@ -1,0 +1,33 @@
+{
+	"nodes":[
+		{"id":"07c522e584bf5a92","type":"text","text":"技能","x":-849,"y":-220,"width":250,"height":60},
+		{"id":"e5829bebb763c1a2","type":"text","text":"打断","x":-508,"y":-360,"width":250,"height":60},
+		{"id":"291593cbeca7c9b2","type":"text","text":"投降","x":-160,"y":-420,"width":250,"height":60},
+		{"id":"c81a626029823372","type":"text","text":"赤霄拔刀、老马拔剑、42黄昏","x":-160,"y":-280,"width":250,"height":60},
+		{"id":"169e07b9034e3fc8","type":"text","text":"立即释放","x":-160,"y":-140,"width":250,"height":60},
+		{"id":"66c1f806991c4b43","type":"text","text":"延迟释放","x":-160,"y":-20,"width":250,"height":60},
+		{"id":"8239222dc97914b4","type":"text","text":"加buff（战术脉唱）","x":200,"y":-140,"width":250,"height":60},
+		{"id":"c0731f098efaf2c9","type":"text","text":"强力击","x":200,"y":-20,"width":250,"height":60},
+		{"id":"8f62c9cd06339701","type":"text","text":"不打断","x":-508,"y":-80,"width":250,"height":60},
+		{"id":"7068da7116e7f0f9","type":"text","text":"加buff","x":-1220,"y":-150,"width":250,"height":60},
+		{"id":"ca18734a6b39b7d7","type":"text","text":"改变攻击范围","x":-1600,"y":-260,"width":250,"height":60},
+		{"id":"1a9538d44afda272","type":"text","text":"改变数值","x":-1600,"y":-150,"width":250,"height":60},
+		{"id":"14b6e344b543f296","type":"text","text":"改变攻击类型","x":-1600,"y":-30,"width":250,"height":60},
+		{"id":"0e33ba647cc2f523","type":"text","text":"一次、多次攻击","x":-1220,"y":-290,"width":250,"height":60}
+	],
+	"edges":[
+		{"id":"5b8ee0cb9a263f2f","fromNode":"e5829bebb763c1a2","fromSide":"right","toNode":"291593cbeca7c9b2","toSide":"left"},
+		{"id":"2c984de58eaecd92","fromNode":"e5829bebb763c1a2","fromSide":"right","toNode":"c81a626029823372","toSide":"left"},
+		{"id":"4a1af22b82f2b4ca","fromNode":"07c522e584bf5a92","fromSide":"right","toNode":"e5829bebb763c1a2","toSide":"left"},
+		{"id":"1e30838d50b7c4c1","fromNode":"07c522e584bf5a92","fromSide":"right","toNode":"8f62c9cd06339701","toSide":"left"},
+		{"id":"31db28ec98b0101c","fromNode":"8f62c9cd06339701","fromSide":"right","toNode":"169e07b9034e3fc8","toSide":"left"},
+		{"id":"95daac10e137800b","fromNode":"8f62c9cd06339701","fromSide":"right","toNode":"66c1f806991c4b43","toSide":"left"},
+		{"id":"b86945ac6568f6cd","fromNode":"169e07b9034e3fc8","fromSide":"right","toNode":"8239222dc97914b4","toSide":"left"},
+		{"id":"0241b66f41858324","fromNode":"66c1f806991c4b43","fromSide":"right","toNode":"c0731f098efaf2c9","toSide":"left"},
+		{"id":"73f4a7d95eb75231","fromNode":"7068da7116e7f0f9","fromSide":"left","toNode":"ca18734a6b39b7d7","toSide":"right"},
+		{"id":"89a74e2443a1888b","fromNode":"7068da7116e7f0f9","fromSide":"left","toNode":"1a9538d44afda272","toSide":"right"},
+		{"id":"80064cd479f0a888","fromNode":"07c522e584bf5a92","fromSide":"left","toNode":"0e33ba647cc2f523","toSide":"right"},
+		{"id":"964199536e6de053","fromNode":"7068da7116e7f0f9","fromSide":"left","toNode":"14b6e344b543f296","toSide":"right"},
+		{"id":"62b33ccd57405354","fromNode":"07c522e584bf5a92","fromSide":"left","toNode":"7068da7116e7f0f9","toSide":"right"}
+	]
+}

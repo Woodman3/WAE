@@ -1,5 +1,6 @@
 target/
 .idea/
+.cargo/
 Session.vim
 work_init.sh
 think/.obsidian

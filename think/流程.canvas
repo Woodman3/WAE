@@ -1,0 +1,14 @@
+{
+	"nodes":[
+		{"id":"10cfd932877b06a2","x":-360,"y":-340,"width":250,"height":60,"type":"text","text":"索敌"},
+		{"id":"805d1c30885a5514","x":-40,"y":-440,"width":250,"height":70,"type":"text","text":"buff技能"},
+		{"id":"d80e877675643f3e","x":-360,"y":-240,"width":250,"height":60,"type":"text","text":"攻击"},
+		{"id":"d69679209a7688d1","x":-40,"y":-340,"width":250,"height":60,"type":"text","text":"加buff"},
+		{"id":"79f241150dad80a9","type":"text","text":"攻击技能","x":-360,"y":-440,"width":250,"height":70}
+	],
+	"edges":[
+		{"id":"1a60309455674de6","fromNode":"79f241150dad80a9","fromSide":"bottom","toNode":"10cfd932877b06a2","toSide":"top"},
+		{"id":"1b83c9c76de48a7e","fromNode":"10cfd932877b06a2","fromSide":"bottom","toNode":"d80e877675643f3e","toSide":"top"},
+		{"id":"df99da9bdc658567","fromNode":"805d1c30885a5514","fromSide":"bottom","toNode":"d69679209a7688d1","toSide":"top"}
+	]
+}
