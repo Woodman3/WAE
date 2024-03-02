@@ -24,7 +24,6 @@ pub struct Calculator {
     /// first element refer to time
     /// second element refer to event vector
     time_line: VecDeque<EventWithTime>,
-    event_set: Vec<Rc<dyn Event>>,
     pub route: Vec<Rc<Vec<Point>>>,
     time_remain: i64,
     /// enemy in initial statement,if we place enemy to map,we will get enemy in it
@@ -54,10 +53,8 @@ impl Calculator {
         f.step(self);
     }
     pub fn new(c: &Config) -> Result<Calculator> {
-        
-        use crate::unit::enemy::Enemy;
         use serde_json::from_value;
-        let (mut time_line,event_set,last_enemy_time)= read_timeline(c)?;
+        let (mut time_line,last_enemy_time)= read_timeline(c)?;
         time_line.make_contiguous().sort_by(|a,b|{
             a.time_stamp.cmp(&b.time_stamp)
         });
@@ -94,7 +91,6 @@ impl Calculator {
             frame_vec,
             star: -1,
             time_line,
-            event_set,
             route,
             time_remain,
             enemy_initial,
