@@ -33,7 +33,7 @@ pub struct Calculator {
 }
 
 impl Calculator {
-    pub fn next(&mut self) -> bool {
+    pub fn step(&mut self) -> bool {
         if self.has_end(){
             self.star=-1;
             return false;
@@ -98,7 +98,7 @@ impl Calculator {
         })
     }
     pub fn goto_end(&mut self) {
-        while self.next() {
+        while self.step() {
             if let Some(f) = self.frame_vec.last() {
                 if f.timestamp%10==0{
                     trace!("{}", f);

@@ -9,11 +9,11 @@ pub const ENEMY_TOUCH_SIZE: f64 = 0.15;
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 #[derive(Debug,Clone)]
 pub struct Map {
-    pub(crate) width: u32,
-    pub(crate) height: u32,
-    pub(crate) layout: Vec<Vec<u64>>,
-    pub(crate) enemy: Vec<Vec<Vec<Weak<RefCell<Enemy>>>>>,
-    pub(crate) operator:Vec<Vec<Option<String>>>
+    pub(super) width: u32,
+    pub(super) height: u32,
+    pub(super) layout: Vec<Vec<u64>>,
+    pub(super) enemy: Vec<Vec<Vec<Weak<RefCell<Enemy>>>>>,
+    pub(super) operator:Vec<Vec<Option<String>>>
 }
 impl Map {
     pub(crate) fn new(v: &Value) -> Result<Map> {
@@ -125,5 +125,8 @@ impl Map {
             }
         }
         ve
+    }
+    pub(super) fn update_layout(&mut self){
+        
     }
 }

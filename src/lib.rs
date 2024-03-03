@@ -1,5 +1,6 @@
-use std::cell::OnceCell;
+use std::{cell::OnceCell, os::raw::c_char};
 use crate::calculator::Calculator;
+use std::ffi::{CString,CStr};
 
 //mod block;
 mod calculator;
@@ -32,15 +33,32 @@ pub unsafe extern "C" fn init(s:String)->u8{
 
 #[no_mangle]
 pub unsafe extern "C" fn step()->u8{
-   0
+    if let Some(c) = INSTANCE.get_mut(){
+        if c.step(){
+            0
+        }else{
+            1
+        }
+    }else{
+        2
+    }
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn get_space()->String{
-    String::from("0")
+pub unsafe extern "C" fn get_obs()->*mut c_char{
+    let r=CString::new("test").unwrap();
+    r.into_raw()
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn direct(args:String)->u8{
+pub unsafe extern "C" fn action(args:Cstr)->u8{
     0
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn free_str(str:*mut c_char){
+    if !str.is_null(){
+        // CString::from_raw(str);
+        drop(CString::from_raw(str));
+    }
 }

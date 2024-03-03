@@ -106,7 +106,7 @@ impl eframe::App for Visualizer{
             .show(ctx,|ui|{
                 ui.checkbox(&mut self.run,"run");
                 if ui.button("next").clicked() || self.run{
-                    self.c.next();
+                    self.c.step();
                 };
                 paint_info(&self.c.frame_vec[0],ui);
         });

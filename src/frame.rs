@@ -5,6 +5,7 @@ use crate::unit::code;
 use crate::unit::operator::Operator;
 use crate::unit::bullet::Bullet;
 use log::info;
+use serde_json::json;
 use std::fmt;
 use std::rc::Rc;
 use crate::calculator::Calculator;
@@ -85,6 +86,19 @@ impl Frame {
 
     pub fn no_enemy(&self)->bool{
         self.enemy_set.len()==0
+    }
+
+    pub fn get_obs(&self)->serde_json::Value{
+        let v=json!({
+            "Deploy":[],
+            "Retreat":[],
+            "Map":[],
+        });
+        for or in self.operator_undeploy.iter(){
+            // todo :add deploy time
+             
+        }
+        v
     }
 }
 
