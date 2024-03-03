@@ -51,7 +51,7 @@ pub unsafe extern "C" fn get_obs()->*mut c_char{
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn action(args:Cstr)->u8{
+pub unsafe extern "C" fn action(args:CStr)->u8{
     0
 }
 

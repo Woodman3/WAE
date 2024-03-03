@@ -6,5 +6,37 @@
     [1,2,4,2,2,3],
     [0,2,2,2,0,0],
     [0,0,0,0,0,0]
-  ]
+  ],
+  "block":{
+    "Street":{
+      "id":2,
+      "name":"Street",
+      "can_deploy":"Only_low",
+      "can_pass":true
+    },
+    "Wall":{
+      "id":0,
+      "name":"Wall",
+      "can_deploy":"No",
+      "can_pass":false
+    },
+    "Platform":{
+      "id":4,
+      "name":"Platform",
+      "can_deploy":"Only_high",
+      "can_pass":false
+    },
+    "Start":{
+      "id":1,
+      "name":"Start",
+      "can_deploy":"Only_low",
+      "can_pass":true
+    },
+    "End":{
+      "id":3,
+      "name":"End",
+      "can_deploy":"Only_low",
+      "can_pass":true
+    }
+  }
 }

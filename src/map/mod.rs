@@ -1,33 +1,34 @@
+mod block;
+
 use crate::unit::enemy::{Enemy};
 use crate::utils::math::distance_p2p;
-use serde_json::Value;
+use serde::Deserialize;
+use serde_json::{Value,from_value};
 use std::cell::RefCell;
 use std::rc::{Rc, Weak};
 use crate::unit::scope::Scope;
 
+use self::block::generate_layout;
+
 pub const ENEMY_TOUCH_SIZE: f64 = 0.15;
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
-#[derive(Debug,Clone)]
+#[derive(Debug,Clone,Default,Deserialize)]
 pub struct Map {
     pub(super) width: u32,
     pub(super) height: u32,
     pub(super) layout: Vec<Vec<u64>>,
+    #[serde(skip)]
     pub(super) enemy: Vec<Vec<Vec<Weak<RefCell<Enemy>>>>>,
+    #[serde(skip)]
     pub(super) operator:Vec<Vec<Option<String>>>
 }
 impl Map {
-    pub(crate) fn new(v: &Value) -> Result<Map> {
-        let width= serde_json::from_value(v["width"].clone())?;
-        let height=serde_json::from_value(v["height"].clone())?;
-        let enemy = vec![vec![Vec::<Weak<RefCell<Enemy>>>::new();width as usize];height as usize];
-        let operator =vec![vec![None;width as usize];height as usize];
-        Ok(Map {
-            width,
-            height,
-            layout: serde_json::from_value::<Vec<Vec<u64>>>(v["layout"].clone())?,
-            enemy,
-            operator,
-        })
+    pub(super) fn new(v: &Value) -> Result<Map> {
+        let mut m:Map = from_value(v.clone())?;
+        m.enemy = vec![vec![Vec::<Weak<RefCell<Enemy>>>::new();m.width as usize];m.height as usize];
+        m.operator =vec![vec![None;m.width as usize];m.height as usize];
+        generate_layout(v, m)
+        // Ok(m)
     }
     pub(crate) fn update_enemy_map(&mut self,enemy_set:Vec<Rc<RefCell<Enemy>>>) {
         self.enemy.iter_mut().for_each(|v| v.iter_mut().for_each(|v| v.clear()));
