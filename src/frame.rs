@@ -88,16 +88,22 @@ impl Frame {
         self.enemy_set.len()==0
     }
 
-    pub fn get_obs(&self)->serde_json::Value{
-        let v=json!({
-            "Deploy":[],
-            "Retreat":[],
-            "Map":[],
-        });
-        for or in self.operator_undeploy.iter(){
+    pub(super) fn get_obs(&self)->serde_json::Value{
+        let mut deploy  = Vec::<String>::new();
+        for (on,_) in self.operator_undeploy.iter(){
             // todo :add deploy time
-             
+            deploy.push(on.clone());
         }
+        let mut retreat = Vec::<String>::new(); 
+        for (on,_) in self.operator_deploy.iter(){
+            retreat.push(on.clone());
+        }
+        let map = self.map.layout.clone();
+        let mut v=json!({
+            "Deploy":deploy,
+            "Retreat":retreat,
+            "Map":map,
+        });
         v
     }
 }

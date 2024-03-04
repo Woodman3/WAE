@@ -1,4 +1,4 @@
-use std::{cell::OnceCell, os::raw::c_char};
+use std::{cell::OnceCell, net::Incoming, os::raw::c_char, ptr::{null, null_mut}};
 use crate::calculator::Calculator;
 use std::ffi::{CString,CStr};
 
@@ -46,8 +46,13 @@ pub unsafe extern "C" fn step()->u8{
 
 #[no_mangle]
 pub unsafe extern "C" fn get_obs()->*mut c_char{
-    let r=CString::new("test").unwrap();
-    r.into_raw()
+    if let Some(Ca) = INSTANCE.get(){
+        let json = Ca.get_obs(); 
+        if let Ok(r)=CString::new(json.to_string()){
+            return r.into_raw()
+        }
+    } 
+    null_mut()
 }
 
 #[no_mangle]

@@ -2,7 +2,7 @@ mod block;
 
 use crate::unit::enemy::{Enemy};
 use crate::utils::math::distance_p2p;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use serde_json::{Value,from_value};
 use std::cell::RefCell;
 use std::rc::{Rc, Weak};

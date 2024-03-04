@@ -6,6 +6,7 @@ use crate::unit::operator::Operator;
 use crate::utils::config::Config;
 use crate::map;
 use log::{trace, warn};
+use serde_json::Value;
 use std::collections::{HashMap, VecDeque};
 use std::rc::Rc;
 use crate::unit::bullet::Bullet;
@@ -128,7 +129,15 @@ impl Calculator {
             }
         }
     }
-    pub fn has_end(&self)->bool{
+    pub(super) fn has_end(&self)->bool{
         self.star!=-1||self.time_remain==0
+    }
+
+    pub(super) fn get_obs(&self)->Value{
+        if let Some(f) = self.frame_vec.last(){
+           f.get_obs() 
+        }else{
+            Value::Null
+        }
     }
 }
