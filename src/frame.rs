@@ -99,7 +99,7 @@ impl Frame {
             retreat.push(on.clone());
         }
         let map = self.map.layout.clone();
-        let mut v=json!({
+        let v=json!({
             "Deploy":deploy,
             "Retreat":retreat,
             "Map":map,

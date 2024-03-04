@@ -140,4 +140,13 @@ impl Calculator {
             Value::Null
         }
     }
+    pub(super) fn insert_event(&mut self,e:Rc<dyn Event>)->bool{
+        if let Some(f) = self.frame_vec.last(){
+            let time = f.timestamp+1;
+            let et =EventWithTime{time_stamp:time,e:e};
+            self.time_line.push_front(et);
+            return true
+        }         
+        false
+    }
 }

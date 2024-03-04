@@ -1,6 +1,8 @@
 use std::{cell::OnceCell, net::Incoming, os::raw::c_char, ptr::{null, null_mut}};
 use crate::calculator::Calculator;
 use std::ffi::{CString,CStr};
+use serde_json::Value;
+use timeline::action_to_event;
 
 //mod block;
 mod calculator;
@@ -56,14 +58,28 @@ pub unsafe extern "C" fn get_obs()->*mut c_char{
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn action(args:CStr)->u8{
-    0
+pub unsafe extern "C" fn action(args:*const c_char)->u8{
+    if args.is_null(){
+        return 1 
+    }
+    let cstr = CStr::from_ptr(args);
+    if let Ok(js) = cstr.to_str(){
+        if let Ok(json) =serde_json::from_str::<Value>(js){ 
+            if let Ok(e) = action_to_event(&json){
+                if let Some(Ca) = INSTANCE.get_mut(){
+                    Ca.insert_event(e);
+                    return 0
+                } 
+            }
+        } 
+    }
+    1
+    
 }
 
 #[no_mangle]
 pub unsafe extern "C" fn free_str(str:*mut c_char){
     if !str.is_null(){
-        // CString::from_raw(str);
         drop(CString::from_raw(str));
     }
 }
