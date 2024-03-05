@@ -21,45 +21,49 @@ pub unsafe extern "C" fn init(s:String)->u8{
     if let Ok(c) = utils::config::Config::new(s){
         if let Ok(ca) = calculator::Calculator::new(&c){
             if let Ok(_)=INSTANCE.set(ca){
-                0
-            }else {
-                3
+                return 0
             }
+            println!("instance set fail!");
         }else{
-            2
+            println!("calculator new fail,please check config");
         }
     }else{
-        1
+        println!("can't load config file");
     }
+    1
 }
 
 #[no_mangle]
 pub unsafe extern "C" fn step()->u8{
     if let Some(c) = INSTANCE.get_mut(){
         if c.step(){
-            0
-        }else{
-            1
+            return 0
         }
+        println!("can't step");
     }else{
-        2
+        println!("can't get instance");
     }
+    1
 }
 
 #[no_mangle]
 pub unsafe extern "C" fn get_obs()->*mut c_char{
-    if let Some(Ca) = INSTANCE.get(){
-        let json = Ca.get_obs(); 
+    if let Some(ca) = INSTANCE.get(){
+        let json = ca.get_obs(); 
         if let Ok(r)=CString::new(json.to_string()){
             return r.into_raw()
         }
-    } 
+        println!("can't convert json to CString");
+    }else{
+        println!("can't get instance");
+    }
     null_mut()
 }
 
 #[no_mangle]
 pub unsafe extern "C" fn action(args:*const c_char)->u8{
     if args.is_null(){
+        println!("pointer can't be null!");
         return 1 
     }
     let cstr = CStr::from_ptr(args);
@@ -70,16 +74,22 @@ pub unsafe extern "C" fn action(args:*const c_char)->u8{
                     Ca.insert_event(e);
                     return 0
                 } 
+                println!("can't get instance");
             }
+            println!("can't convert json to action");
         } 
+        println!("can't convert str to json");
     }
+    println!("can't convert cstring to ruststr");
     1
-    
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn free_str(str:*mut c_char){
+pub unsafe extern "C" fn free_str(str:*mut c_char)->u8{
     if !str.is_null(){
         drop(CString::from_raw(str));
+        return 0
     }
+    println!("pointer can't be null!");
+    1
 }
