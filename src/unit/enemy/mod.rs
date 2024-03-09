@@ -5,7 +5,7 @@ use serde_json::Value;
 use std::fmt;
 use std::rc::{Rc, Weak};
 use log::{error, trace, warn};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use crate::calculator::PERIOD;
 use crate::frame::{Frame, OperatorRef};
 use crate::unit::bullet::Bullet;
@@ -188,3 +188,11 @@ impl Ord for EnemyWithPriority{
         self.time_stamp.cmp(&other.time_stamp)
     }
 }
+
+// impl Serialize for Enemy{
+//     fn serialize<S>(&self, serializer: S) -> std::prelude::v1::Result<S::Ok, S::Error>
+//     where
+//         S: serde::Serializer {
+
+//     }
+// }

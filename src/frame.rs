@@ -106,6 +106,11 @@ impl Frame {
         });
         v
     }
+
+    // pub(super) fn get_acs(&self)->serde_json::Value{
+
+    // }
+
 }
 
 impl fmt::Display for Frame {
@@ -125,3 +130,11 @@ enemy info:",
         write!(f, "")
     }
 }
+
+// impl serde::Serialize for Frame{
+//     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+//     where
+//         S: serde::Serializer {
+//         todo!()
+//     }
+// }

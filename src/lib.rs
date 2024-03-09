@@ -61,6 +61,11 @@ pub unsafe extern "C" fn get_obs()->*mut c_char{
 }
 
 #[no_mangle]
+pub unsafe extern "C" fn get_acs()->*mut c_char{
+    null_mut()
+}
+
+#[no_mangle]
 pub unsafe extern "C" fn action(args:*const c_char)->u8{
     if args.is_null(){
         println!("pointer can't be null!");
