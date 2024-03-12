@@ -11,11 +11,12 @@ use std::rc::Rc;
 use crate::calculator::Calculator;
 use crate::map;
 
-pub type OperatorRef =Rc<RefCell<Operator>>;
+pub(super) type OperatorRef =Rc<RefCell<Operator>>;
+pub(super) type EnemyRef=Rc<RefCell<Enemy>>;
 #[derive(Debug,Clone)]
-pub struct Frame {
+pub(super) struct Frame {
     pub timestamp: u64,
-    pub enemy_set: Vec<Rc<RefCell<Enemy>>>,
+    pub enemy_set: Vec<EnemyRef>,
     pub operator_deploy:HashMap<String,OperatorRef>,
     pub operator_undeploy:HashMap<String,OperatorRef>,
     pub map:map::Map,

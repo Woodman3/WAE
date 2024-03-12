@@ -6,7 +6,7 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::{Weak};
 use log::warn;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use crate::frame::OperatorRef;
 use crate::unit::enemy::Enemy;
 use crate::unit::skill::effect::Effect;
@@ -14,20 +14,20 @@ use crate::utils::config::Config;
 use skill_type::*;
 use crate::unit::scope::Scope;
 
-#[derive(Clone,Deserialize,Debug,Default)]
+#[derive(Clone,Deserialize,Debug,Default,Serialize)]
+#[serde(default)]
 pub struct Skill{
     pub charge_type: ChargeType,
     pub trigger_type:TriggerType,
     pub schedule_type:ScheduleType,
     pub duration:f64, ///skill time
-    #[serde(skip)]
     pub last:f64,///if in skill ,it show time remain,or is 0
     pub sp_cost:f64,
     pub sp:f64,
     overcharge:bool,
     skill_entity:SkillEntity,
 }
-#[derive(Deserialize,Debug,Default,Clone)]
+#[derive(Deserialize,Debug,Default,Clone,Serialize)]
 pub(crate) struct ToEnemySkill {
     #[serde(skip)]
     pub(crate) target:Vec<Weak<RefCell<Enemy>>>,
@@ -37,10 +37,11 @@ pub(crate) struct ToEnemySkill {
     pub(self) search_scope:Option<Scope>,
 }
 
+
 pub(crate) struct NotDirectSkill{
 }
 
-#[derive(Default,Deserialize,Debug,Clone)]
+#[derive(Default,Deserialize,Debug,Clone,Serialize)]
 #[serde(tag="type")]
 enum SkillEntity{
     ToEnemySkill(ToEnemySkill),

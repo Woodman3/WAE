@@ -1,6 +1,6 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone,Deserialize,Debug,Default,PartialEq)]
+#[derive(Clone,Deserialize,Debug,Default,PartialEq,Serialize)]
 pub enum ChargeType {
     Auto,
     Attack,
@@ -9,7 +9,7 @@ pub enum ChargeType {
     #[default]
     None
 }
-#[derive(Clone,Deserialize,Debug,Default)]
+#[derive(Clone,Deserialize,Debug,Default,Serialize)]
 pub enum TriggerType{
     Auto,
     Manual,
@@ -17,7 +17,7 @@ pub enum TriggerType{
     #[default]
     None
 }
-#[derive(Clone,Copy,Deserialize,Debug,Default)]
+#[derive(Clone,Copy,Deserialize,Debug,Default,Serialize)]
 pub enum ScheduleType{
     PreEmptive,//抢占式，会打断其他技能的释放，比如拔刀
     Immediately,//非抢占式，哪怕已经在释放其他技能也会立即释放，比如战术脉唱
@@ -25,7 +25,7 @@ pub enum ScheduleType{
     Delay//非抢占式，会延迟到其他技能释放完毕后再释放，比如强力击
 }
 
-#[derive(Clone,Copy,Deserialize,Debug,Default)]
+#[derive(Clone,Copy,Deserialize,Debug,Default,Serialize)]
 pub enum AttackType{
     #[default]
     Melee,

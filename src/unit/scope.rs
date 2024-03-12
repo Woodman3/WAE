@@ -1,11 +1,11 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use crate::utils::math::GridRect;
 
 ///from left-up to right-down,the default toward is East
-#[derive(Clone,Debug,Default,Deserialize)]
+#[derive(Clone,Debug,Default,Deserialize,Serialize)]
 pub struct Scope(pub Vec<GridRect>);
 
-#[derive(Debug,Clone,Default)]
+#[derive(Debug,Clone,Default,Deserialize,Serialize)]
 pub enum Toward{
     North,
     South,

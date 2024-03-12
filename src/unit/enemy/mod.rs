@@ -1,4 +1,4 @@
-use std::cell::RefCell;
+use std::cell::{Ref, RefCell};
 use std::cmp::Ordering;
 use crate::utils::math;
 use serde_json::Value;
@@ -6,44 +6,39 @@ use std::fmt;
 use std::rc::{Rc, Weak};
 use log::{error, trace, warn};
 use serde::{Deserialize, Serialize};
+use serde::ser::{Serializer};
 use crate::calculator::PERIOD;
 use crate::frame::{Frame, OperatorRef};
 use crate::unit::bullet::Bullet;
 use crate::unit::{skill, Unit};
 use crate::unit::code::DIE;
 use crate::unit::skill::effect::FixedDamage;
-use crate::unit::operator::Operator;
+use crate::unit::operator::{OperatorShared};
 use crate::utils::math::{Point, to_target};
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
-#[derive(Debug, Clone,Default,Deserialize)]
+pub(crate)type EnemyShared = Weak<RefCell<Enemy>>;
+#[derive(Debug, Clone,Default,Deserialize,Serialize)]
 #[serde(default)]
 pub struct Enemy {
     pub name:String,
     move_speed: f64,
     info: super::UnitInfo,
-    #[serde(skip)]
     pub stage:super::UnitInfo,
-    #[serde(skip)]
     pub location: Point, /// -1 mean haven't place
-    #[serde(skip)]
     pub next_point: Point,
-    #[serde(skip)]
     direction:Point,
-    #[serde(skip)]
     route_stage: usize,
-    #[serde(skip)]
     pub die_code: u32, /// 0 mean haven't die
-    #[serde(skip)]
     pub route: Option<Rc<Vec<Point>>>,
-    #[serde(skip)]
-    pub be_block:Weak<RefCell<Operator>>,
-    #[serde(skip)]
-    pub identifier:usize,
+    #[serde(serialize_with="super::operator::serialize_operator_shared",skip_deserializing)]
+    pub be_block:OperatorShared,
+    pub id:usize,
 }
-#[derive(Debug,Clone,Default)]
+#[derive(Debug,Clone,Default,Deserialize,Serialize)]
 pub struct EnemyWithPriority{
-    pub enemy:Weak<RefCell<Enemy>>,
+    #[serde(serialize_with = "serialize_enemy_shared",skip_deserializing)]
+    pub enemy:EnemyShared,
     pub time_stamp:u64,
 }
 impl Enemy {
@@ -163,7 +158,7 @@ impl Unit for Enemy{
 
 impl PartialEq<Self> for Enemy {
     fn eq(&self, other: &Self) -> bool {
-        self.identifier==other.identifier
+        self.id==other.id
     }
 }
 
@@ -189,10 +184,7 @@ impl Ord for EnemyWithPriority{
     }
 }
 
-// impl Serialize for Enemy{
-//     fn serialize<S>(&self, serializer: S) -> std::prelude::v1::Result<S::Ok, S::Error>
-//     where
-//         S: serde::Serializer {
-
-//     }
-// }
+pub(crate) fn serialize_enemy_shared<S>(ptr:&EnemyShared, serializer:S) -> std::result::Result<S::Ok,S::Error> where S: Serializer{
+    let id = ptr.upgrade().unwrap().borrow().id as u64;
+    serializer.serialize_u64(id)
+}

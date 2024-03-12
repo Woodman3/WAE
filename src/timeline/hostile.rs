@@ -23,7 +23,7 @@ impl Event for EnemyPlaceEvent {
         e.route = Some(Rc::clone(&c.route[self.enemy_route]));
         e.location = c.route[self.enemy_route][0];
         e.next_point = c.route[self.enemy_route][1];
-        e.identifier=f.next_id;
+        e.id=f.next_id;
         f.next_id+=1;
         f.enemy_set.push(Rc::new(RefCell::new(e)));
     }

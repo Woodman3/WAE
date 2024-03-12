@@ -12,7 +12,7 @@ use self::block::generate_layout;
 
 pub const ENEMY_TOUCH_SIZE: f64 = 0.15;
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
-#[derive(Debug,Clone,Default,Deserialize)]
+#[derive(Debug,Clone,Default,Deserialize,Serialize)]
 pub struct Map {
     pub(super) width: u32,
     pub(super) height: u32,

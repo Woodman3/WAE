@@ -4,43 +4,38 @@ use std::fmt;
 use std::fmt::{Display, Formatter};
 use std::rc::{Weak};
 use log::{trace, warn};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
+use serde::ser::{Serializer};
 use serde_json::Value;
 use crate::frame::Frame;
 use crate::unit::skill::Skill;
 use crate::unit::skill::effect::FixedDamage;
 use crate::unit::bullet::Bullet;
-use crate::unit::enemy::{Enemy, EnemyWithPriority};
+use crate::unit::enemy::{Enemy, EnemyWithPriority,EnemyShared};
 use crate::unit::Unit;
 use crate::utils::math::{Grid, Point};
 
 mod operator_mission;
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
-#[derive(Debug,Clone,Default,Deserialize)]
+pub(crate) type OperatorShared = Weak<RefCell<Operator>>;
+#[derive(Debug,Clone,Default,Deserialize,Serialize)]
+#[serde(default)]
 pub struct Operator{
     pub name: String,
     pub info:super::UnitInfo,
-    #[serde(skip)]
     pub stage:super::UnitInfo,
-    #[serde(skip)]
     pub location:Grid,
     pub attack_scope: Scope,
-    #[serde(skip)]
     pub search_scope: Scope,
     pub re_deploy:f32,
-    #[serde(skip)]
     pub toward:Toward,
-    #[serde(skip)]
     pub enemy_find:Vec<EnemyWithPriority>,
+    #[serde(serialize_with = "super::enemy::serialize_enemy_shared",skip_deserializing)]
+    pub target:EnemyShared,
     #[serde(skip)]
-    pub target:Weak<RefCell<Enemy>>,
-    #[serde(skip)]
-    pub block_vec:Vec<Weak<RefCell<Enemy>>>,
-    #[serde(skip)]
+    pub block_vec:Vec<EnemyShared>,
     pub die_code: u32,
-    #[serde(skip)]
     pub skill_ready:Vec<Skill>,
-    #[serde(skip)]
     pub skill_block:Vec<Skill>,
     #[serde(skip)]
     mission_vec:Vec<fn(&mut Operator,&mut Frame)>,
@@ -131,3 +126,10 @@ impl Display for Operator{
         write!(f,"")
     }
 }
+
+pub(crate) fn serialize_operator_shared<S>(ptr:&OperatorShared, serializer:S) -> std::result::Result<S::Ok,S::Error> where S: Serializer{
+    let name = ptr.upgrade().unwrap().borrow().name.clone();
+    serializer.serialize_str(name.as_str())
+}
+
+    

@@ -6,7 +6,7 @@ pub mod skill;
 pub(super) mod operator;
 
 use std::fmt::Debug;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use crate::frame::Frame;
 use crate::unit::bullet::Bullet;
 use skill::effect::FixedDamage;
@@ -14,7 +14,7 @@ use crate::unit::skill::effect::{ChangeClass, ChangeType, Buff, DamageType};
 use crate::unit::skill::skill_type::AttackType;
 use crate::utils::math::Point;
 
-#[derive(Debug, Clone,Default, Deserialize)]
+#[derive(Debug, Clone,Default, Deserialize,Serialize)]
 pub struct UnitInfo {
     damage_type: DamageType,
     hp: f64,

@@ -1,17 +1,18 @@
 use std::ops::{Add, Mul, Sub};
-use serde::Deserialize;
-#[derive(Clone,Copy,Debug,Default,Deserialize)]
+use serde::{Deserialize, Serialize};
+#[derive(Clone,Copy,Debug,Default,Deserialize,Serialize)]
 pub struct Point{
     pub x:f64,
     pub y:f64
 }
-#[derive(Clone,Debug,Copy,Default,Deserialize)]
+#[derive(Clone,Debug,Copy,Default,Deserialize,Serialize)]
 pub struct Grid{
     pub row:i64,
     pub col:i64
 }
-#[derive(Clone,Debug,Default,Deserialize)]
+#[derive(Clone,Debug,Default,Deserialize,Serialize)]
 #[serde(from = "[i64;4]")]
+#[serde(into = "[i64;4]")]
 pub struct GridRect {
     pub ul:Grid,
     pub dr:Grid
@@ -62,6 +63,11 @@ impl Into<(Grid,Grid)> for GridRect{
 impl From<[i64;4]> for GridRect{
     fn from(value: [i64; 4]) -> Self {
         (Grid::from((value[0],value[1])),Grid::from((value[2],value[3]))).into()
+    }
+}
+impl Into<[i64;4]> for GridRect{
+    fn into(self) -> [i64;4] {
+        [self.ul.row,self.ul.col,self.dr.row,self.dr.col]
     }
 }
 impl Into<(i64,i64,i64,i64)> for GridRect{
