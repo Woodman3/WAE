@@ -21,6 +21,7 @@ pub(super) struct Frame {
     pub operator_undeploy:HashMap<String,OperatorRef>,
     pub map:map::Map,
     pub bullet_set:Vec<Bullet>,
+    /// start for 1
     pub next_id:usize,
 }
 
@@ -132,10 +133,7 @@ enemy info:",
     }
 }
 
-// impl serde::Serialize for Frame{
-//     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-//     where
-//         S: serde::Serializer {
-//         todo!()
-//     }
-// }
+#[cfg(test)]
+pub mod test{
+    
+}

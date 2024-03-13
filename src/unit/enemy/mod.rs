@@ -16,6 +16,9 @@ use crate::unit::skill::effect::FixedDamage;
 use crate::unit::operator::{OperatorShared};
 use crate::utils::math::{Point, to_target};
 
+#[cfg(test)]
+mod test;
+
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 pub(crate)type EnemyShared = Weak<RefCell<Enemy>>;
 #[derive(Debug, Clone,Default,Deserialize,Serialize)]
@@ -185,6 +188,11 @@ impl Ord for EnemyWithPriority{
 }
 
 pub(crate) fn serialize_enemy_shared<S>(ptr:&EnemyShared, serializer:S) -> std::result::Result<S::Ok,S::Error> where S: Serializer{
-    let id = ptr.upgrade().unwrap().borrow().id as u64;
-    serializer.serialize_u64(id)
+    // let id = ptr.upgrade().unwrap().borrow().id as u64;
+    if let Some(e) = ptr.upgrade(){
+        let id = e.borrow().id as u64;
+        serializer.serialize_u64(id)
+    }else{
+        serializer.serialize_none()
+    }
 }

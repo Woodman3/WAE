@@ -1,4 +1,6 @@
 mod block;
+#[cfg(test)]
+mod test;
 
 use crate::unit::enemy::{Enemy};
 use crate::utils::math::distance_p2p;
@@ -13,13 +15,13 @@ use self::block::generate_layout;
 pub const ENEMY_TOUCH_SIZE: f64 = 0.15;
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 #[derive(Debug,Clone,Default,Deserialize,Serialize)]
+#[serde(default)]
 pub struct Map {
     pub(super) width: u32,
     pub(super) height: u32,
     pub(super) layout: Vec<Vec<u64>>,
     #[serde(skip)]
     pub(super) enemy: Vec<Vec<Vec<Weak<RefCell<Enemy>>>>>,
-    #[serde(skip)]
     pub(super) operator:Vec<Vec<Option<String>>>
 }
 impl Map {

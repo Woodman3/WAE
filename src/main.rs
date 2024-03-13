@@ -13,7 +13,6 @@ mod map;
 mod timeline;
 mod unit;
 mod utils;
-mod test;
 
 fn main() {
     use eframe::egui::vec2;

@@ -16,6 +16,8 @@ use crate::unit::Unit;
 use crate::utils::math::{Grid, Point};
 
 mod operator_mission;
+#[cfg(test)]
+mod test;
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 pub(crate) type OperatorShared = Weak<RefCell<Operator>>;
 #[derive(Debug,Clone,Default,Deserialize,Serialize)]
@@ -128,8 +130,11 @@ impl Display for Operator{
 }
 
 pub(crate) fn serialize_operator_shared<S>(ptr:&OperatorShared, serializer:S) -> std::result::Result<S::Ok,S::Error> where S: Serializer{
-    let name = ptr.upgrade().unwrap().borrow().name.clone();
-    serializer.serialize_str(name.as_str())
+    if let Some(e) = ptr.upgrade(){
+        let name = e.borrow().name.clone();
+        serializer.serialize_str(name.as_str())
+    }else{
+        serializer.serialize_none()
+    }
 }
-
-    
+ 

@@ -150,3 +150,7 @@ impl Calculator {
         false
     }
 }
+
+#[cfg(test)]
+mod test{
+}
