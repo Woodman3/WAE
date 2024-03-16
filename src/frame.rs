@@ -1,7 +1,7 @@
 use std::cell::RefCell;
 use std::collections::HashMap;
 use crate::unit::enemy::Enemy;
-use crate::unit::code;
+use crate::unit::{code};
 use crate::unit::operator::Operator;
 use crate::unit::bullet::Bullet;
 use log::info;
@@ -55,7 +55,7 @@ impl Frame {
         self.bullet_set.iter_mut().for_each(|b| b.step());
         let bv:Vec<Bullet>=self.bullet_set.iter().filter(|&b| b.distance<=code::BULLET_HIT_DISTANCE).cloned().collect();
         for b in bv{
-            let mut u=b.target.borrow_mut();
+            let mut u=b.target.clone();
             u.be_hit(&b,self);
         }
         self.bullet_set.retain(|b| b.distance>code::BULLET_HIT_DISTANCE);

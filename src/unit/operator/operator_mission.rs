@@ -24,7 +24,7 @@ impl Operator{
                 }
                 Ranged=>{
                     f.bullet_set.push(Bullet::new(
-                        e,
+                        Unit::Enemy(Rc::clone(&e)),
                         Point::from(self.location),
                         2f64,
                         self.stage.damage_type,

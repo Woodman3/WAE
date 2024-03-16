@@ -10,7 +10,7 @@ use serde::ser::{Serializer};
 use crate::calculator::PERIOD;
 use crate::frame::{Frame, OperatorRef};
 use crate::unit::bullet::Bullet;
-use crate::unit::{skill, Unit};
+use crate::unit::{skill};
 use crate::unit::code::DIE;
 use crate::unit::skill::effect::FixedDamage;
 use crate::unit::operator::{OperatorShared};
@@ -44,6 +44,7 @@ pub struct EnemyWithPriority{
     pub enemy:EnemyShared,
     pub time_stamp:u64,
 }
+
 impl Enemy {
     /// t is 1/fps it mean time interval
     pub fn step(&mut self) {
@@ -125,14 +126,14 @@ impl fmt::Display for Enemy {
 }
 
 
-impl Unit for Enemy{
-    fn get_loc(&self) -> Point {
+impl Enemy{
+    pub(super) fn get_loc(&self) -> Point {
         self.location
     }
-    fn be_hit(&mut self, b: &Bullet, _f: &mut Frame) {
+    pub(super) fn be_hit(&mut self, b: &Bullet, _f: &mut Frame) {
         self.be_damage(&b.damage);
     }
-    fn be_damage(&mut self, d: &FixedDamage) {
+    pub(super) fn be_damage(&mut self, d: &FixedDamage) {
         use super::skill::effect::DamageType::*;
         match d.damage_type {
             Magic =>{

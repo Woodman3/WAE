@@ -5,13 +5,19 @@ pub mod bullet;
 pub mod skill;
 pub(super) mod operator;
 
+use std::cell::{Ref, RefCell};
 use std::fmt::Debug;
+use std::rc::Rc;
 use serde::{Deserialize, Serialize};
+use serde::ser::{Serializer};
+use enum_dispatch::enum_dispatch;
 use crate::frame::Frame;
 use crate::unit::bullet::Bullet;
 use skill::effect::FixedDamage;
 use crate::unit::skill::effect::{ChangeClass, ChangeType, Buff, DamageType};
 use crate::unit::skill::skill_type::AttackType;
+use operator::Operator;
+use enemy::Enemy;
 use crate::utils::math::Point;
 
 #[derive(Debug, Clone,Default, Deserialize,Serialize)]
@@ -29,10 +35,17 @@ pub struct UnitInfo {
     attack_type:AttackType,
 }
 
-pub trait Unit:Debug{
-    fn get_loc(&self)->Point;
-    fn be_hit(&mut self,b:&Bullet,f:&mut Frame);
-    fn be_damage(&mut self,d:&FixedDamage);
+
+// pub trait UnitTrait:Debug{
+//     fn get_loc(&self)->Point;
+//     fn be_hit(&mut self,b:&Bullet,f:&mut Frame);
+//     fn be_damage(&mut self,d:&FixedDamage);
+// }
+
+#[derive(Clone,Debug,Deserialize,Serialize)]
+pub(super) enum Unit {
+    Enemy(Rc<RefCell<Enemy>>),
+    Operator(Rc<RefCell<Operator>>),
 }
 
 impl UnitInfo {
@@ -63,4 +76,36 @@ impl UnitInfo {
     }
 }
 
+impl Unit{
+    pub(super) fn get_loc(&self)->Point{
+        match &self {
+            Unit::Enemy(e) => {
+                e.borrow().get_loc()
+            },
+            Unit::Operator(o) => {
+                o.borrow().get_loc()
+            },
+        }
+    }
+    pub(super) fn be_hit(&mut self,b:&Bullet,f:&mut Frame){
+        match &self {
+            Unit::Enemy(e) => {
+                e.borrow_mut().be_hit(b,f)
+            },
+            Unit::Operator(o) => {
+                o.borrow_mut().be_hit(b,f)
+            },
+        }
+    }
+    pub(super) fn be_damage(&mut self,d:&FixedDamage){
+        match &self {
+            Unit::Enemy(e) => {
+                e.borrow_mut().be_damage(d)
+            },
+            Unit::Operator(o) => {
+                o.borrow_mut().be_damage(d)
+            },
+        }
+    }
+}
 

@@ -1,5 +1,5 @@
 use std::cell::RefCell;
-use std::rc::Weak;
+use std::rc::{Rc, Weak};
 use crate::calculator::PERIOD;
 use crate::frame::Frame;
 use crate::unit::bullet::Bullet;
@@ -29,7 +29,7 @@ impl Operator{
                             }
                             Ranged=>{
                                 f.bullet_set.push(Bullet::new(
-                                    u,
+                                    Unit::Enemy(Rc::clone(&u)),
                                     Point::from(self.location),
                                     2f64,
                                     self.stage.damage_type,

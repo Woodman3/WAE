@@ -1,3 +1,5 @@
+use serde::{Deserialize, Serialize};
+
 use crate::unit::Unit;
 use crate::utils::math::{distance_from_segment_to_point, to_target, Point};
 use std::cell::RefCell;
@@ -7,7 +9,7 @@ use crate::unit::skill::effect::{FixedDamage, DamageType};
 
 #[derive(Clone, Debug)]
 pub struct Bullet {
-    pub target: Rc<RefCell<dyn Unit>>,
+    pub target: Unit,
     direction: Point,
     pub location: Point,
     move_speed: f64,
@@ -17,12 +19,12 @@ pub struct Bullet {
 
 impl Bullet {
     pub fn step(&mut self) {
-        let target_point = self.target.borrow().get_loc();
+        let target_point = self.target.get_loc();
         let (_direction, new) = to_target(self.location, target_point, self.move_speed);
         self.distance = distance_from_segment_to_point(self.location, new, target_point);
         self.location=new;
     }
-    pub fn new(target: Rc<RefCell<dyn Unit>>, location: Point, move_speed: f64,
+    pub fn new(target:Unit, location: Point, move_speed: f64,
     damage_type:DamageType,damage:f64) -> Self {
         Bullet {
             target,

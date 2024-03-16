@@ -12,7 +12,6 @@ use crate::unit::skill::Skill;
 use crate::unit::skill::effect::FixedDamage;
 use crate::unit::bullet::Bullet;
 use crate::unit::enemy::{Enemy, EnemyWithPriority,EnemyShared};
-use crate::unit::Unit;
 use crate::utils::math::{Grid, Point};
 
 mod operator_mission;
@@ -73,12 +72,12 @@ impl Operator {
     }
 }
 
-impl Unit for Operator {
-    fn get_loc(&self) -> Point {
+impl Operator {
+    pub(super) fn get_loc(&self) -> Point {
         Point::from(self.location)
     }
 
-    fn be_hit(&mut self, b: &Bullet, _f: &mut Frame) {
+    pub(super) fn be_hit(&mut self, b: &Bullet, _f: &mut Frame) {
         self.be_damage(&b.damage);
         if self.stage.hp <=0f64{
             self.die_code=super::code::DIE;
@@ -88,7 +87,7 @@ impl Unit for Operator {
     }
 
 
-    fn be_damage(&mut self, d: &FixedDamage) {
+    pub(super) fn be_damage(&mut self, d: &FixedDamage) {
         use super::skill::effect::DamageType::*;
         match d.damage_type {
             Magic =>{
