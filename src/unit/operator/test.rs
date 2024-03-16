@@ -1,5 +1,5 @@
 use super::*;
-use serde_json::{to_string, to_string_pretty};
+use serde_json::{to_string_pretty};
 #[test]
 fn test_serialize(){
     let o = Operator::default();

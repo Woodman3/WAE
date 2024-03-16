@@ -31,10 +31,4 @@ fn main() {
 #[cfg(test)]
 mod test{
 
-    #[test]
-    fn t(){
-        let a=A{v:1};
-        let ra = Rc::new(RefCell::new(a));
-        let rt:Temp = ra.into();
-    }
 }

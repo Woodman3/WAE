@@ -1,4 +1,4 @@
-use std::cell::{Ref, RefCell};
+use std::cell::{RefCell};
 use std::cmp::Ordering;
 use crate::utils::math;
 use serde_json::Value;
@@ -87,7 +87,7 @@ impl Enemy {
                     //     self.stage.damage,
                     // ));
                 }
-                _ => {error!("unknown attack_type!")}
+                // _ => {error!("unknown attack_type!")}
             }
             self.stage.attack_time=self.info.attack_time;
         }
@@ -147,10 +147,10 @@ impl Enemy{
             Real=>{
                 self.stage.hp -=d.value;
             }
-            _ => {
-                warn!("unknown attack type of bullet ,bullet has been departure");
-                return
-            }
+            // _ => {
+            //     warn!("unknown attack type of bullet ,bullet has been departure");
+            //     return
+            // }
         }
         if self.stage.hp <=0.0{
             self.die_code=super::code::DIE;

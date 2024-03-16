@@ -11,7 +11,7 @@ use crate::frame::Frame;
 use crate::unit::skill::Skill;
 use crate::unit::skill::effect::FixedDamage;
 use crate::unit::bullet::Bullet;
-use crate::unit::enemy::{Enemy, EnemyWithPriority,EnemyShared};
+use crate::unit::enemy::{EnemyWithPriority,EnemyShared};
 use crate::utils::math::{Grid, Point};
 
 mod operator_mission;
@@ -101,10 +101,10 @@ impl Operator {
             Real=>{
                 self.stage.hp -=d.value;
             }
-            _ => {
-                warn!("unknown attack type of bullet ,bullet has been departure");
-                return
-            }
+            // _ => {
+            //     warn!("unknown attack type of bullet ,bullet has been departure");
+            //     return
+            // }
         }
     }
 }

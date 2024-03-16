@@ -36,7 +36,7 @@ impl Operator{
                                     self.stage.atk,
                                 ));
                             }
-                            _ => { log::error!("unknown attack_type!")}
+                            // _ => { log::error!("unknown attack_type!")}
                         }
                     }else{
                         self.target=Weak::new();

@@ -1,4 +1,7 @@
-use std::{cell::OnceCell, net::Incoming, os::raw::c_char, ptr::{null, null_mut}};
+#![allow(non_snake_case)]
+#![allow(unused)]
+#![allow(dead_code)]
+use std::{cell::OnceCell, os::raw::c_char, ptr::{null_mut}};
 use crate::calculator::Calculator;
 use std::ffi::{CString,CStr};
 use serde_json::Value;

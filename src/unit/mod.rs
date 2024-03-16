@@ -5,11 +5,11 @@ pub mod bullet;
 pub mod skill;
 pub(super) mod operator;
 
-use std::cell::{Ref, RefCell};
+use std::cell::{RefCell};
 use std::fmt::Debug;
 use std::rc::Rc;
 use serde::{Deserialize, Serialize};
-use serde::ser::{Serializer};
+
 use crate::frame::Frame;
 use crate::unit::bullet::Bullet;
 use skill::effect::FixedDamage;

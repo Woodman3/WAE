@@ -18,7 +18,7 @@ impl Scope {
         use std::mem::swap;
         match to {
             Toward::North => {
-                /// reflect by y=x and then change two point
+                // reflect by y=x and then change two point
                 for r in self.0.iter_mut(){
                     swap(&mut r.ul.row,&mut r.ul.col);
                     swap(&mut r.dr.row,&mut r.dr.col);
