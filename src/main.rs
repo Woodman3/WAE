@@ -22,7 +22,7 @@ fn main() {
     // demo::fun();
     let mut Ca = calculator::Calculator::new(&c).unwrap();
     let mut native_config = eframe::NativeOptions::default();
-    native_config.initial_window_size = vec2(1000.0, 500.0).into();
+    native_config.viewport.inner_size = vec2(1000.0, 500.0).into();
     eframe::run_native("BEC", native_config, Box::new(|cc| {
         Box::new(Visualizer::new(cc,Ca))}));
     // Ca.to_end();
@@ -30,29 +30,6 @@ fn main() {
 
 #[cfg(test)]
 mod test{
-    use std::{cell::RefCell, rc::Rc};
-    use enum_dispatch::enum_dispatch;
-    use serde::Serialize;
-    use serde_json::to_string_pretty;
-
-    #[enum_dispatch]
-    trait Temptrait{}
-    #[derive(Debug,Serialize)]
-    struct A{v:i32}
-    #[derive(Debug,Serialize)]
-    struct B{v:f32}
-    impl Temptrait for A{}
-    impl Temptrait for B{}
-    #[enum_dispatch(Temptrait)]
-    #[derive(Debug,Serialize)]
-    enum TempEnum{
-        A,
-        B,
-    }    
-    enum TempRef{
-        A(Rc<RefCell<A>>),
-        B(Rc<RefCell<B>>),
-    }    
 
     #[test]
     fn t(){

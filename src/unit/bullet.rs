@@ -7,7 +7,7 @@ use std::fmt::{Display, Formatter};
 use std::rc::Rc;
 use crate::unit::skill::effect::{FixedDamage, DamageType};
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug,Serialize,Deserialize)]
 pub struct Bullet {
     pub target: Unit,
     direction: Point,

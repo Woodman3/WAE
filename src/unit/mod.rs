@@ -10,7 +10,6 @@ use std::fmt::Debug;
 use std::rc::Rc;
 use serde::{Deserialize, Serialize};
 use serde::ser::{Serializer};
-use enum_dispatch::enum_dispatch;
 use crate::frame::Frame;
 use crate::unit::bullet::Bullet;
 use skill::effect::FixedDamage;

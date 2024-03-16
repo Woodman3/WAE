@@ -5,6 +5,7 @@ use crate::unit::{code};
 use crate::unit::operator::Operator;
 use crate::unit::bullet::Bullet;
 use log::info;
+use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::fmt;
 use std::rc::Rc;
@@ -13,7 +14,7 @@ use crate::map;
 
 pub(super) type OperatorRef =Rc<RefCell<Operator>>;
 pub(super) type EnemyRef=Rc<RefCell<Enemy>>;
-#[derive(Debug,Clone)]
+#[derive(Debug,Clone,Deserialize,Serialize)]
 pub(super) struct Frame {
     pub timestamp: u64,
     pub enemy_set: Vec<EnemyRef>,
