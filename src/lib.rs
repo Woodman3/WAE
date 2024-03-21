@@ -8,17 +8,19 @@ use serde_json::Value;
 use timeline::action_to_event;
 
 //mod block;
-mod calculator;
+pub mod calculator;
+pub mod frame;
+pub mod map;
+pub mod timeline;
+pub mod unit;
+pub mod utils;
 mod demo;
-mod frame;
-mod map;
-mod timeline;
-mod unit;
-mod utils;
-mod api;
 
 static mut INSTANCE:OnceCell<Calculator> = OnceCell::new();
 
+/// init calculator and make first frame,only shoule be use once
+/// # args
+/// * `path` - the config directory 
 #[no_mangle]
 pub unsafe extern "C" fn init(path:*const c_char)->u8{
     if path.is_null(){
@@ -44,6 +46,10 @@ pub unsafe extern "C" fn init(path:*const c_char)->u8{
     1
 }
 
+/// step the frame
+/// # return value
+/// * `0` step gose well
+/// * `1` step gose wrong
 #[no_mangle]
 pub unsafe extern "C" fn step()->u8{
     if let Some(c) = INSTANCE.get_mut(){
@@ -57,25 +63,51 @@ pub unsafe extern "C" fn step()->u8{
     1
 }
 
+/// get observation space of curent frame
+/// return value is a pointer of string,you should use `free_str` to spare space
+/// the string is a json
 #[no_mangle]
 pub unsafe extern "C" fn get_obs()->*mut c_char{
     if let Some(ca) = INSTANCE.get(){
-        let json = ca.get_obs(); 
-        if let Ok(r)=CString::new(json.to_string()){
-            return r.into_raw()
+        if let Some(json) = ca.get_obs(){
+            if let Ok(r)=CString::new(json.to_string()){
+                return r.into_raw()
+            }
+            println!("can't convert json to CString");
+        }else{
+            println!("can't get json");
         }
-        println!("can't convert json to CString");
     }else{
         println!("can't get instance");
     }
     null_mut()
 }
 
+/// get action space of currently frame
+/// return value is a pointer of string,you should use `free_str` to spare space
+/// the string is a json
 #[no_mangle]
 pub unsafe extern "C" fn get_acs()->*mut c_char{
+    if let Some(ca) = INSTANCE.get(){
+        if let Some(json) = ca.get_acs(){
+            if let Ok(r)=CString::new(json.to_string()){
+                return r.into_raw()
+            }
+            println!("can't convert json to CString");
+        }else{
+            println!("can't get json");
+        }
+    }else{
+        println!("can't get instance");
+    }
     null_mut()
 }
 
+/// make action of currently of frame
+/// you should alse call `step` after make action
+/// # return value
+/// * `0` action add well
+/// * `1` action add wrong
 #[no_mangle]
 pub unsafe extern "C" fn action(args:*const c_char)->u8{
     if args.is_null(){
