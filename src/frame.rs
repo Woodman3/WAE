@@ -14,6 +14,7 @@ use crate::map;
 
 pub(super) type OperatorRef =Rc<RefCell<Operator>>;
 pub(super) type EnemyRef=Rc<RefCell<Enemy>>;
+
 #[derive(Debug,Clone,Deserialize,Serialize)]
 pub(super) struct Frame {
     pub timestamp: u64,
@@ -110,9 +111,9 @@ impl Frame {
         v
     }
 
-    // pub(super) fn get_acs(&self)->serde_json::Value{
-
-    // }
+    pub(super) fn get_acs(&self)->serde_json::Value{
+        json!(&self)
+    }
 
 }
 

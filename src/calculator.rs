@@ -133,13 +133,22 @@ impl Calculator {
         self.star!=-1||self.time_remain==0
     }
 
-    pub(super) fn get_obs(&self)->Value{
+    pub(super) fn get_obs(&self)->Option<Value>{
         if let Some(f) = self.frame_vec.last(){
-           f.get_obs() 
+           Some(f.get_obs())
         }else{
-            Value::Null
+            None
         }
     }
+
+    pub(super) fn get_acs(&self)->Option<Value>{
+        if let Some(f) = self.frame_vec.last(){
+           Some(f.get_acs())
+        }else{
+            None
+        }
+    }
+
     pub(super) fn insert_event(&mut self,e:Rc<dyn Event>)->bool{
         if let Some(f) = self.frame_vec.last(){
             let time = f.timestamp+1;

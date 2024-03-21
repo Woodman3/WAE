@@ -65,20 +65,7 @@ impl Serialize for B{
 
 #[test]
 fn test(){
-    // let mut ra= Rc::new(RefCell::new(A{id:0,b:Weak::new()})); 
-    // let mut rb = Rc::new(RefCell::new(B{id:0,a:Weak::new()}));
-    // rb.borrow_mut().a=Rc::downgrade(&ra);
-    // ra.borrow_mut().b=Rc::downgrade(&rb);
-    // let c=C{a:ra,b:rb};
-    // let j=to_string(&c).unwrap();
-    // println!("{j}");
-    // let j = json!(
-    //     {
-    //         "a":{"id":1,"b":2},
-    //         "b":{"id":2,"a":1}
-    //     }
-    // );
-    // let c:C=from_value(j).unwrap();
-    let c=C::default();
-    println!("{:?}",c);
+    let v=serde_json::Value::Null;
+    let s=serde_json::to_string(&v).unwrap();
+    println!("{s}")
 }
