@@ -20,19 +20,27 @@ mod api;
 static mut INSTANCE:OnceCell<Calculator> = OnceCell::new();
 
 #[no_mangle]
-pub unsafe extern "C" fn init(s:String)->u8{
-    if let Ok(c) = utils::config::Config::new(s){
-        if let Ok(ca) = calculator::Calculator::new(&c){
-            if let Ok(_)=INSTANCE.set(ca){
-                return 0
-            }
-            println!("instance set fail!");
-        }else{
-            println!("calculator new fail,please check config");
-        }
-    }else{
-        println!("can't load config file");
+pub unsafe extern "C" fn init(path:*const c_char)->u8{
+    if path.is_null(){
+        println!("pointer can't be null!");
+        return 1 
     }
+    let cstr = CStr::from_ptr(path);
+    if let Ok(path) = cstr.to_str(){
+        if let Ok(c) = utils::config::Config::new(path){
+            if let Ok(ca) = calculator::Calculator::new(&c){
+                if let Ok(_)=INSTANCE.set(ca){
+                    return 0
+                }
+                println!("instance set fail!");
+            }else{
+                println!("calculator new fail,please check config");
+            }
+        }else{
+            println!("can't load config file");
+        }
+    }
+    println!("can't convert cstring to ruststr");
     1
 }
 
