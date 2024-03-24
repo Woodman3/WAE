@@ -29,17 +29,32 @@ pub unsafe extern "C" fn init(path:*const c_char)->u8{
     }
     let cstr = CStr::from_ptr(path);
     if let Ok(path) = cstr.to_str(){
-        if let Ok(c) = utils::config::Config::new(path){
-            if let Ok(ca) = calculator::Calculator::new(&c){
-                if let Ok(_)=INSTANCE.set(ca){
-                    return 0
+        // if let Ok(c) = utils::config::Config::new(path){
+        //     if let Ok(ca) = calculator::Calculator::new(&c){
+        //         if let Ok(_)=INSTANCE.set(ca){
+        //             return 0
+        //         }
+        //         println!("instance set fail!");
+        //     }else{
+        //         println!("calculator new fail,please check config");
+        //     }
+        // }else{
+        //     println!("can't load config file");
+        // }
+        match utils::config::Config::new(path){
+            Ok(c)=>{
+                if let Ok(ca) = calculator::Calculator::new(&c){
+                    if let Ok(_)=INSTANCE.set(ca){
+                        return 0
+                    }
+                    println!("instance set fail!");
+                }else{
+                    println!("calculator new fail,please check config");
                 }
-                println!("instance set fail!");
-            }else{
-                println!("calculator new fail,please check config");
             }
-        }else{
-            println!("can't load config file");
+            Err(e)=>{
+                println!("can't load config file,Error message:{:?}",e);
+            }
         }
     }
     println!("can't convert cstring to ruststr");
