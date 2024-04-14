@@ -21,17 +21,17 @@ use crate::utils::math::Point;
 
 #[derive(Debug, Clone,Default, Deserialize,Serialize)]
 pub struct UnitInfo {
-    damage_type: DamageType,
-    hp: f64,
+    pub(super) damage_type: DamageType,
+    pub(super) hp: u32,
     #[serde(skip)]
-    max_hp:f64,
-    aspd: f64,
-    atk: f64,
-    def: f64,
-    magic_resist: f64,
-    attack_time:f64,
-    block_num:u32,
-    attack_type:AttackType,
+    pub(super) max_hp:u32,
+    pub(super) aspd: f64,
+    pub(super) atk: u32,
+    pub(super) def: u32,
+    pub(super) magic_resist: f64,
+    pub(super) attack_time:f64,
+    pub(super) block_num:u32,
+    pub(super) attack_type:AttackType,
 }
 
 

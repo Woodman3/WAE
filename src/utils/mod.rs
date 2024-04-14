@@ -3,6 +3,7 @@ pub mod error;
 pub mod math;
 pub mod visualizer;
 mod visualizer_config;
+pub(super) mod data_loder;
 
 
 pub fn get_short_type_name<'a, T>() -> &'a str {
