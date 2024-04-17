@@ -1,3 +1,4 @@
+use crate::unit::scope::Scope;
 use crate::utils::math::Grid;
 use serde::de::IntoDeserializer;
 use serde::{Deserialize, Serialize};
@@ -106,30 +107,33 @@ impl Loader{
     fn operator_loader(&self,name:String,phase:usize,level:u32)->Option<Operator>{
         if let Some(ok) = self.get_operator_key(&name){
             if let Ok(oo)= from_value::<OfficalOperator>(self.character_table[ok].clone()){
-                if let Some(ui) =self.operator_phase_generate(name,phase,level,&oo){
-                    let mut o = Operator::default();
-                    o.info =ui.clone();
-                    o.stage=ui; 
-                    return Some(o)
-                }
+                return self.operator_phase_generate(name,phase,level,&oo)
             }
         }
         None
         
     }
-    fn operator_phase_generate(&self,name:String,phase:usize,level:u32,oo:&OfficalOperator)->Option<UnitInfo>{
+    fn operator_phase_generate(&self,name:String,phase:usize,level:u32,oo:&OfficalOperator)->Option<Operator>{
         if let Some(op) = oo.phases.get(phase){
             let max_level =op.maxLevel;
             if level<max_level && level>0 {
+                let mut o =Operator::default();
                 let upper = &op.attributesKeyFrames[1].data;
                 let mut data = op.attributesKeyFrames[0].data.clone(); 
-                let change  = level as f32 /max_level as f32; 
+                let change  = (level-1) as f32 /(max_level-1) as f32; 
                 data.maxHp+=((upper.maxHp-data.maxHp) as f32*change) as u32;
                 data.atk+=((upper.atk-data.atk) as f32*change) as u32;
                 data.def+=((upper.def-data.def) as f32*change) as u32;
                 let mut ui:UnitInfo = data.into(); 
-                if let Ok(r)= from_value::<OfficalRange>(self.range_table[op.rangeId.clone()].clone()){
-                    return  Some(ui) 
+                if let Ok(mut r)= from_value::<OfficalRange>(self.range_table[op.rangeId.clone()].clone()){
+                    let s = Scope{0:r.merge()};
+                    o.attack_scope = s.clone();
+                    o.search_scope= s;
+                    o.re_deploy=upper.respawnTime as f32;
+                    o.info=ui.clone();
+                    o.stage=ui;
+                    o.name=name;
+                    return  Some(o) 
                 }
             }
         }else{
@@ -152,7 +156,7 @@ impl Loader{
 }
 
 impl OfficalRange{
-    pub(super) fn shorter(&mut self)->Vec<GridRect>{
+    pub(super) fn merge(&mut self)->Vec<GridRect>{
         let mut r = Vec::<GridRect>::new();
         let v = &mut self.grids;
         v.sort_by(|a,b| {
@@ -177,9 +181,11 @@ impl OfficalRange{
         let mut merged = Vec::<GridRect>::new();
         for gr in r {
             if let Some(last) = merged.last_mut() {
-                if last.dr.row == gr.dr.row&&last.ul.row==gr.dr.row && last.dr.col + 1 == gr.ul.col {
-                    last.dr.col = gr.dr.col; // 合并 GridRect
-                    continue;
+                if last.dr.row == gr.dr.row&&last.ul.row==gr.ul.row{
+                    if last.dr.col + 1 == gr.ul.col|| last.dr.col - 1 == gr.ul.col{
+                        last.dr.col = gr.dr.col; // 合并 GridRect
+                        continue;
+                    }
                 }
             }
             merged.push(gr);
@@ -195,7 +201,7 @@ mod test{
     fn loader_test(){
         if let Ok(l)=Loader::new("./data"){
             
-            if let Some(oo)=l.operator_loader("Skadi".into(),2,30){
+            if let Some(oo)=l.operator_loader("Ela".into(),0,30){
                 println!("{:?}",oo)  ;
             }
         }else{
