@@ -90,15 +90,15 @@ impl Operator {
     pub(super) fn be_damage(&mut self, d: &FixedDamage) {
         use super::skill::effect::DamageType::*;
         match d.damage_type {
-            Magic =>{
+            MAGICAL =>{
                 let damage=(d.value as f64*(1f64-self.stage.magic_resist)) as u32;
                 self.stage.hp -=damage;
             }
-            Physical=>{
+            PHYSICAL=>{
                 let damage=d.value-self.stage.def;
                 self.stage.hp -=damage;
             }
-            Real=>{
+            REAL=>{
                 self.stage.hp -=d.value;
             }
             // _ => {

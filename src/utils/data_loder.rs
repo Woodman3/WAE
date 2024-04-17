@@ -16,7 +16,8 @@ use super::math::GridRect;
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 struct Loader{
     character_table:Value,
-    range_table:Value
+    range_table:Value,
+    gamedata_const:Value
 }
 
 
@@ -96,13 +97,16 @@ impl Into<UnitInfo> for OfficalData{
 
 impl Loader{
     pub fn new<P: AsRef<Path>>(path: P) -> Result<Loader> {
-        let mut file = File::open(path.as_ref().join("character_table.json"))?;
-        let mut reader = BufReader::new(file);
-        let character_table=serde_json::from_reader(reader)?;
-        file = File::open(path.as_ref().join("range_table.json"))?;
-        reader = BufReader::new(file);
-        let range_table=serde_json::from_reader(reader)?;
-        Ok(Loader{character_table,range_table})
+        let character_table = load_json_file(path.as_ref().join("character_table.json"))?;
+        let range_table = load_json_file(path.as_ref().join("range_table.json"))?;
+        let gamedata_const = load_json_file(path.as_ref().join("gamedata_const.json"))?;
+        fn load_json_file<P: AsRef<Path>>(path: P) -> Result<Value> {
+            let file = File::open(path)?;
+            let reader = BufReader::new(file);
+            let value = serde_json::from_reader(reader)?;
+            Ok(value)
+        }
+        Ok(Loader{character_table,range_table, gamedata_const })
     }
     fn operator_loader(&self,name:String,phase:usize,level:u32)->Option<Operator>{
         if let Some(ok) = self.get_operator_key(&name){
