@@ -20,10 +20,10 @@ pub struct Skill{
     pub charge_type: ChargeType,
     pub trigger_type:TriggerType,
     pub schedule_type:ScheduleType,
-    pub duration:f64, ///skill time
-    pub last:f64,///if in skill ,it show time remain,or is 0
-    pub sp_cost:f64,
-    pub sp:f64,
+    pub duration:f32, ///skill time
+    pub last:f32,///if in skill ,it show time remain,or is 0
+    pub sp_cost:f32,
+    pub sp:f32,
     overcharge:bool,
     skill_entity:SkillEntity,
 }

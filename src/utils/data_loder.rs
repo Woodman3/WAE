@@ -11,6 +11,7 @@ use std::path::Path;
 use log::error;
 use crate::unit::operator::Operator;
 use crate::unit::{Unit, UnitInfo};
+use crate::unit::skill::Skill;
 use super::load_json_file;
 
 use super::error;
@@ -72,14 +73,37 @@ struct OfficalData{
     pub(super) levitateImmune: bool,
     pub(super) disarmedCombatImmune: bool,
 }
-#[derive(Deserialize,Default,Debug)]
-struct OfficalSkill{
-    skillId:String,
-}
 
 #[derive(Deserialize,Default,Debug)]
 struct OfficalRange{
     grids:Vec<Grid>,
+}
+
+#[derive(Deserialize,Default,Debug)]
+struct OfficalSkill{
+    rangeId:String,
+    skillType:String,
+    durationType:String,
+    duration:f32,
+    spData:OfficalSpData,
+    blackBoard:Vec<OfficalBlackBoard>,
+}
+
+#[derive(Deserialize,Default,Debug)]
+struct OfficalSpData{
+    spType:String,
+    levelUpCost:u32,
+    maxChargeTime:u32,
+    spCost:u32,
+    initSp:u32,
+    increment:u32,
+}
+
+#[derive(Deserialize,Default,Debug)]
+struct OfficalBlackBoard{
+    key:String,
+    value:f32,
+    valueStr:String,
 }
 
 impl Into<UnitInfo> for OfficalData{
@@ -158,6 +182,19 @@ impl Loader{
             error!("wrong phase level of {name}");
         }
         None
+    }
+
+    fn operator_skill_generata(&self,skillId:String)->Option<Skill>{
+        if let Ok(os)=from_value::<OfficalSkill>(self.skill_table[skillId].clone()){
+            let mut s = Skill::default();
+            s.duration=os.duration;
+            s.sp=os.spData.initSp as f32;
+            s.sp_cost=os.spData.spCost as f32;
+            
+            return Some(s);
+        }
+        None
+
     }
 
     pub(super) fn get_operator_key(&self,name:&String)->Option<String>{
