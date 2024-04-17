@@ -101,6 +101,10 @@ impl Operator {
             REAL=>{
                 self.stage.hp -=d.value;
             }
+            HEAL => {
+                self.stage.hp +=d.value;
+            },
+            NONE => {},
             // _ => {
             //     warn!("unknown attack type of bullet ,bullet has been departure");
             //     return

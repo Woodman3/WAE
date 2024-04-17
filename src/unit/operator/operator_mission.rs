@@ -15,14 +15,14 @@ impl Operator{
         if let Some(e)=self.target.upgrade(){
             use super::super::skill::skill_type::AttackType::*;
             match self.stage.attack_type {
-                Melee=>{
+                MELEE=>{
                     let d= FixedDamage {
                         value:self.stage.atk,
                         damage_type:self.stage.damage_type.clone(),
                     };
                     e.borrow_mut().be_damage(&d);
                 }
-                Ranged=>{
+                RANGE=>{
                     f.bullet_set.push(Bullet::new(
                         Unit::Enemy(Rc::clone(&e)),
                         Point::from(self.location),

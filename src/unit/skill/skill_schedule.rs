@@ -20,14 +20,14 @@ impl Operator{
                 for t in s.target.iter(){
                     if let Some(u)=t.upgrade(){
                         match s.attack_type {
-                            Melee=>{
+                            MELEE=>{
                                 let d= FixedDamage {
                                     value:self.stage.atk,
                                     damage_type:self.stage.damage_type.clone(),
                                 };
                                 u.borrow_mut().be_damage(&d);
                             }
-                            Ranged=>{
+                            RANGE=>{
                                 f.bullet_set.push(Bullet::new(
                                     Unit::Enemy(Rc::clone(&u)),
                                     Point::from(self.location),

@@ -69,7 +69,7 @@ impl Enemy {
         }else {
             use skill::skill_type::AttackType::*;
             match self.stage.attack_type {
-                Melee=>{
+                MELEE=>{
                     let d= FixedDamage {
                         value:self.stage.atk,
                         damage_type:self.stage.damage_type.clone(),
@@ -77,7 +77,7 @@ impl Enemy {
                     o.borrow_mut().be_damage(&d);
                     // self.target.upgrade().unwrap().borrow_mut().be_damage(&d);
                 }
-                Ranged=>{
+                RANGE=>{
                     //todo: ranged enemy
                     // bv.push(Bullet::new(
                     //     self.target.upgrade().unwrap(),
@@ -147,6 +147,10 @@ impl Enemy{
             REAL=>{
                 self.stage.hp -=d.value;
             }
+            HEAL => {
+                self.stage.hp +=d.value;
+            },
+            NONE => {},
             // _ => {
             //     warn!("unknown attack type of bullet ,bullet has been departure");
             //     return

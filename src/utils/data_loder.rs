@@ -1,14 +1,17 @@
 use crate::unit::scope::Scope;
+use crate::unit::skill::effect::DamageType;
+use crate::unit::skill::skill_type::AttackType;
 use crate::utils::math::Grid;
 use serde::de::IntoDeserializer;
 use serde::{Deserialize, Serialize};
-use serde_json::{Value,from_value};
+use serde_json::{from_str, from_value, Value};
 use std::fs::File;
 use std::io::BufReader;
 use std::path::Path;
 use log::error;
 use crate::unit::operator::Operator;
 use crate::unit::{Unit, UnitInfo};
+use super::load_json_file;
 
 use super::error;
 use super::math::GridRect;
@@ -17,7 +20,8 @@ type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 struct Loader{
     character_table:Value,
     range_table:Value,
-    gamedata_const:Value
+    gamedata_const:Value,
+    skill_table:Value
 }
 
 
@@ -26,10 +30,10 @@ struct OfficalOperator{
     pub(super) name:String,
     pub(super) displayNumber:String,
     pub(super) appellation:String,
-    pub(super) position:String,
     pub(super) phases:Vec<OfficalPhase>,
     pub(super) skills:Vec<OfficalSkill>,
-
+    pub(super) subProfessionId:String,
+    pub(super) position:String,
 }
 #[derive(Deserialize,Default,Debug)]
 struct OfficalPhase{
@@ -66,7 +70,7 @@ struct OfficalData{
     pub(super) sleepImmune: bool ,
     pub(super) frozenImmune: bool,
     pub(super) levitateImmune: bool,
-    pub(super) disarmedCombatImmune: bool
+    pub(super) disarmedCombatImmune: bool,
 }
 #[derive(Deserialize,Default,Debug)]
 struct OfficalSkill{
@@ -100,18 +104,25 @@ impl Loader{
         let character_table = load_json_file(path.as_ref().join("character_table.json"))?;
         let range_table = load_json_file(path.as_ref().join("range_table.json"))?;
         let gamedata_const = load_json_file(path.as_ref().join("gamedata_const.json"))?;
-        fn load_json_file<P: AsRef<Path>>(path: P) -> Result<Value> {
-            let file = File::open(path)?;
-            let reader = BufReader::new(file);
-            let value = serde_json::from_reader(reader)?;
-            Ok(value)
-        }
-        Ok(Loader{character_table,range_table, gamedata_const })
+        let skill_table = load_json_file(path.as_ref().join("skill_table.json"))?;
+
+        Ok(Loader {
+            character_table,
+            range_table,
+            gamedata_const,
+            skill_table,
+        })
     }
     fn operator_loader(&self,name:String,phase:usize,level:u32)->Option<Operator>{
         if let Some(ok) = self.get_operator_key(&name){
             if let Ok(oo)= from_value::<OfficalOperator>(self.character_table[ok].clone()){
-                return self.operator_phase_generate(name,phase,level,&oo)
+                if let Some(mut o)=self.operator_phase_generate(name,phase,level,&oo){
+                    if let Ok(sp)=from_value::<DamageType>(self.gamedata_const["subProfessionDamageTypePairs"][oo.subProfessionId.clone()].clone()){
+                        o.info.damage_type=sp;
+                        o.stage.damage_type=sp;
+                        return Some(o);
+                    }
+                }
             }
         }
         None
@@ -121,23 +132,26 @@ impl Loader{
         if let Some(op) = oo.phases.get(phase){
             let max_level =op.maxLevel;
             if level<max_level && level>0 {
-                let mut o =Operator::default();
-                let upper = &op.attributesKeyFrames[1].data;
-                let mut data = op.attributesKeyFrames[0].data.clone(); 
-                let change  = (level-1) as f32 /(max_level-1) as f32; 
-                data.maxHp+=((upper.maxHp-data.maxHp) as f32*change) as u32;
-                data.atk+=((upper.atk-data.atk) as f32*change) as u32;
-                data.def+=((upper.def-data.def) as f32*change) as u32;
-                let mut ui:UnitInfo = data.into(); 
                 if let Ok(mut r)= from_value::<OfficalRange>(self.range_table[op.rangeId.clone()].clone()){
-                    let s = Scope{0:r.merge()};
-                    o.attack_scope = s.clone();
-                    o.search_scope= s;
-                    o.re_deploy=upper.respawnTime as f32;
-                    o.info=ui.clone();
-                    o.stage=ui;
-                    o.name=name;
-                    return  Some(o) 
+                    if let Ok(mut at) = from_value::<AttackType>(Value::String(oo.position.clone())){
+                        let mut o =Operator::default();
+                        let upper = &op.attributesKeyFrames[1].data;
+                        let mut data = op.attributesKeyFrames[0].data.clone(); 
+                        let change  = (level-1) as f32 /(max_level-1) as f32; 
+                        data.maxHp+=((upper.maxHp-data.maxHp) as f32*change) as u32;
+                        data.atk+=((upper.atk-data.atk) as f32*change) as u32;
+                        data.def+=((upper.def-data.def) as f32*change) as u32;
+                        let mut ui:UnitInfo = data.into(); 
+                        ui.attack_type=at;
+                        let s = Scope{0:r.merge()};
+                        o.attack_scope = s.clone();
+                        o.search_scope= s;
+                        o.re_deploy=upper.respawnTime as f32;
+                        o.info=ui.clone();
+                        o.stage=ui;
+                        o.name=name;
+                        return  Some(o) 
+                    }
                 }
             }
         }else{
@@ -204,8 +218,7 @@ mod test{
     #[test]
     fn loader_test(){
         if let Ok(l)=Loader::new("./data"){
-            
-            if let Some(oo)=l.operator_loader("Ela".into(),0,30){
+            if let Some(oo)=l.operator_loader("Shu".into(),0,30){
                 println!("{:?}",oo)  ;
             }
         }else{

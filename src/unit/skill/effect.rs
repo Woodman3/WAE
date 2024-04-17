@@ -65,7 +65,9 @@ pub(crate) struct Damage{
 #[derive(Debug,Clone,Copy,Deserialize,Default,Serialize)]
 pub enum DamageType {
     #[default]
+    NONE,
     PHYSICAL,
     MAGICAL,
+    HEAL,
     REAL,
 }

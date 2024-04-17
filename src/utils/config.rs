@@ -3,6 +3,7 @@ use serde_json::Value;
 use std::fs::File;
 use std::io::BufReader;
 use std::path::Path;
+use super::load_json_file;
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 pub fn construct_info_from_json<T: for<'a> Deserialize<'a>>(
@@ -37,29 +38,22 @@ pub struct Config {
 }
 impl Config {
     pub fn new<P: AsRef<Path>>(path: P) -> Result<Config> {
-        let mut file = File::open(path.as_ref().join("hostile.json"))?;
-        let mut reader = BufReader::new(file);
-        let hostile = serde_json::from_reader(reader)?;
-        file = File::open(path.as_ref().join("enemy.json"))?;
-        reader = BufReader::new(file);
-        let enemy = serde_json::from_reader(reader)?;
-        file = File::open(path.as_ref().join("operator.json"))?;
-        reader = BufReader::new(file);
-        let operator= serde_json::from_reader(reader)?;
-        file = File::open(path.as_ref().join("doctor.json"))?;
-        reader = BufReader::new(file);
-        let doctor= serde_json::from_reader(reader)?;
-        file = File::open(path.as_ref().join("map.json"))?;
-        reader = BufReader::new(file);
-        let map= serde_json::from_reader(reader)?;
-        file = File::open(path.as_ref().join("skill_test.json"))?;
-        reader = BufReader::new(file);
-        let skill= serde_json::from_reader(reader)?;
-        file = File::open(path.as_ref().join("demo.json"))?;
-        reader = BufReader::new(file);
-        let demo= serde_json::from_reader(reader)?;
-        // let content:String = std::fs::read_to_string(json_path.to_owned()+"hostile.json")?;
-        // let hostile_binding = serde_json::from_str::<Value>(&content)?;
-        Ok(Config { hostile, enemy,operator,doctor,map,skill,demo})
+        let hostile = load_json_file(path.as_ref().join("hostile.json"))?;
+        let enemy = load_json_file(path.as_ref().join("enemy.json"))?;
+        let operator = load_json_file(path.as_ref().join("operator.json"))?;
+        let doctor = load_json_file(path.as_ref().join("doctor.json"))?;
+        let map = load_json_file(path.as_ref().join("map.json"))?;
+        let skill = load_json_file(path.as_ref().join("skill_test.json"))?;
+        let demo = load_json_file(path.as_ref().join("demo.json"))?;
+
+        Ok(Config {
+            hostile,
+            enemy,
+            operator,
+            doctor,
+            map,
+            skill,
+            demo,
+        })
     }
 }

@@ -28,8 +28,10 @@ pub enum ScheduleType{
 #[derive(Clone,Copy,Deserialize,Debug,Default,Serialize)]
 pub enum AttackType{
     #[default]
-    Melee,
-    Ranged
+    NONE,
+    ALL,
+    MELEE,
+    RANGED,
 }
 
 pub(super) enum SkillStage{
