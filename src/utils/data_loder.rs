@@ -1,4 +1,5 @@
 use crate::utils::math::Grid;
+use serde::de::IntoDeserializer;
 use serde::{Deserialize, Serialize};
 use serde_json::{Value,from_value};
 use std::fs::File;
@@ -39,7 +40,7 @@ struct OfficalKeyFrame{
     pub(super) level:u32,
     pub(super) data:OfficalData 
 }
-#[derive(Deserialize,Default,Debug)]
+#[derive(Deserialize,Default,Debug,Clone)]
 struct OfficalData{
     pub(super) maxHp:u32,
     pub(super) atk:u32,
@@ -70,6 +71,7 @@ struct OfficalSkill{
     skillId:String,
 }
 
+#[derive(Deserialize,Default,Debug)]
 struct OfficalRange{
     grids:Vec<Grid>,
 }
@@ -106,7 +108,7 @@ impl Loader{
             if let Ok(oo)= from_value::<OfficalOperator>(self.character_table[ok].clone()){
                 if let Some(ui) =self.operator_phase_generate(name,phase,level,&oo){
                     let mut o = Operator::default();
-                    o.info =ui;
+                    o.info =ui.clone();
                     o.stage=ui; 
                     return Some(o)
                 }
@@ -119,14 +121,14 @@ impl Loader{
         if let Some(op) = oo.phases.get(phase){
             let max_level =op.maxLevel;
             if level<max_level && level>0 {
-                let upper = op.attributesKeyFrames[1].data;
-                let mut data = op.attributesKeyFrames[0].data; 
+                let upper = &op.attributesKeyFrames[1].data;
+                let mut data = op.attributesKeyFrames[0].data.clone(); 
                 let change  = level as f32 /max_level as f32; 
-                data.maxHp+=(upper.maxHp-data.maxHp)*change;
-                data.atk+=(upper.atk-data.atk)*change;
-                data.def+=(upper.def-data.def)*change;
+                data.maxHp+=((upper.maxHp-data.maxHp) as f32*change) as u32;
+                data.atk+=((upper.atk-data.atk) as f32*change) as u32;
+                data.def+=((upper.def-data.def) as f32*change) as u32;
                 let mut ui:UnitInfo = data.into(); 
-                if let Ok(r)= from_value::<OfficalRange>(self.range_table[op.rangeId]){
+                if let Ok(r)= from_value::<OfficalRange>(self.range_table[op.rangeId.clone()].clone()){
                     return  Some(ui) 
                 }
             }
@@ -193,7 +195,7 @@ mod test{
     fn loader_test(){
         if let Ok(l)=Loader::new("./data"){
             
-            if let Some(oo)=l.operator_loader("Skadi".into(),1){
+            if let Some(oo)=l.operator_loader("Skadi".into(),2,30){
                 println!("{:?}",oo)  ;
             }
         }else{

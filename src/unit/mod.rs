@@ -8,6 +8,7 @@ pub(super) mod operator;
 use std::cell::{RefCell};
 use std::fmt::Debug;
 use std::rc::Rc;
+use serde::de::IntoDeserializer;
 use serde::{Deserialize, Serialize};
 
 use crate::frame::Frame;
@@ -60,16 +61,16 @@ impl UnitInfo {
                 self.aspd=f(self.aspd,b.value);
             }
             ATK => {
-                self.atk=f(self.atk,b.value);
+                self.atk=f(self.atk.into(),b.value) as u32;
             }
             DEF => {
-                self.def=f(self.def,b.value);
+                self.def=f(self.def.into(),b.value) as u32;
             }
             MaxHP => {
-                self.max_hp=f(self.max_hp,b.value);
+                self.max_hp=f(self.max_hp.into(),b.value) as u32;
             }
             Hp => {
-                self.hp=f(self.hp,b.value);
+                self.hp=f(self.hp.into(),b.value) as u32;
             }
         }
     }

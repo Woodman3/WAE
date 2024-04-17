@@ -25,7 +25,7 @@ impl Bullet {
         self.location=new;
     }
     pub fn new(target:Unit, location: Point, move_speed: f64,
-    damage_type:DamageType,damage:f64) -> Self {
+    damage_type:DamageType,damage:u32) -> Self {
         Bullet {
             target,
             direction: (0.0, 0.0).into(),

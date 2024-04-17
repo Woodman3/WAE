@@ -79,7 +79,7 @@ impl Operator {
 
     pub(super) fn be_hit(&mut self, b: &Bullet, _f: &mut Frame) {
         self.be_damage(&b.damage);
-        if self.stage.hp <=0f64{
+        if self.stage.hp <=0{
             self.die_code=super::code::DIE;
             trace!("an enemy has die!");
             return;
@@ -91,7 +91,7 @@ impl Operator {
         use super::skill::effect::DamageType::*;
         match d.damage_type {
             Magic =>{
-                let damage=d.value*(1f64-self.stage.magic_resist);
+                let damage=(d.value as f64*(1f64-self.stage.magic_resist)) as u32;
                 self.stage.hp -=damage;
             }
             Physical=>{

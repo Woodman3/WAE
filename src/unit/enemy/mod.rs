@@ -98,7 +98,7 @@ impl Enemy {
         }else{
             self.step();
         }
-        if self.stage.hp <=0.0{
+        if self.stage.hp <=0{
             self.die_code=DIE;
         }
     }
@@ -137,7 +137,7 @@ impl Enemy{
         use super::skill::effect::DamageType::*;
         match d.damage_type {
             Magic =>{
-                let damage=d.value*(1f64-self.stage.magic_resist);
+                let damage=(d.value as f64*(1.0-self.stage.magic_resist)) as u32;
                 self.stage.hp -=damage;
             }
             Physical=>{
@@ -152,7 +152,7 @@ impl Enemy{
             //     return
             // }
         }
-        if self.stage.hp <=0.0{
+        if self.stage.hp <=0{
             self.die_code=super::code::DIE;
             trace!("an enemy has die!");
             return;
