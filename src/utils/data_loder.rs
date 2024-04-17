@@ -150,13 +150,39 @@ impl Loader{
 }
 
 impl OfficalRange{
-    pub(super) fn shorter(&self)->Vec<GridRect>{
-        let r = Vec::<GridRect>::new();
-        let v= self.grids.clone();
-        while(!v.is_empty()){
-
+    pub(super) fn shorter(&mut self)->Vec<GridRect>{
+        let mut r = Vec::<GridRect>::new();
+        let v = &mut self.grids;
+        v.sort_by(|a,b| {
+            if(a.col!=b.col){
+                a.col.cmp(&b.col)
+            }else{
+                a.row.cmp(&b.row)
+            }
+        });
+        let mut i = 0;
+        while i < v.len() {
+            let s = v[i];
+            let mut gr = GridRect { ul: s, dr: s };
+            while i + 1 < v.len() && v[i + 1].row == gr.dr.row+1 && v[i + 1].col == gr.dr.col {
+                gr.dr.row += 1;
+                i += 1;
+            }
+            r.push(gr);
+            i += 1;
         }
-        r 
+        
+        let mut merged = Vec::<GridRect>::new();
+        for gr in r {
+            if let Some(last) = merged.last_mut() {
+                if last.dr.row == gr.dr.row&&last.ul.row==gr.dr.row && last.dr.col + 1 == gr.ul.col {
+                    last.dr.col = gr.dr.col; // 合并 GridRect
+                    continue;
+                }
+            }
+            merged.push(gr);
+        }
+        merged
     }
 }
 
