@@ -1,6 +1,6 @@
 use crate::unit::scope::Scope;
 use crate::unit::skill::effect::DamageType;
-use crate::unit::skill::skill_type::AttackType;
+use crate::unit::skill::skill_type::{AttackType, ChargeType};
 use crate::utils::math::Grid;
 use serde::de::IntoDeserializer;
 use serde::{Deserialize, Serialize};
@@ -33,7 +33,7 @@ struct OfficalOperator{
     pub(super) displayNumber:String,
     pub(super) appellation:String,
     pub(super) phases:Vec<OfficalPhase>,
-    pub(super) skills:Vec<OfficalSkill>,
+    pub(super) skills:Vec<OfficalSkillsDescription>,
     pub(super) subProfessionId:String,
     pub(super) position:String,
 }
@@ -81,30 +81,35 @@ struct OfficalRange{
 }
 
 #[derive(Deserialize,Default,Debug)]
+struct OfficalSkillsDescription{
+    pub(super) skillId:String,
+}
+
+#[derive(Deserialize,Default,Debug)]
 struct OfficalSkill{
     rangeId:String,
     skillType:String,
     durationType:String,
     duration:f32,
     spData:OfficalSpData,
-    blackBoard:Vec<OfficalBlackBoard>,
+    blackboard:Vec<OfficalBlackBoard>,
 }
 
 #[derive(Deserialize,Default,Debug)]
 struct OfficalSpData{
     spType:String,
-    levelUpCost:u32,
+    levelUpCost:Option<u32>,
     maxChargeTime:u32,
     spCost:u32,
     initSp:u32,
-    increment:u32,
+    increment:f32,
 }
 
 #[derive(Deserialize,Default,Debug)]
 struct OfficalBlackBoard{
     key:String,
     value:f32,
-    valueStr:String,
+    valueStr:Option<String>,
 }
 
 impl Into<UnitInfo> for OfficalData{
@@ -132,12 +137,18 @@ impl Into<Skill> for OfficalSkill{
             "PASSIVE"=>TriggerType::PASSIVE,
             _=>TriggerType::None
         };
+        let charge_type:ChargeType = match self.spData.spType.as_str(){
+            "INCREASE_WITH_TIME"=>ChargeType::Time,
+            "INCREASE_WITH_ATTACK"=>ChargeType::Attack,
+            "INCREASE_WITH_BE_HIT"=>ChargeType::BeHit,
+            _=>ChargeType::None
+        };
         Skill{
             duration:self.duration,
             sp:self.spData.initSp as f32,
             sp_cost:self.spData.spCost as f32,
             trigger_type,
-            charge_type:from_value(Value::String(self.spData.spType)).unwrap(),
+            charge_type,
             ..Default::default()
         }
     }
@@ -157,59 +168,60 @@ impl Loader{
             skill_table,
         })
     }
-    fn operator_loader(&self,name:String,phase:usize,level:u32)->Option<Operator>{
-        if let Some(ok) = self.get_operator_key(&name){
-            if let Ok(oo)= from_value::<OfficalOperator>(self.character_table[ok].clone()){
-                if let Some(mut o)=self.operator_phase_generate(name,phase,level,&oo){
-                    if let Ok(sp)=from_value::<DamageType>(self.gamedata_const["subProfessionDamageTypePairs"][oo.subProfessionId.clone()].clone()){
-                        o.info.damage_type=sp;
-                        o.stage.damage_type=sp;
-                        return Some(o);
-                    }
-                }
-            }
-        }
-        None
-        
+    /// name can be english or chinese, if name is english,first letter should be upper case
+    /// phase is the phase of operator, 0 is the lowest phase, 2 is the highest phase
+    /// level is the level of operator, 1 is the lowest level, the highest level depend on phase and operator
+    /// skill level is the level of skill, 1 is the lowest level, the highest level depend phase and operator
+    /// return None if operator not found or phase or level is wrong
+    fn operator_loader(&self,name:String,phase:usize,level:u32,skill_index:usize,skill_level:usize)->Result<Operator>{
+        let ok = self.get_operator_key(&name).ok_or("Operator not found")?;
+        let oo= from_value::<OfficalOperator>(self.character_table[ok].clone())?;
+        let mut o=self.operator_phase_generate(name,phase,level,skill_index,skill_level,&oo)?;
+        let sp=from_value::<DamageType>(self.gamedata_const["subProfessionDamageTypePairs"][oo.subProfessionId.clone()].clone())?;
+        o.info.damage_type=sp;
+        o.stage.damage_type=sp;
+        return Ok(o);
     }
-    fn operator_phase_generate(&self,name:String,phase:usize,level:u32,oo:&OfficalOperator)->Option<Operator>{
-        if let Some(op) = oo.phases.get(phase){
-            let max_level =op.maxLevel;
-            if level<max_level && level>0 {
-                if let Ok(mut r)= from_value::<OfficalRange>(self.range_table[op.rangeId.clone()].clone()){
-                    if let Ok(mut at) = from_value::<AttackType>(Value::String(oo.position.clone())){
-                        let mut o =Operator::default();
-                        let upper = &op.attributesKeyFrames[1].data;
-                        let mut data = op.attributesKeyFrames[0].data.clone(); 
-                        let change  = (level-1) as f32 /(max_level-1) as f32; 
-                        data.maxHp+=((upper.maxHp-data.maxHp) as f32*change) as u32;
-                        data.atk+=((upper.atk-data.atk) as f32*change) as u32;
-                        data.def+=((upper.def-data.def) as f32*change) as u32;
-                        let mut ui:UnitInfo = data.into(); 
-                        ui.attack_type=at;
-                        let s = Scope{0:r.merge()};
-                        o.attack_scope = s.clone();
-                        o.search_scope= s;
-                        o.re_deploy=upper.respawnTime as f32;
-                        o.info=ui.clone();
-                        o.stage=ui;
-                        o.name=name;
-                        return  Some(o) 
-                    }
-                }
-            }
+    fn operator_phase_generate(&self,name:String,phase:usize,level:u32,skill_index:usize,skill_level:usize,oo:&OfficalOperator)->Result<Operator>{
+        let op = oo.phases.get(phase).ok_or("Phase not found")?;
+        let max_level =op.maxLevel;
+        let max_skill_level = match phase{
+            0=>4,
+            1=>7,
+            2=>10,
+            _=>0
+        }; 
+        if level >= 1 && level <= max_level && skill_level >= 1 && skill_level <= max_skill_level {
+            let mut r= from_value::<OfficalRange>(self.range_table[op.rangeId.clone()].clone())?;
+            let mut at= from_value::<AttackType>(Value::String(oo.position.clone()))?;
+            let sd=oo.skills.get(skill_index).ok_or("Skill not found")?;
+            let mut s=self.operator_skill_generate(sd.skillId.clone(),skill_level)?;
+            let mut o =Operator::default();
+            let upper = &op.attributesKeyFrames[1].data;
+            let mut data = op.attributesKeyFrames[0].data.clone();
+            let change = (level - 1) as f32 / (max_level - 1) as f32;
+            data.maxHp += ((upper.maxHp - data.maxHp) as f32 * change) as u32;
+            data.atk += ((upper.atk - data.atk) as f32 * change) as u32;
+            data.def += ((upper.def - data.def) as f32 * change) as u32;
+            let mut ui: UnitInfo = data.into();
+            ui.attack_type = at;
+            let s = Scope { 0: r.merge() };
+            o.attack_scope = s.clone();
+            o.search_scope = s;
+            o.re_deploy=upper.respawnTime as f32;
+            o.info=ui.clone();
+            o.stage=ui;
+            o.name=name;
+            return  Ok(o);
         }else{
-            error!("wrong phase level of {name}");
+            Err("Level or skill level out of range".into())
         }
-        None
     }
 
-    fn operator_skill_generata(&self,skillId:String)->Option<Skill>{
-        if let Ok(os)=from_value::<OfficalSkill>(self.skill_table[skillId].clone()){
-            let mut s:Skill = os.into();
-            return Some(s);
-        }
-        None
+    fn operator_skill_generate(&self,skill_id:String,skill_level:usize)->Result<Skill>{
+        let os=from_value::<OfficalSkill>(self.skill_table[skill_id]["levels"][skill_level].clone())?;
+        let mut s:Skill = os.into();
+        Ok(s)
     }
 
     pub(super) fn get_operator_key(&self,name:&String)->Option<String>{
@@ -270,9 +282,8 @@ mod test{
     #[test]
     fn loader_test(){
         if let Ok(l)=Loader::new("./data"){
-            if let Some(oo)=l.operator_loader("Shu".into(),0,30){
-                println!("{:?}",oo)  ;
-            }
+            let oo=l.operator_loader("Shu".into(),2,30,2,8).unwrap();
+            println!("{:?}",oo)  ;
         }else{
             println!("wrong data path in loader test");
         }
