@@ -2,18 +2,17 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone,Deserialize,Debug,Default,PartialEq,Serialize)]
 pub enum ChargeType {
-    Auto,
+    Time,
     Attack,
     BeHit,
-    Passive,
     #[default]
     None
 }
 #[derive(Clone,Deserialize,Debug,Default,Serialize)]
 pub enum TriggerType{
-    Auto,
-    Manual,
-    Passive,
+    AUTO,
+    MANUAL,
+    PASSIVE,
     #[default]
     None
 }

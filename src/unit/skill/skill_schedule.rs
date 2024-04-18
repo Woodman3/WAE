@@ -73,7 +73,7 @@ impl Operator{
             true
         });
         for s in self.skill_block.iter_mut(){
-            if s.charge_type==ChargeType::Auto{
+            if s.charge_type==ChargeType::Time{
                 s.charge(PERIOD);
             }
         }

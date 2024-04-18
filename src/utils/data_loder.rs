@@ -12,6 +12,7 @@ use log::error;
 use crate::unit::operator::Operator;
 use crate::unit::{Unit, UnitInfo};
 use crate::unit::skill::Skill;
+use crate::unit::skill::skill_type::TriggerType;
 use super::load_json_file;
 
 use super::error;
@@ -123,6 +124,25 @@ impl Into<UnitInfo> for OfficalData{
     }
 }
 
+impl Into<Skill> for OfficalSkill{
+    fn into(self) -> Skill {
+        let trigger_type:TriggerType = match self.skillType.as_str(){
+            "AUTO"=>TriggerType::AUTO,
+            "MANUAL"=>TriggerType::MANUAL,
+            "PASSIVE"=>TriggerType::PASSIVE,
+            _=>TriggerType::None
+        };
+        Skill{
+            duration:self.duration,
+            sp:self.spData.initSp as f32,
+            sp_cost:self.spData.spCost as f32,
+            trigger_type,
+            charge_type:from_value(Value::String(self.spData.spType)).unwrap(),
+            ..Default::default()
+        }
+    }
+}
+
 impl Loader{
     pub fn new<P: AsRef<Path>>(path: P) -> Result<Loader> {
         let character_table = load_json_file(path.as_ref().join("character_table.json"))?;
@@ -186,15 +206,10 @@ impl Loader{
 
     fn operator_skill_generata(&self,skillId:String)->Option<Skill>{
         if let Ok(os)=from_value::<OfficalSkill>(self.skill_table[skillId].clone()){
-            let mut s = Skill::default();
-            s.duration=os.duration;
-            s.sp=os.spData.initSp as f32;
-            s.sp_cost=os.spData.spCost as f32;
-            
+            let mut s:Skill = os.into();
             return Some(s);
         }
         None
-
     }
 
     pub(super) fn get_operator_key(&self,name:&String)->Option<String>{
