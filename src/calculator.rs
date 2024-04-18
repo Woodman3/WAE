@@ -13,7 +13,7 @@ use crate::unit::bullet::Bullet;
 use crate::unit::enemy::Enemy;
 use crate::utils::math::Point;
 
-pub(crate) static PERIOD:f64=0.0166;
+pub(crate) static PERIOD:f32=0.0166;
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 /// calculate
 #[derive(Debug)]

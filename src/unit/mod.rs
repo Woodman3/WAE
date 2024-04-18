@@ -30,7 +30,7 @@ pub struct UnitInfo {
     pub(super) atk: u32,
     pub(super) def: u32,
     pub(super) magic_resist: f64,
-    pub(super) attack_time:f64,
+    pub(super) attack_time:f32,
     pub(super) block_num:u32,
     pub(super) attack_type:AttackType,
 }

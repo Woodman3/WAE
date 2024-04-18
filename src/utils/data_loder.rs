@@ -58,7 +58,7 @@ struct OfficalData{
     pub(super) blockCnt: u32,
     pub(super) moveSpeed: f32,
     pub(super) attackSpeed: f64,
-    pub(super) baseAttackTime: f64,
+    pub(super) baseAttackTime: f32,
     pub(super) respawnTime: u32,
     pub(super) hpRecoveryPerSec: f32,
     pub(super) spRecoveryPerSec: f32,

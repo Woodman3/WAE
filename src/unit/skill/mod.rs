@@ -24,8 +24,8 @@ pub struct Skill{
     pub last:f32,///if in skill ,it show time remain,or is 0
     pub sp_cost:f32,
     pub sp:f32,
-    overcharge:bool,
-    skill_entity:SkillEntity,
+    pub(crate) overcharge:bool,
+    pub(crate) skill_entity:SkillEntity,
 }
 #[derive(Deserialize,Debug,Default,Clone,Serialize)]
 pub(crate) struct ToEnemySkill {
@@ -43,7 +43,7 @@ pub(crate) struct NotDirectSkill{
 
 #[derive(Default,Deserialize,Debug,Clone,Serialize)]
 #[serde(tag="type")]
-enum SkillEntity{
+pub(crate) enum SkillEntity{
     ToEnemySkill(ToEnemySkill),
     #[default]
     None,
@@ -67,7 +67,7 @@ impl Skill{
         self.last!=0.0&&self.sp>=self.sp_cost
     }
     pub fn can_charge(&self)->bool{ self.sp<self.sp_cost||self.overcharge }
-    pub fn charge(&mut self,value:f64){
+    pub fn charge(&mut self,value:f32){
         if self.can_charge(){
             self.sp+=value
         }

@@ -25,7 +25,7 @@ pub(crate)type EnemyShared = Weak<RefCell<Enemy>>;
 #[serde(default)]
 pub struct Enemy {
     pub name:String,
-    move_speed: f64,
+    move_speed: f32,
     info: super::UnitInfo,
     pub stage:super::UnitInfo,
     pub location: Point, /// -1 mean haven't place

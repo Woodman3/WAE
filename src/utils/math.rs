@@ -2,8 +2,8 @@ use std::ops::{Add, Mul, Sub};
 use serde::{Deserialize, Serialize};
 #[derive(Clone,Copy,Debug,Default,Deserialize,Serialize)]
 pub struct Point{
-    pub x:f64,
-    pub y:f64
+    pub x:f32,
+    pub y:f32
 }
 #[derive(Clone,Debug,Copy,Default,Deserialize,Serialize)]
 pub struct Grid{
@@ -78,7 +78,7 @@ impl Into<(i64,i64,i64,i64)> for GridRect{
 
 impl Into<(f64,f64)> for Point{
     fn into(self) -> (f64, f64) {
-        (self.x,self.y)
+        (self.x.into(),self.y.into())
     }
 }
 impl Into<(f32,f32)> for Point{
@@ -88,22 +88,26 @@ impl Into<(f32,f32)> for Point{
 }
 impl From<(f64,f64)> for Point{
     fn from(value: (f64, f64)) -> Self {
+        Point{x:value.0 as f32,y:value.1 as f32}
+    }
+}
+impl From<(f32,f32)> for Point{
+    fn from(value: (f32,f32)) -> Self {
         Point{x:value.0,y:value.1}
     }
 }
 impl From<(u32,u32)> for Point{
     fn from(value: (u32,u32)) -> Self {
-        Point{x:value.0 as f64,y:value.1 as f64}
+        Point{x:value.0 as f32,y:value.1 as f32}
     }
 }
 impl From<Grid> for Point{
     fn from(value: Grid) -> Self {
-        Point{x:value.col as f64 + 0.5,y:value.row as f64 +0.5}
+        Point{x:value.col as f32 + 0.5,y:value.row as f32 +0.5}
     }
 }
 impl Add for Point {
     type Output = Self;
-
     fn add(self, rhs: Self) -> Self::Output {
         (self.x+rhs.x,self.y+rhs.y).into()
     }
@@ -117,7 +121,7 @@ impl Sub for Point {
 }
 
 impl Mul for Point {
-    type Output = f64;
+    type Output = f32;
 
     fn mul(self, rhs: Self) -> Self::Output {
         self.x*rhs.x+self.y*rhs.y
@@ -145,7 +149,7 @@ macro_rules! mul2d {
     };
 }
 ///we define A is start_point,B is end_point,P is target_point in short
-pub fn distance_from_segment_to_point(A: Point, B: Point, P: Point) -> f64 {
+pub fn distance_from_segment_to_point(A: Point, B: Point, P: Point) -> f32 {
     // let AB = sub2d!(B, A);
     // let AP = sub2d!(P, A);
     // let r = mul2d!(AB, AP) / mul2d!(AB, AB);
@@ -186,7 +190,7 @@ where  T:Into<f64>+Copy,
     d.sqrt()
 }
 
-pub fn to_target(location:Point,target:Point,move_speed:f64)->(Point,Point){
+pub fn to_target(location:Point,target:Point,move_speed:f32)->(Point,Point){
     use crate::calculator::PERIOD;
     let direction=calculate_direction(target,location);
     let mut new = location.clone();
