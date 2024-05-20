@@ -3,7 +3,7 @@ pub mod error;
 pub mod math;
 pub mod visualizer;
 mod visualizer_config;
-pub(super) mod data_loder;
+// pub(super) mod data_loader;
 
 use std::path::Path;
 use std::fs::File;

@@ -1,22 +1,21 @@
-use crate::unit::scope::Scope;
-use crate::unit::skill::effect::DamageType;
-use crate::unit::skill::skill_type::{AttackType, ChargeType};
-use crate::utils::math::Grid;
-use serde::de::IntoDeserializer;
 use serde::{Deserialize, Serialize};
 use serde_json::{from_str, from_value, Value};
 use std::fs::File;
 use std::io::BufReader;
 use std::path::Path;
 use log::error;
+use crate::unit::scope::Scope;
+use crate::unit::skill::effect::DamageType;
+use crate::unit::skill::skill_type::{AttackType, ChargeType};
+use crate::utils::math::Grid;
 use crate::unit::operator::Operator;
 use crate::unit::{Unit, UnitInfo};
 use crate::unit::skill::Skill;
 use crate::unit::skill::skill_type::TriggerType;
-use super::load_json_file;
-
-use super::error;
-use super::math::GridRect;
+use crate::utils::load_json_file;
+use crate::utils::math::GridRect;
+use super::Result;
+use super::Loader;
 
 #[derive(Deserialize,Default,Debug)]
 struct OfficalOperator{
@@ -146,19 +145,6 @@ impl Into<Skill> for OfficalSkill{
 }
 
 impl Loader{
-    pub fn new<P: AsRef<Path>>(path: P) -> Result<Loader> {
-        let character_table = load_json_file(path.as_ref().join("character_table.json"))?;
-        let range_table = load_json_file(path.as_ref().join("range_table.json"))?;
-        let gamedata_const = load_json_file(path.as_ref().join("gamedata_const.json"))?;
-        let skill_table = load_json_file(path.as_ref().join("skill_table.json"))?;
-
-        Ok(Loader {
-            character_table,
-            range_table,
-            gamedata_const,
-            skill_table,
-        })
-    }
     /// name can be english or chinese, if name is english,first letter should be upper case
     /// phase is the phase of operator, 0 is the lowest phase, 2 is the highest phase
     /// level is the level of operator, 1 is the lowest level, the highest level depend on phase and operator

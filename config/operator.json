@@ -2,7 +2,7 @@
   "Amiya": {
     "name": "Amiya",
     "info": {
-      "damage_type": "Magic",
+      "damage_type": "MAGICAL",
       "hp": 1500,
       "aspd": 1,
       "atk": 100,
@@ -10,7 +10,7 @@
       "magic_resist": 0.1,
       "attack_time": 0.2,
       "block_num":1,
-      "attack_type": "Ranged"
+      "attack_type": "RANGED"
     },
     "attack_scope": [
       [
@@ -31,7 +31,7 @@
   "Skadi": {
     "name": "Skadi",
     "info": {
-      "damage_type": "Physical",
+      "damage_type": "PHYSICAL",
       "hp": 2000,
       "aspd": 1.2,
       "atk": 300,
@@ -39,7 +39,7 @@
       "magic_resist": 0.1,
       "attack_time": 0.1,
       "block_num":2,
-      "attack_type": "Melee"
+      "attack_type": "MELEE"
     },
     "attack_scope": [
       [
