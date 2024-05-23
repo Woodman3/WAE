@@ -1,7 +1,10 @@
 pub(crate) mod operator_loader;
 pub(crate) mod level_loader;
 
+use std::path::Path;
 use serde_json::Value;
+use super::load_json_file;
+
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 pub(crate) struct Loader{
     character_table:Value,
