@@ -148,6 +148,10 @@ impl Calculator {
             None
         }
     }
+    
+    pub(super) fn get_frame(&self)->Option<&Frame>{
+        self.frame_vec.last()
+    }
 
     pub(super) fn insert_event(&mut self,e:Rc<dyn Event>)->bool{
         if let Some(f) = self.frame_vec.last(){

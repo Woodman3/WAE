@@ -1,18 +1,18 @@
+import json
+# pdb.set_trace()
 from ctypes import * 
-dl=WinDLL
+dl=CDLL
 dll=dl("./target/debug/wae.dll")
+# dll=dl("./target/debug/libwae.so")
 buffer = create_string_buffer(b'\0',100)
 t=dll.init(b"./config")
 if(t==0):
-    ptr=dll.get_obs()
-    cp = c_char_p(ptr) 
-    # data=cp.value.decode()
-    # print(data)
-    
-    dll.get_obs.restype=c_char_p
-    data = dll.get_obs()
-    print(ptr)
-    print(data)
+    dll.get_obs.restype =POINTER(c_char) 
+    ptr = dll.get_obs()
+    data = cast(ptr, c_char_p).value
+    data = json.loads(data)
+    dll.free_str(ptr)
+    print(data["Map"])
     
 else:
     print("init error")

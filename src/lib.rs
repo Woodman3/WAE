@@ -156,3 +156,25 @@ pub unsafe extern "C" fn free_str(str:*mut c_char)->u8{
     println!("pointer can't be null!");
     1
 }
+
+#[no_mangle]
+pub unsafe extern "C" fn free_instance(){
+    None =INSTANCE.take();
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn get_frame()->*mut c_char{
+    if let Some(ca) = INSTANCE.get(){
+        if let Some(json) = ca.get_frame(){
+            if let Ok(r)=CString::new(json.to_string()){
+                return r.into_raw()
+            }
+            println!("can't convert json to CString");
+        }else{
+            println!("can't get json");
+        }
+    }else{
+        println!("can't get instance");
+    }
+    null_mut()
+}
