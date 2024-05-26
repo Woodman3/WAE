@@ -1,5 +1,4 @@
 import gymnasium as gym
-from gym.spaces import Discrete, Box, Dict
 import numpy as numpy
 
 import ctypes
@@ -13,17 +12,30 @@ class WAE(gym.Env):
     def __init__(self,render_modes=None,config_path:str="./config"):
         self.lib_init("./libwae.so",config_path) 
         self.render_modes = render_modes
-        self.frame = self.lib_get_str("get_frame")        
+        self.get_frame()
 
-        self.observation_space =Dict({
-            "map":Box(low=0,high=255,shape=(10,10)),
-        })
-        self.action_space = gym.spaces.Discrete(4)
+        self.observation_space = gym.spaces.Text(10000)
+        self.action_space = gym.spaces.Text(10000)
+
+    def _get_obs(self):
+        return self.frame
+
+    def _get_info(self):
+        return self.frame
+
+    def step(self, action):
+        self.lib.step(action)
+        self.get_frame()
+        return self.frame,0,False,{}
+
+    
         
     def lib_init(lib_path:str,config_path:str):
         self.lib = ctypes.dll(lib_path)
         assert(lib.init(config_path)==0)
         self.lib.get_frame.argtypes = [POINTER(c_char)] 
+        self.lib.step.argtypes = [c_char_p]
+
 
     def lib_get_str(self,func_name)->Optional[Dict]:
         try:
@@ -37,6 +49,9 @@ class WAE(gym.Env):
         except:
             f"Error: {func_name} not found in lib"
             return None
+    
+    def get_frame(self):
+        self.frame = self.lib_get_str("get_frame")        
 
     
 
