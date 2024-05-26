@@ -159,7 +159,7 @@ pub unsafe extern "C" fn free_str(str:*mut c_char)->u8{
 
 #[no_mangle]
 pub unsafe extern "C" fn free_instance(){
-    None =INSTANCE.take();
+    INSTANCE.take();
 }
 
 #[no_mangle]
