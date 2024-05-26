@@ -2560,6 +2560,7 @@ dependencies = [
  "bytemuck",
  "cfg-if",
  "log",
+ "png",
  "tiny-skia-path",
 ]
 
@@ -2735,6 +2736,7 @@ dependencies = [
  "log",
  "serde",
  "serde_json",
+ "tiny-skia",
 ]
 
 [[package]]
