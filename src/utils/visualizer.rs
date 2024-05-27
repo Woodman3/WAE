@@ -108,6 +108,12 @@ impl eframe::App for Visualizer{
                 if ui.button("next").clicked() || self.run{
                     self.c.step();
                 };
+                if ui.button("save_frame").clicked(){
+                    if let Some(f) = self.c.get_frame(){
+                        let j = serde_json::to_string_pretty(f).unwrap();
+                        std::fs::write("frame.json",j).unwrap();
+                    }
+                }
                 paint_info(&self.c.frame_vec[0],ui);
         });
     }
