@@ -3,7 +3,8 @@ use eframe::egui::Color32;
 use tiny_skia::Color;
 
 pub const ENEMY_RADIUS:f32=ENEMY_TOUCH_SIZE as f32 * BLOCK_SIZE;
-pub const ENEMY_COLOR:Color32=Color32::RED;
+// pub const ENEMY_COLOR:Color32=Color32::RED;
+pub const ENEMY_COLOR:Color=Color::from_rgba8(50, 127, 150, 200);
 pub const OPERATOR_RADIUS:f32=2.0;
 
 pub const OPERATOR_COLOR:Color32=Color32::BLUE;
