@@ -20,38 +20,39 @@ fn paint_frame(f:&Frame,painter:Painter){
     for i in 0..=width{
         painter.vline(i as f32*BLOCK_SIZE,Rangef{min:0.0,max:height as f32 *BLOCK_SIZE},map_stroke);
     }
-    let enemy_stroke:Stroke=(4.0,ENEMY_COLOR).into();
-    for e in f.enemy_set.iter(){
-        let e=e.borrow();
-        let (mut x,mut y):(f32,f32)=e.location.into();
-        x*=BLOCK_SIZE;
-        y*=BLOCK_SIZE;
-        painter.circle_stroke(pos2(x,y), ENEMY_RADIUS, enemy_stroke);
-    }
-    for (_key,o) in f.operator_deploy.iter(){
-        let o =o.borrow();
-        let p=super::math::Point::from(o.location);
-        let (mut x,mut y):(f32,f32)=p.into();
-        x*=BLOCK_SIZE;
-        y*=BLOCK_SIZE;
-        painter.circle_filled(pos2(x,y),OPERATOR_RADIUS,OPERATOR_COLOR);
-    }
-    for b in f.bullet_set.iter(){
-        let (mut x,mut y):(f32,f32)=b.location.into();
-        x*=BLOCK_SIZE;
-        y*=BLOCK_SIZE;
-        painter.circle_filled(pos2(x,y),BULLET_RADIUS,BULLET_COLOR);
-    }
-    let me = &f.map.enemy;
-    for i in 0..width{
-        for j in 0..height{
-            let l=me[j as usize][i as usize].len();
-            if l!=0{
-                let pos=Pos2::from([(i as f32)*BLOCK_SIZE+5.0,(j as f32)*BLOCK_SIZE+5.0]);
-                painter.circle_filled(pos,3.0,Color32::BROWN);
-            }
-        }
-    }
+    // let enemy_stroke:Stroke=(4.0,ENEMY_COLOR).into();
+    // let enemy_stroke:Stroke=(4.0,Color32::RED).into();
+    // for e in f.enemy_set.iter(){
+    //     let e=e.borrow();
+    //     let (mut x,mut y):(f32,f32)=e.location.into();
+    //     x*=BLOCK_SIZE;
+    //     y*=BLOCK_SIZE;
+    //     painter.circle_stroke(pos2(x,y), ENEMY_RADIUS, enemy_stroke);
+    // }
+    // for (_key,o) in f.operator_deploy.iter(){
+    //     let o =o.borrow();
+    //     let p=super::math::Point::from(o.location);
+    //     let (mut x,mut y):(f32,f32)=p.into();
+    //     x*=BLOCK_SIZE;
+    //     y*=BLOCK_SIZE;
+    //     painter.circle_filled(pos2(x,y),OPERATOR_RADIUS,OPERATOR_COLOR);
+    // }
+    // for b in f.bullet_set.iter(){
+    //     let (mut x,mut y):(f32,f32)=b.location.into();
+    //     x*=BLOCK_SIZE;
+    //     y*=BLOCK_SIZE;
+    //     painter.circle_filled(pos2(x,y),BULLET_RADIUS,BULLET_COLOR);
+    // }
+    // let me = &f.map.enemy;
+    // for i in 0..width{
+    //     for j in 0..height{
+    //         let l=me[j as usize][i as usize].len();
+    //         if l!=0{
+    //             let pos=Pos2::from([(i as f32)*BLOCK_SIZE+5.0,(j as f32)*BLOCK_SIZE+5.0]);
+    //             painter.circle_filled(pos,3.0,Color32::BROWN);
+    //         }
+    //     }
+    // }
 
 }
 fn paint_info(f:&Frame,ui:&mut Ui){

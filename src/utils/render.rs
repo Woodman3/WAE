@@ -4,7 +4,7 @@ use tiny_skia::*;
 
 struct Render<'a>{
     frame:&'a Frame,
-    pixmap:Pixmap
+    pixmap:Pixmap,
 }
 impl<'a> Render<'a> {
     fn new(f: &'a Frame) -> Self {
@@ -38,11 +38,11 @@ impl<'a> Render<'a> {
     }
     fn paint_enemy(&mut self){
         let mut enemy_paint = Paint::default();
-        enemy_paint.set_color(ENEMY_COLOR);
+        enemy_paint.set_color(*ENEMY_COLOR);
         let enemy_path = {
             let mut pb = PathBuilder::new();
             for e in &self.frame.enemy_set{
-                let (x,y) = e.borrow().location.into();
+                let (mut x,mut y) = e.borrow().location.into();
                 x = PADING + x * BLOCK_SIZE;
                 y = PADING + y * BLOCK_SIZE;
                 pb.push_circle(x, y, ENEMY_RADIUS);
@@ -52,9 +52,46 @@ impl<'a> Render<'a> {
         let enemy_stroke = Stroke::default();
         self.pixmap.stroke_path(&enemy_path, &enemy_paint, &enemy_stroke, Transform::identity(), None);
     }
+    fn paint_operator(&mut self){
+        let mut operator_paint = Paint::default();
+        operator_paint.set_color(*OPERATOR_COLOR);
+        let operator_path = {
+            let mut pb = PathBuilder::new();
+            for (_key,o) in &self.frame.operator_deploy{
+                let o = o.borrow();
+                let p = super::math::Point::from(o.location);
+                let (mut x,mut y) = p.into();
+                x = PADING + x * BLOCK_SIZE;
+                y = PADING + y * BLOCK_SIZE;
+                pb.push_circle(x, y, OPERATOR_RADIUS);
+            }
+            pb.finish().unwrap()
+        };
+        let operator_stroke = Stroke::default();
+        self.pixmap.stroke_path(&operator_path, &operator_paint, &operator_stroke, Transform::identity(), None);
+    }
+    fn paint_bullet(&mut self){
+        let mut bullet_paint = Paint::default();
+        bullet_paint.set_color(*BULLET_COLOR);
+        if let Some(bullet_path) = {
+            let mut pb = PathBuilder::new();
+            for b in &self.frame.bullet_set{
+                let (mut x,mut y) = b.location.into();
+                x = PADING + x * BLOCK_SIZE;
+                y = PADING + y * BLOCK_SIZE;
+                pb.push_circle(x, y, BULLET_RADIUS);
+            }
+            pb.finish()
+        }{
+            let bullet_stroke = Stroke::default();
+            self.pixmap.stroke_path(&bullet_path, &bullet_paint, &bullet_stroke, Transform::identity(), None);
+        }
+    }
     pub(super) fn render(&mut self){
         self.paint_block();
         self.paint_enemy();
+        self.paint_operator();
+        self.paint_bullet();
     }
     fn save(&self){
         self.pixmap.save_png("image.png").unwrap();
