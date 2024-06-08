@@ -51,6 +51,7 @@ impl<'a> Render<'a> {
         };
         let enemy_stroke = Stroke::default();
         self.pixmap.stroke_path(&enemy_path, &enemy_paint, &enemy_stroke, Transform::identity(), None);
+        // self.pixmap.fill_path(&enemy_path, &enemy_paint, FillRule::Winding , Transform::identity(),None );
     }
     fn paint_operator(&mut self){
         let mut operator_paint = Paint::default();
@@ -96,6 +97,9 @@ impl<'a> Render<'a> {
     fn save(&self){
         self.pixmap.save_png("image.png").unwrap();
     }
+    fn encode(&self)->Vec<u8>{
+        self.pixmap.encode_png().unwrap()
+    }
 }
 
 #[cfg(test)]
@@ -109,5 +113,7 @@ mod test{
         let mut f = serde_json::from_slice::<Frame>(&j).unwrap();
         let mut r = Render::new(&f);
         r.render();
+        r.save();
     }
+
 }
