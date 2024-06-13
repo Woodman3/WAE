@@ -1,9 +1,12 @@
 use eframe::egui;
+use egui::include_image;
 use crate::frame::Frame;
 use eframe::egui::{Context, Painter, pos2, Pos2, Rangef, Rect, Sense, Stroke, TextFormat, Ui, vec2};
 use eframe::epaint::{Color32};
+use egui_extras::install_image_loaders;
 use crate::calculator::Calculator;
 use super::visualizer_config::*;
+use std::env;
 
 pub struct Visualizer{
     pub c:Calculator,
@@ -11,15 +14,15 @@ pub struct Visualizer{
 }
 
 fn paint_frame(f:&Frame,painter:Painter){
-    let width=f.map.width ;
-    let height = f.map.height;
-    let map_stroke:Stroke=(3.0,Color32::BLACK).into();
-    for i in 0..=height {
-        painter.hline(Rangef{min:0.0,max:width as f32 *BLOCK_SIZE},i as f32 *BLOCK_SIZE,map_stroke);
-    }
-    for i in 0..=width{
-        painter.vline(i as f32*BLOCK_SIZE,Rangef{min:0.0,max:height as f32 *BLOCK_SIZE},map_stroke);
-    }
+    // let width=f.map.width ;
+    // let height = f.map.height;
+    // let map_stroke:Stroke=(3.0,Color32::BLACK).into();
+    // for i in 0..=height {
+    //     painter.hline(Rangef{min:0.0,max:width as f32 *BLOCK_SIZE},i as f32 *BLOCK_SIZE,map_stroke);
+    // }
+    // for i in 0..=width{
+    //     painter.vline(i as f32*BLOCK_SIZE,Rangef{min:0.0,max:height as f32 *BLOCK_SIZE},map_stroke);
+    // }
     // let enemy_stroke:Stroke=(4.0,ENEMY_COLOR).into();
     // let enemy_stroke:Stroke=(4.0,Color32::RED).into();
     // for e in f.enemy_set.iter(){
@@ -89,18 +92,15 @@ impl Visualizer{
 impl eframe::App for Visualizer{
     fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
         egui::Context::request_repaint(ctx);
+        install_image_loaders(ctx);
         egui::CentralPanel::default().show(ctx,|ui|{
-            let r:Rect=[(100.0,100.0).into(),(2000.0,2000.0).into()].into();
-            // ui.allocate_rect(r,Sense::hover());
-            // let painter=Painter::new(
-            //     ctx.clone(),
-            //     ui.layer_id(),
-            //     // ui.available_rect_before_wrap(),
-            //     r,
-            // );
-            let (_r,painter)=ui.allocate_painter(vec2(1000.0,2000.0),Sense::hover());
-            ui.label(format!("rect min:{:?},max{:?}",r.min,r.max));
-            paint_frame(&self.c.frame_vec[0],painter);
+            // let r:Rect=[(100.0,100.0).into(),(2000.0,2000.0).into()].into();
+            // let (_r,painter)=ui.allocate_painter(vec2(1000.0,2000.0),Sense::hover());
+            // ui.label(format!("rect min:{:?},max{:?}",r.min,r.max));
+            // paint_frame(&self.c.frame_vec[0],painter);
+            let cwd = env::current_dir().unwrap();
+            let path = cwd.join("image.png");
+            ui.image(include_image!("../../image.png"));
         });
         egui::SidePanel::right("debug")
             .min_width(300.0)
