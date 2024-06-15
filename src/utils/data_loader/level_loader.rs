@@ -117,7 +117,9 @@ impl LevelLoader{
                 if path.is_file() && path.file_name().map_or(false, |f| f == file_name) {
                     return Ok(path.to_string_lossy().into_owned());
                 } else if path.is_dir() {
-                    return Self::find_file_in_dir(&path, file_name)
+                    if let Ok(found) = Self::find_file_in_dir(&path, file_name){
+                        return Ok(found)
+                    }
                 }
             }
         }
@@ -142,9 +144,10 @@ mod test{
     // }
     #[test]
     fn test_find_file_in_dir(){
-        let path = Path::new("data/levels");
+        // let path = Path::new("data/levels");
+        let path = Path::new("data/levels/obt");
         let file_name = "level_main_01-07.json";
-        let result = LevelLoader::find_file_in_dir(path, file_name);
+        let result = LevelLoader::find_file_in_dir(path, file_name).unwrap();
         println!("{:?}", result);
     }
 }
