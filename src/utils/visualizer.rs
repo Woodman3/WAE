@@ -1,11 +1,14 @@
 use eframe::egui;
+use egui::epaint::textures;
 use egui::include_image;
+use egui::load::Bytes;
 use crate::frame::Frame;
 use eframe::egui::{Context, Painter, pos2, Pos2, Rangef, Rect, Sense, Stroke, TextFormat, Ui, vec2};
 use eframe::epaint::{Color32};
 use egui_extras::install_image_loaders;
 use crate::calculator::Calculator;
 use super::visualizer_config::*;
+use super::render::Render;
 use std::env;
 
 pub struct Visualizer{
@@ -98,9 +101,16 @@ impl eframe::App for Visualizer{
             // let (_r,painter)=ui.allocate_painter(vec2(1000.0,2000.0),Sense::hover());
             // ui.label(format!("rect min:{:?},max{:?}",r.min,r.max));
             // paint_frame(&self.c.frame_vec[0],painter);
-            let cwd = env::current_dir().unwrap();
-            let path = cwd.join("image.png");
-            ui.image(include_image!("../../image.png"));
+            let mut r = Render::new(&self.c.frame_vec[0]); 
+            r.render();
+            let image_bytes= r.encode();
+            let img = image::load_from_memory_with_format(&image_bytes,image::ImageFormat::Png).unwrap();
+            let img = img.as_rgba8().unwrap();
+            let (width, height) = img.dimensions();
+            let image_data = egui::ColorImage::from_rgba_unmultiplied(
+                [width as usize,height as usize], &img); 
+            let texture = ctx.load_texture("frame", image_data,egui::TextureOptions::LINEAR);
+            ui.image((texture.id(),texture.size_vec2()));
         });
         egui::SidePanel::right("debug")
             .min_width(300.0)

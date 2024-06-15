@@ -2,12 +2,12 @@ use crate::frame::Frame;
 use super::visualizer_config::*;
 use tiny_skia::*;
 
-struct Render<'a>{
+pub struct Render<'a>{
     frame:&'a Frame,
     pixmap:Pixmap,
 }
 impl<'a> Render<'a> {
-    fn new(f: &'a Frame) -> Self {
+    pub fn new(f: &'a Frame) -> Self {
         let map_width = f.map.width;
         let map_height = f.map.height;
         let figure_width = map_width as u32 * BLOCK_SIZE as u32 + PADING as u32 * 2;
@@ -21,7 +21,7 @@ impl<'a> Render<'a> {
     fn paint_block(&mut self){
         let mut block_paint = Paint::default();
         block_paint.set_color(BLOCK_COLOR);
-        let block_path = {
+        if let Some(block_path) = {
             let mut pb = PathBuilder::new();
             for i in 0..=self.frame.map.height {
                 pb.move_to(PADING as f32, PADING as f32 + i as f32 * BLOCK_SIZE);
@@ -31,15 +31,16 @@ impl<'a> Render<'a> {
                 pb.move_to(PADING as f32 + i as f32 * BLOCK_SIZE, PADING as f32);
                 pb.line_to(PADING as f32 + i as f32 * BLOCK_SIZE, PADING as f32 + self.frame.map.height as f32 * BLOCK_SIZE);
             }
-            pb.finish().unwrap()
-        };
-        let block_stroke = Stroke::default();
-        self.pixmap.stroke_path(&block_path, &block_paint, &block_stroke, Transform::identity(), None);   
+            pb.finish()
+        }{
+            let block_stroke = Stroke::default();
+            self.pixmap.stroke_path(&block_path, &block_paint, &block_stroke, Transform::identity(), None);   
+        }
     }
     fn paint_enemy(&mut self){
         let mut enemy_paint = Paint::default();
         enemy_paint.set_color(*ENEMY_COLOR);
-        let enemy_path = {
+        if let Some(enemy_path) = {
             let mut pb = PathBuilder::new();
             for e in &self.frame.enemy_set{
                 let (mut x,mut y) = e.borrow().location.into();
@@ -47,16 +48,16 @@ impl<'a> Render<'a> {
                 y = PADING + y * BLOCK_SIZE;
                 pb.push_circle(x, y, ENEMY_RADIUS);
             }
-            pb.finish().unwrap()
-        };
-        let enemy_stroke = Stroke::default();
-        self.pixmap.stroke_path(&enemy_path, &enemy_paint, &enemy_stroke, Transform::identity(), None);
-        // self.pixmap.fill_path(&enemy_path, &enemy_paint, FillRule::Winding , Transform::identity(),None );
+            pb.finish()
+        }{
+            let enemy_stroke = Stroke::default();
+            self.pixmap.stroke_path(&enemy_path, &enemy_paint, &enemy_stroke, Transform::identity(), None);
+        }
     }
     fn paint_operator(&mut self){
         let mut operator_paint = Paint::default();
         operator_paint.set_color(*OPERATOR_COLOR);
-        let operator_path = {
+        if let Some(operator_path) = {
             let mut pb = PathBuilder::new();
             for (_key,o) in &self.frame.operator_deploy{
                 let o = o.borrow();
@@ -66,10 +67,11 @@ impl<'a> Render<'a> {
                 y = PADING + y * BLOCK_SIZE;
                 pb.push_circle(x, y, OPERATOR_RADIUS);
             }
-            pb.finish().unwrap()
-        };
-        let operator_stroke = Stroke::default();
-        self.pixmap.stroke_path(&operator_path, &operator_paint, &operator_stroke, Transform::identity(), None);
+            pb.finish()
+        }{
+            let operator_stroke = Stroke::default();
+            self.pixmap.stroke_path(&operator_path, &operator_paint, &operator_stroke, Transform::identity(), None);
+        }
     }
     fn paint_bullet(&mut self){
         let mut bullet_paint = Paint::default();
@@ -88,16 +90,16 @@ impl<'a> Render<'a> {
             self.pixmap.stroke_path(&bullet_path, &bullet_paint, &bullet_stroke, Transform::identity(), None);
         }
     }
-    pub(super) fn render(&mut self){
+    pub fn render(&mut self){
         self.paint_block();
         self.paint_enemy();
         self.paint_operator();
         self.paint_bullet();
     }
-    fn save(&self){
+    pub fn save(&self){
         self.pixmap.save_png("image.png").unwrap();
     }
-    fn encode(&self)->Vec<u8>{
+    pub fn encode(&self)->Vec<u8>{
         self.pixmap.encode_png().unwrap()
     }
 }
