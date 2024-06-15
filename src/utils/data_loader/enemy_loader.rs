@@ -15,10 +15,10 @@ struct OfficalEnemyValue{
 #[derive(Deserialize,Default,Debug)]
 struct OfficalEnemyData{
     pub(super) name:OfficalEnemyDataTemplate<String>,
-    pub(super) applyWay:OfficalEnemyDataTemplate<String>,
-    pub(super) motion:OfficalEnemyDataTemplate<String>,
-    pub(super) lifePointReduce:OfficalEnemyDataTemplate<u32>,
-    pub(super) attribute:OfficalEnemyDataTemplate<String>,
+    // pub(super) applyWay:OfficalEnemyDataTemplate<String>,
+    // pub(super) motion:OfficalEnemyDataTemplate<String>,
+    // pub(super) lifePointReduce:OfficalEnemyDataTemplate<u32>,
+    // pub(super) attributes:OfficalEnemyDataTemplate<String>,
 }
 
 struct OfficalEnemyAttribute{
@@ -59,12 +59,17 @@ struct OfficalEnemyDataTemplate<T>
 
 #[cfg(test)]
 mod test{
+    use crate::utils::load_json_file;
     use super::*;
-    use serde_json::json;
+    use serde_json::{Value,from_value};
     #[test]
     fn test_offical_enemy(){
         let path = "data/levels/enemydata/enemy_database.json";
         let enemy_index = 0;
-         
+        let mut data = load_json_file(path).unwrap();
+        data = data["enemies"].clone();
+        let enemies = from_value::<Vec<OfficalEnemy>>(data).unwrap();
+        let enemy = &enemies[enemy_index];
+        println!("{:?}",enemy);
     }
 }
