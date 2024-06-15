@@ -148,6 +148,7 @@ mod test{
         let path = Path::new("data/levels/obt");
         let file_name = "level_main_01-07.json";
         let result = LevelLoader::find_file_in_dir(path, file_name).unwrap();
-        println!("{:?}", result);
+        let level = load_json_file(result).unwrap();
+        println!("{:?}",level);
     }
 }
