@@ -63,6 +63,8 @@ mod test{
     use serde_json::json;
     #[test]
     fn test_offical_enemy(){
-
+        let path = "data/levels/enemydata/enemy_database.json";
+        let enemy_index = 0;
+         
     }
 }
