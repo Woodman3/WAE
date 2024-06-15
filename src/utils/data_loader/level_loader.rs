@@ -2,6 +2,7 @@ use std::path::Path;
 use std::path::PathBuf;
 
 use serde_json::Value;
+use serde::Deserialize;
 
 use crate::map::Map;
 use crate::utils::load_json_file;
@@ -11,17 +12,30 @@ use super::Result;
 use super::Loader;
 
 // type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
+#[derive(Deserialize,Default,Debug)]
 struct LevelLoader{
     path:PathBuf,
     level:String,
     data:Value
 }
 
+#[derive(Deserialize,Default,Debug)]
 struct OfficalLevelData{
     pub(super) options:Value,
-    pub(super) tiles:Vec<Vec<i32>>,
+    pub(super) mapData:OfficalMapData,
+    pub(super) routes:Vec<OfficalRoute>,
+    pub(super) enemyDbRefs:Vec<OfficalEnemyDbRef>,
+    pub(super) waves:Vec<OfficalWave>,
+    pub(super) ranmdomSeed:u32,
 }
 
+#[derive(Deserialize,Default,Debug)]
+struct OfficalMapData{
+    pub(super) map:Vec<Vec<i32>>,
+    pub(super) tiles:Vec<OfficalTile>,
+}
+
+#[derive(Deserialize,Default,Debug)]
 struct OfficalTile{
     pub(super) tileKey:String,
     pub(super) heightType:String,
@@ -32,12 +46,49 @@ struct OfficalTile{
     // pub(super) effects:Vec<OfficalEffect>,
 }
 
+#[derive(Deserialize,Default,Debug)]
 struct OfficalRoute{
     pub(super) motionMode:String,
     pub(super) starPosition:Grid,
     pub(super) endPosition:Grid,
     pub(super) spawnRandomRange:Point,
     pub(super) spawnOffset:Point,
+    pub(super) checkpoint:Value,
+    pub(super) allowDiagonalMove: bool,
+    pub(super) visitEveryTileCenter: bool,
+    pub(super) visitEveryNodeCenter: bool,
+    pub(super) visitEveryCheckPoint: bool,
+}
+
+#[derive(Deserialize,Default,Debug)]
+struct OfficalEnemyDbRef{
+    pub(super) useDb:bool,
+    pub(super) id:String,
+    pub(super) level:i32,
+    pub(super) overwrittenData:Option<Value>,
+}
+
+#[derive(Deserialize,Default,Debug)]
+struct OfficalWave{
+    pub(super) preDelay:f32,
+    pub(super) postDelay:f32,
+    pub(super) fragments:Vec<OfficalWaveFragment>,
+}
+
+#[derive(Deserialize,Default,Debug)]
+struct OfficalWaveFragment{
+    pub(super) preDelay:f32,
+    pub(super) actions:Vec<OfficalWaveAction>,
+
+}
+
+#[derive(Deserialize,Default,Debug)]
+struct OfficalWaveAction{
+    pub(super) actionType:String,
+    pub(super) preDelay:f32,
+    pub(super) postDelay:f32,
+    pub(super) routeIndex:u32,
+
 }
 
 impl LevelLoader{
