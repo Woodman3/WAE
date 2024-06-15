@@ -1,5 +1,6 @@
 pub(crate) mod operator_loader;
 pub(crate) mod level_loader;
+pub(crate) mod enemy_loader;
 
 use std::path::Path;
 use serde_json::Value;
