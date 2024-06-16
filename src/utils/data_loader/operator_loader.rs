@@ -150,7 +150,7 @@ impl Loader{
     /// level is the level of operator, 1 is the lowest level, the highest level depend on phase and operator
     /// skill level is the level of skill, 1 is the lowest level, the highest level depend phase and operator
     /// return None if operator not found or phase or level is wrong
-    fn operator_loader(&self,name:String,phase:usize,level:u32,skill_index:usize,skill_level:usize)->Result<Operator>{
+    fn load_operator(&self,name:String,phase:usize,level:u32,skill_index:usize,skill_level:usize)->Result<Operator>{
         let ok = self.get_operator_key(&name).ok_or("Operator not found")?;
         let oo= from_value::<OfficalOperator>(self.character_table[ok].clone())?;
         let mut o=self.operator_phase_generate(name,phase,level,skill_index,skill_level,&oo)?;
@@ -259,7 +259,7 @@ mod test{
     #[test]
     fn loader_test(){
         if let Ok(l)=Loader::new("./data"){
-            let oo=l.operator_loader("Shu".into(),2,30,2,8).unwrap();
+            let oo=l.load_operator("Shu".into(),2,30,2,8).unwrap();
             println!("{:?}",oo)  ;
         }else{
             println!("wrong data path in loader test");

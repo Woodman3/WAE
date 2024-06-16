@@ -11,14 +11,6 @@ use crate::utils::math::Point;
 use super::Result;
 use super::Loader;
 
-// type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
-#[derive(Deserialize,Default,Debug)]
-struct LevelLoader{
-    path:PathBuf,
-    level:String,
-    data:Value
-}
-
 #[derive(Deserialize,Default,Debug)]
 struct OfficalLevelData{
     pub(super) options:Value,
@@ -91,47 +83,31 @@ struct OfficalWaveAction{
 
 }
 
-impl LevelLoader{
-    fn new<P: AsRef<Path>>(path: P, level:String)->LevelLoader{
-        LevelLoader{
-            path:path.as_ref().to_path_buf(),
-            level:level,
-            data:Value::Null,
-        }
-    }
-    fn load(&mut self)->Result<()>{
-        self.data = load_json_file(self.path.join(self.level.clone()+".json"))?;
-        Ok(())
-    }
-    fn find_level(&self, level_name: String) -> Result<&Value> {
-        let level_path = Self::find_file_in_dir(&self.path, &format!("{}.json", level_name))?;
-
-        Err("Level not found".into())
-        
-    }
-    fn find_file_in_dir(dir: &Path, file_name: &str) -> Result<String> {
-        if dir.is_dir() {
-            for entry in std::fs::read_dir(dir)? {
-                let entry = entry?;
-                let path = entry.path();
-                if path.is_file() && path.file_name().map_or(false, |f| f == file_name) {
-                    return Ok(path.to_string_lossy().into_owned());
-                } else if path.is_dir() {
-                    if let Ok(found) = Self::find_file_in_dir(&path, file_name){
-                        return Ok(found)
-                    }
+fn find_file_in_dir(dir: &Path, file_name: &str) -> Result<String> {
+    if dir.is_dir() {
+        for entry in std::fs::read_dir(dir)? {
+            let entry = entry?;
+            let path = entry.path();
+            if path.is_file() && path.file_name().map_or(false, |f| f == file_name) {
+                return Ok(path.to_string_lossy().into_owned());
+            } else if path.is_dir() {
+                if let Ok(found) = find_file_in_dir(&path, file_name){
+                    return Ok(found)
                 }
             }
         }
-        Err("File not found".into())
     }
-
+    Err("File not found".into())
 }
-// impl Loader{
-//     fn map_generate(&self)->Result<Map>{
-        
-//     }
-// }
+impl Loader{
+    fn load_level(&self, level_name: String)->Result<Value>{
+        let path = self.path.join("levels");
+        let level_file = level_name + ".json";
+        let file_path = find_file_in_dir(&path, &level_file)?;
+        let level = load_json_file(file_path)?;
+        Ok(level)
+    }
+}
 
 #[cfg(test)]
 mod test{
@@ -147,7 +123,7 @@ mod test{
         // let path = Path::new("data/levels");
         let path = Path::new("data/levels/obt");
         let file_name = "level_main_01-07.json";
-        let result = LevelLoader::find_file_in_dir(path, file_name).unwrap();
+        let result = find_file_in_dir(path, file_name).unwrap();
         let level = load_json_file(result).unwrap();
         println!("{:?}",level);
     }
