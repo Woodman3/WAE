@@ -10,6 +10,7 @@ use crate::utils::math::Grid;
 use crate::utils::math::Point;
 use super::Result;
 use super::Loader;
+use crate::map::block::LayoutCode;
 
 #[derive(Deserialize,Default,Debug)]
 struct OfficalLevelData{
@@ -23,7 +24,7 @@ struct OfficalLevelData{
 
 #[derive(Deserialize,Default,Debug)]
 struct OfficalMapData{
-    pub(super) map:Vec<Vec<i32>>,
+    pub(super) map:Vec<Vec<u32>>,
     pub(super) tiles:Vec<OfficalTile>,
 }
 
@@ -99,13 +100,31 @@ fn find_file_in_dir(dir: &Path, file_name: &str) -> Result<String> {
     }
     Err("File not found".into())
 }
+impl Into<LayoutCode> for OfficalTile{
+    fn into(self)->u8{
+        let c:u8=0;
+        todo!()
+    }
+}
+
+impl Into<Map> for OfficalMapData{
+    fn into(self)->Map{
+        let width = self.map[0].len() as u32;
+        let height = self.map.len() as u32;
+        todo!("imple layout")
+    }
+}
 impl Loader{
-    fn load_level(&self, level_name: String)->Result<Value>{
+    fn load_level(&self, level_name: String)->Result<OfficalLevelData>{
         let path = self.path.join("levels");
         let level_file = level_name + ".json";
         let file_path = find_file_in_dir(&path, &level_file)?;
-        let level = load_json_file(file_path)?;
+        let level_json = load_json_file(file_path)?;
+        let level = serde_json::from_value::<OfficalLevelData>(level_json)?; 
         Ok(level)
+    }
+    fn load_map(&self,level:&Value)->Result<Map>{
+        todo!()
     }
 }
 
