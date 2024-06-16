@@ -7,3 +7,4 @@ example/ffi
 config.toml
 *.code-workspace
 frame.json
+image.png
