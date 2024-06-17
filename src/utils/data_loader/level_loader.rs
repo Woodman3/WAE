@@ -1,6 +1,7 @@
 use std::path::Path;
 use std::path::PathBuf;
 
+use egui::Layout;
 use serde_json::Value;
 use serde::Deserialize;
 
@@ -101,7 +102,7 @@ fn find_file_in_dir(dir: &Path, file_name: &str) -> Result<String> {
     Err("File not found".into())
 }
 impl Into<LayoutCode> for OfficalTile{
-    fn into(self)->u8{
+    fn into(self)->LayoutCode{
         let c:u8=0;
         todo!()
     }
@@ -130,6 +131,8 @@ impl Loader{
 
 #[cfg(test)]
 mod test{
+    use serde_json::from_value;
+
     use super::*;
     // #[test]
     // fn test_level_loader(){
@@ -146,4 +149,39 @@ mod test{
         let level = load_json_file(result).unwrap();
         println!("{:?}",level);
     }
+
+    fn find_all_file_in_dir(dir:&Path,list:&mut Vec<String>){
+        if dir.is_dir(){
+            for entry in std::fs::read_dir(dir).unwrap(){
+                let entry = entry.unwrap();
+                let path = entry.path();
+                if path.is_file(){
+                    get_value_by_key(&path, list);
+                }else if path.is_dir(){
+                    find_all_file_in_dir(&path,list);
+                }
+            }
+        }
+    }
+
+    fn get_value_by_key(path:&Path,list:&mut Vec<String>){
+        let json=load_json_file(path).unwrap();
+        if let Ok(data) = from_value::<OfficalLevelData>(json)
+        {
+            for t in data.mapData.tiles{
+                if !list.contains(&t.heightType) {
+                    list.push(t.tileKey);
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn find_all_value(){
+        let mut value_list=Vec::<String>::new();
+        let path = Path::new("data/levels/obt/main");
+        find_all_file_in_dir(path,&mut value_list);
+        println!("{:?}",value_list); 
+    }
+
 }

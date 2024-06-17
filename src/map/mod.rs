@@ -1,4 +1,4 @@
-mod block;
+pub(super) mod block;
 #[cfg(test)]
 mod test;
 
