@@ -20,7 +20,7 @@ struct OfficalLevelData{
     pub(super) routes:Vec<OfficalRoute>,
     pub(super) enemyDbRefs:Vec<OfficalEnemyDbRef>,
     pub(super) waves:Vec<OfficalWave>,
-    pub(super) ranmdomSeed:u32,
+    pub(super) randomSeed:u32,
 }
 
 #[derive(Deserialize,Default,Debug)]
@@ -33,8 +33,8 @@ struct OfficalMapData{
 struct OfficalTile{
     pub(super) tileKey:String,
     pub(super) heightType:String,
-    pub(super) buildable:String,
-    pub(super) passable:String,
+    pub(super) buildableType:String,
+    pub(super) passableMask:String,
     pub(super) playerSideMask:String,
     // pub(super) blackboard:String,
     // pub(super) effects:Vec<OfficalEffect>,
@@ -43,11 +43,11 @@ struct OfficalTile{
 #[derive(Deserialize,Default,Debug)]
 struct OfficalRoute{
     pub(super) motionMode:String,
-    pub(super) starPosition:Grid,
+    pub(super) startPosition:Grid,
     pub(super) endPosition:Grid,
     pub(super) spawnRandomRange:Point,
     pub(super) spawnOffset:Point,
-    pub(super) checkpoint:Value,
+    pub(super) checkpoints:Value,
     pub(super) allowDiagonalMove: bool,
     pub(super) visitEveryTileCenter: bool,
     pub(super) visitEveryNodeCenter: bool,
@@ -80,7 +80,6 @@ struct OfficalWaveFragment{
 struct OfficalWaveAction{
     pub(super) actionType:String,
     pub(super) preDelay:f32,
-    pub(super) postDelay:f32,
     pub(super) routeIndex:u32,
 
 }
@@ -141,13 +140,13 @@ mod test{
     //     println!("{:?}", loader.data);
     // }
     #[test]
-    fn test_find_file_in_dir(){
-        // let path = Path::new("data/levels");
+    fn test_level_loader(){
         let path = Path::new("data/levels/obt");
         let file_name = "level_main_01-07.json";
         let result = find_file_in_dir(path, file_name).unwrap();
         let level = load_json_file(result).unwrap();
-        println!("{:?}",level);
+        let data = from_value::<OfficalLevelData>(level).unwrap();
+        println!("{:?}",data);
     }
 
     fn find_all_file_in_dir(dir:&Path,list:&mut Vec<String>){
@@ -169,7 +168,7 @@ mod test{
         if let Ok(data) = from_value::<OfficalLevelData>(json)
         {
             for t in data.mapData.tiles{
-                if !list.contains(&t.heightType) {
+                if !list.contains(&t.tileKey) {
                     list.push(t.tileKey);
                 }
             }
