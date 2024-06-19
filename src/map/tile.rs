@@ -44,6 +44,35 @@ pub(crate) enum TilePassable{
     FlyOnly,
 }
 
+#[derive(Serialize,Deserialize,Debug,Default,Clone,Copy)]
+#[serde(rename_all = "snake_case")]
+pub(crate) enum TileKey{
+    TileForbidden, 
+    TileWall, 
+    TileRoad, 
+    TileStart, 
+    TileEnd, 
+    TileFlystart, 
+    TileFloor, 
+    #[default]
+    TileEmpty, 
+    TileFence,
+    TileRcmCrate, 
+    TileTelout, 
+    TileTelin, 
+    TileRcmOperator, 
+    TileHole, 
+    TileGazebo, 
+    TileBigforce, 
+    TileHealing, 
+    TileGrass, 
+    TileDefup, 
+    TileInfection, 
+    TileVolcano, 
+    TileFenceBound
+}
+
+
 pub(crate) const ID_MASK_LEN:u32 = 8;
 pub(crate) const DEPLOY_MASK_LEN:u32=3;
 

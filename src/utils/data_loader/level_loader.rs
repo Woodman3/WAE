@@ -11,7 +11,7 @@ use crate::utils::math::Grid;
 use crate::utils::math::Point;
 use super::Result;
 use super::Loader;
-use crate::map::tile::{LayoutCode,TileHeight,TileBuildable,TilePassable};
+use crate::map::tile::{LayoutCode,TileHeight,TileBuildable,TilePassable,TileKey};
 
 #[derive(Deserialize,Default,Debug)]
 struct OfficalLevelData{
@@ -31,12 +31,13 @@ struct OfficalMapData{
 
 #[derive(Deserialize,Default,Debug)]
 struct OfficalTile{
-    pub(super) tileKey:String,
+    pub(super) tileKey:TileKey,
     pub(super) heightType:TileHeight,
     pub(super) buildableType:TileBuildable,
     pub(super) passableMask:TilePassable,
     // pub(super) blackboard:String,
     // pub(super) effects:Vec<OfficalEffect>,
+    // it also has a palyerSideMask,but all is value is "ALL",so i ignore it
 }
 
 #[derive(Deserialize,Default,Debug)]
@@ -164,9 +165,9 @@ mod test{
         {
             for t in data.mapData.tiles{
                 // edit value here
-                if !list.contains(&t.playerSideMask) {
-                    list.push(t.playerSideMask);
-                }
+                // if !list.contains(&t.tileKey) {
+                //     list.push(t.tileKey);
+                // }
             }
         }
     }
