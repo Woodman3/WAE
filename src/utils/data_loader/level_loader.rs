@@ -11,7 +11,7 @@ use crate::utils::math::Grid;
 use crate::utils::math::Point;
 use super::Result;
 use super::Loader;
-use crate::map::block::LayoutCode;
+use crate::map::tile::{LayoutCode,TileHeight,TileBuildable,TilePassable};
 
 #[derive(Deserialize,Default,Debug)]
 struct OfficalLevelData{
@@ -32,10 +32,9 @@ struct OfficalMapData{
 #[derive(Deserialize,Default,Debug)]
 struct OfficalTile{
     pub(super) tileKey:String,
-    pub(super) heightType:String,
-    pub(super) buildableType:String,
-    pub(super) passableMask:String,
-    pub(super) playerSideMask:String,
+    pub(super) heightType:TileHeight,
+    pub(super) buildableType:TileBuildable,
+    pub(super) passableMask:TilePassable,
     // pub(super) blackboard:String,
     // pub(super) effects:Vec<OfficalEffect>,
 }
@@ -83,6 +82,8 @@ struct OfficalWaveAction{
     pub(super) routeIndex:u32,
 
 }
+
+// enun OfficalP
 
 fn find_file_in_dir(dir: &Path, file_name: &str) -> Result<String> {
     if dir.is_dir() {
@@ -133,12 +134,6 @@ mod test{
     use serde_json::from_value;
 
     use super::*;
-    // #[test]
-    // fn test_level_loader(){
-    //     let mut loader = LevelLoader::new("src/data/levels", "level1");
-    //     loader.load().unwrap();
-    //     println!("{:?}", loader.data);
-    // }
     #[test]
     fn test_level_loader(){
         let path = Path::new("data/levels/obt");
@@ -168,8 +163,9 @@ mod test{
         if let Ok(data) = from_value::<OfficalLevelData>(json)
         {
             for t in data.mapData.tiles{
-                if !list.contains(&t.tileKey) {
-                    list.push(t.tileKey);
+                // edit value here
+                if !list.contains(&t.playerSideMask) {
+                    list.push(t.playerSideMask);
                 }
             }
         }

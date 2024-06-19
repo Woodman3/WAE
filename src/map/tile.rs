@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, default};
 
 // const VEC_LEN:usize=1024;
 // mod blockinfo;
@@ -17,6 +17,31 @@ struct TileInfo{
     name:String,
     can_deploy:String,
     can_pass:bool  
+}
+
+#[derive(Serialize,Deserialize,Debug,Default,Clone,Copy)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub(crate) enum TileHeight{
+    #[default]
+    Lowland,
+    Highland,
+}
+
+#[derive(Serialize,Deserialize,Debug,Default,Clone,Copy)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub(crate) enum TileBuildable{
+    #[default]
+    None,
+    Ranged,
+    Melee,
+}
+
+#[derive(Serialize,Deserialize,Debug,Default,Clone,Copy)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub(crate) enum TilePassable{
+    #[default]
+    All,
+    FlyOnly,
 }
 
 pub(crate) const ID_MASK_LEN:u32 = 8;

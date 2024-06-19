@@ -1,4 +1,4 @@
-pub(super) mod block;
+pub(super) mod tile;
 #[cfg(test)]
 mod test;
 
@@ -10,7 +10,7 @@ use std::cell::RefCell;
 use std::rc::{Rc, Weak};
 use crate::unit::scope::Scope;
 
-use self::block::generate_layout;
+use self::tile::generate_layout;
 
 pub const ENEMY_TOUCH_SIZE: f64 = 0.15;
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
