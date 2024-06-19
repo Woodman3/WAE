@@ -47,15 +47,15 @@ pub(crate) enum TilePassable{
 #[derive(Serialize,Deserialize,Debug,Default,Clone,Copy)]
 #[serde(rename_all = "snake_case")]
 pub(crate) enum TileKey{
-    TileForbidden, 
+    #[default]
+    TileEmpty, 
     TileWall, 
     TileRoad, 
     TileStart, 
     TileEnd, 
+    TileForbidden, 
     TileFlystart, 
     TileFloor, 
-    #[default]
-    TileEmpty, 
     TileFence,
     TileRcmCrate, 
     TileTelout, 

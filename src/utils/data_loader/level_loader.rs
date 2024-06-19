@@ -3,7 +3,7 @@ use std::path::PathBuf;
 
 use egui::Layout;
 use serde_json::Value;
-use serde::Deserialize;
+use serde::{ Deserialize,Serialize };
 
 use crate::map::Map;
 use crate::utils::load_json_file;
@@ -42,7 +42,7 @@ struct OfficalTile{
 
 #[derive(Deserialize,Default,Debug)]
 struct OfficalRoute{
-    pub(super) motionMode:String,
+    pub(super) motionMode:Route,
     pub(super) startPosition:Grid,
     pub(super) endPosition:Grid,
     pub(super) spawnRandomRange:Point,
@@ -52,6 +52,15 @@ struct OfficalRoute{
     pub(super) visitEveryTileCenter: bool,
     pub(super) visitEveryNodeCenter: bool,
     pub(super) visitEveryCheckPoint: bool,
+}
+
+#[derive(Serialize,Deserialize,Debug,Default,Clone,Copy)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+enum Route {
+    #[default]
+    ENum,
+    Walk,
+    Fly 
 }
 
 #[derive(Deserialize,Default,Debug)]
@@ -78,6 +87,7 @@ struct OfficalWaveFragment{
 
 #[derive(Deserialize,Default,Debug)]
 struct OfficalWaveAction{
+    // story,diaplay enemy info,and so on,it seems not related to the enmey behavior
     pub(super) actionType:String,
     pub(super) preDelay:f32,
     pub(super) routeIndex:u32,
@@ -163,11 +173,14 @@ mod test{
         let json=load_json_file(path).unwrap();
         if let Ok(data) = from_value::<OfficalLevelData>(json)
         {
-            for t in data.mapData.tiles{
-                // edit value here
-                // if !list.contains(&t.tileKey) {
-                //     list.push(t.tileKey);
-                // }
+            for i in data.waves.into_iter(){
+                for j in i.fragments.into_iter(){
+                    for k in j.actions.into_iter(){
+                        if !list.contains(&k.actionType){
+                            list.push(k.actionType);
+                        }
+                    }
+                }
             }
         }
     }
