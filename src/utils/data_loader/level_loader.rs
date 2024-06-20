@@ -27,7 +27,7 @@ struct OfficalLevelData{
     pub(super) randomSeed:u32,
 }
 
-#[derive(Deserialize,Default,Debug)]
+#[derive(Deserialize,Default,Debug,Clone)]
 struct OfficalMapData{
     pub(super) map:Vec<Vec<u64>>,
     pub(super) tiles:Vec<OfficalTile>,
@@ -166,9 +166,12 @@ impl Loader{
         let level_file = level_name + ".json";
         let file_path = find_file_in_dir(&path, &level_file)?;
         let level_json = load_json_file(file_path)?;
-        let level = serde_json::from_value::<OfficalLevelData>(level_json)?; Ok(level) }
-    fn load_map(&self,level:&Value)->Result<Map>{
-        todo!()
+        let level = serde_json::from_value::<OfficalLevelData>(level_json)?; 
+        Ok(level)
+    }
+    fn load_map(&self,level:&OfficalLevelData)->Result<Map>{
+        let map:Map= level.mapData.clone().into();
+        Ok(map)
     }
 }
 
