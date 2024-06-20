@@ -9,8 +9,23 @@ use super::Map;
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 /// | ... | 1 | 1 | 3 | | 8 |
-/// | save | can pass | has deploy | deploy limit | id |
+/// | save | has deploy | can pass | deploy limit | id |
 pub(crate) type LayoutCode=u64;
+
+pub(crate) const ID_MASK_LEN:LayoutCode = 8;
+pub(crate) const DEPLOY_MASK_LEN:LayoutCode=3;
+pub(crate) const HAS_DEPLOY_MASK_LEN:LayoutCode=1;
+pub(crate) const PASS_MASK_LEN:LayoutCode =1;
+
+pub(crate) const ID_MASK:LayoutCode=(1<<ID_MASK_LEN)-1;
+
+pub(crate) const DEPLOY_HIGH:LayoutCode=1<<ID_MASK_LEN;
+pub(crate) const DEPLOY_LOW:LayoutCode=2<<ID_MASK_LEN;
+
+pub(crate) const PASS_ALL:LayoutCode=1<<(ID_MASK_LEN+DEPLOY_MASK_LEN);
+pub(crate) const PASS_FLY:LayoutCode=0<<(ID_MASK_LEN+DEPLOY_MASK_LEN);
+
+
 #[derive(Serialize,Deserialize,Debug)]
 struct TileInfo{
     id:u64,
@@ -73,15 +88,6 @@ pub(crate) enum TileKey{
 }
 
 
-pub(crate) const ID_MASK_LEN:u32 = 8;
-pub(crate) const DEPLOY_MASK_LEN:u32=3;
-
-pub(crate) const ID_MASK:u64=2_u64.pow(ID_MASK_LEN)-1;
-pub(crate) const DEPLOY_MASK:u64=2_u64.pow(ID_MASK_LEN+DEPLOY_MASK_LEN)-1-ID_MASK;
-pub(crate) const PASS_MASK:u64=2_u64.pow(ID_MASK_LEN+DEPLOY_MASK_LEN);
-
-pub(crate) const DEPLOY_HIGH:u64=1<<ID_MASK_LEN;
-pub(crate) const DEPLOY_LOW:u64=2<<ID_MASK_LEN;
 
 impl From<TileInfo> for LayoutCode{
     fn from(value: TileInfo) -> Self {

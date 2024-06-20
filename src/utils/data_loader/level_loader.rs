@@ -5,6 +5,10 @@ use egui::Layout;
 use serde_json::Value;
 use serde::{ Deserialize,Serialize };
 
+use crate::map::tile::DEPLOY_HIGH;
+use crate::map::tile::DEPLOY_LOW;
+use crate::map::tile::PASS_ALL;
+use crate::map::tile::PASS_FLY;
 use crate::map::Map;
 use crate::utils::load_json_file;
 use crate::utils::math::Grid;
@@ -25,11 +29,11 @@ struct OfficalLevelData{
 
 #[derive(Deserialize,Default,Debug)]
 struct OfficalMapData{
-    pub(super) map:Vec<Vec<u32>>,
+    pub(super) map:Vec<Vec<u64>>,
     pub(super) tiles:Vec<OfficalTile>,
 }
 
-#[derive(Deserialize,Default,Debug)]
+#[derive(Deserialize,Default,Debug,Clone,Copy)]
 struct OfficalTile{
     pub(super) tileKey:TileKey,
     pub(super) heightType:TileHeight,
@@ -114,16 +118,46 @@ fn find_file_in_dir(dir: &Path, file_name: &str) -> Result<String> {
 }
 impl Into<LayoutCode> for OfficalTile{
     fn into(self)->LayoutCode{
-        let c:u8=0;
-        todo!()
+        let mut c=0;
+        c |= self.tileKey as u64;
+        // l don't know why HG set both of heightype and buildabletype
+        // c |= match self.heightType {
+        //     TileHeight::Lowland => DEPLOY_LOW,
+        //     TileHeight::Highland => DEPLOY_HIGH,
+        //     _ => 0,
+        // };
+        c |= match self.buildableType {
+            TileBuildable::Melee => DEPLOY_LOW,
+            TileBuildable::Ranged => DEPLOY_HIGH,
+            _ => 0,
+        };
+        c |= match self.passableMask {
+            TilePassable::FlyOnly => PASS_FLY,
+            TilePassable::All => PASS_ALL,
+            _ => 0,
+        }; 
+        c
     }
 }
 
+//todo:there stil have some problem 
 impl Into<Map> for OfficalMapData{
     fn into(self)->Map{
-        let width = self.map[0].len() as u32;
-        let height = self.map.len() as u32;
-        todo!("imple layout")
+        let width = self.map[0].len() ;
+        let height = self.map.len();
+        let mut layout=vec![vec![0; width]; height]; ;
+        for i in 0..height{
+            for j in 0..width{
+                layout[i][j]=self.tiles[self.map[i][j] as usize].into();
+            }
+        }
+        Map{
+            width:width as u32,
+            height:height as u32,
+            layout,
+            enemy:Vec::new(),
+            operator:Vec::new(),
+        }
     }
 }
 impl Loader{
@@ -132,9 +166,7 @@ impl Loader{
         let level_file = level_name + ".json";
         let file_path = find_file_in_dir(&path, &level_file)?;
         let level_json = load_json_file(file_path)?;
-        let level = serde_json::from_value::<OfficalLevelData>(level_json)?; 
-        Ok(level)
-    }
+        let level = serde_json::from_value::<OfficalLevelData>(level_json)?; Ok(level) }
     fn load_map(&self,level:&Value)->Result<Map>{
         todo!()
     }
