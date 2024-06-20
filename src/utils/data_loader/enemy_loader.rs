@@ -1,5 +1,7 @@
 use serde::Deserialize;
 
+use crate::unit::enemy::Enemy;
+
 #[derive(Deserialize,Default,Debug)]
 struct OfficalEnemy{
     pub(super) Key:String,
@@ -56,6 +58,13 @@ struct OfficalEnemyDataTemplate<T>
 {
     pub(super) m_defined:bool,
     pub(super) m_value:Option<T>,
+}
+
+impl Into<Enemy> for OfficalEnemy {
+    fn into(self) -> Enemy {
+
+        todo!()
+    }
 }
 
 #[cfg(test)]
