@@ -24,19 +24,19 @@ pub(crate)type EnemyShared = Weak<RefCell<Enemy>>;
 #[derive(Debug, Clone,Default,Deserialize,Serialize)]
 #[serde(default)]
 pub struct Enemy {
-    pub name:String,
-    move_speed: f32,
-    info: super::UnitInfo,
-    pub stage:super::UnitInfo,
-    pub location: Point, /// -1 mean haven't place
-    pub next_point: Point,
-    direction:Point,
-    route_stage: usize,
-    pub die_code: u32, /// 0 mean haven't die
-    pub route: Option<Rc<Vec<Point>>>,
+    pub(crate) name:String,
+    pub(crate) move_speed: f32,
+    pub(crate) info: super::UnitInfo,
+    pub(crate) stage:super::UnitInfo,
+    pub(crate) location: Point, /// -1 mean haven't place
+    pub(crate) next_point: Point,
+    pub(crate) direction:Point,
+    pub(crate) route_stage: usize,
+    pub(crate) die_code: u32, /// 0 mean haven't die
+    pub(crate) route: Option<Rc<Vec<Point>>>,
     #[serde(serialize_with="super::operator::serialize_operator_shared",skip_deserializing)]
-    pub be_block:OperatorShared,
-    pub id:usize,
+    pub(crate) be_block:OperatorShared,
+    pub(crate) id:usize,
 }
 #[derive(Debug,Clone,Default,Deserialize,Serialize)]
 pub struct EnemyWithPriority{
