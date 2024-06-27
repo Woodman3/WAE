@@ -63,11 +63,12 @@ pub(crate) struct Damage{
     pub(super) change:Option<Change>,
 }
 #[derive(Debug,Clone,Copy,Deserialize,Default,Serialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum DamageType {
     #[default]
-    NONE,
-    PHYSICAL,
-    MAGICAL,
-    HEAL,
-    REAL,
+    None,
+    Physical,
+    Magical,
+    Heal,
+    Real,
 }

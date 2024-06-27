@@ -9,10 +9,11 @@ pub enum ChargeType {
     None
 }
 #[derive(Clone,Deserialize,Debug,Default,Serialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum TriggerType{
-    AUTO,
-    MANUAL,
-    PASSIVE,
+    Auto,
+    Manual,
+    Passive,
     #[default]
     None
 }
@@ -25,12 +26,13 @@ pub enum ScheduleType{
 }
 
 #[derive(Clone,Copy,Deserialize,Debug,Default,Serialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum AttackType{
     #[default]
-    NONE,
-    ALL,
-    MELEE,
-    RANGED,
+    None,
+    All,
+    Melee,
+    Ranged,
 }
 
 pub(super) enum SkillStage{
