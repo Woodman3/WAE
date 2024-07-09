@@ -26,7 +26,7 @@ impl Operator{
                     f.bullet_set.push(Bullet::new(
                         Unit::Enemy(Rc::clone(&e)),
                         Point::from(self.location),
-                        2f32,
+                        2f64,
                         self.stage.damage_type,
                         self.stage.atk,
                     ));

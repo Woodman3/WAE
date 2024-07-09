@@ -40,23 +40,23 @@ struct OfficalKeyFrame{
 }
 #[derive(Deserialize,Default,Debug,Clone)]
 struct OfficalData{
-    pub(super) maxHp:u32,
-    pub(super) atk:u32,
-    pub(super) def:u32,
+    pub(super) maxHp:i64,
+    pub(super) atk:i64,
+    pub(super) def:i64,
     pub(super) magicResistance:f64,
-    pub(super) cost:u32,
-    pub(super) blockCnt: u32,
-    pub(super) moveSpeed: f32,
+    pub(super) cost:i64,
+    pub(super) blockCnt: i64,
+    pub(super) moveSpeed: f64,
     pub(super) attackSpeed: f64,
-    pub(super) baseAttackTime: f32,
-    pub(super) respawnTime: u32,
+    pub(super) baseAttackTime: f64,
+    pub(super) respawnTime: i64,
     pub(super) hpRecoveryPerSec: f32,
     pub(super) spRecoveryPerSec: f32,
     pub(super) maxDeployCount: f32,
     pub(super) maxDeckStackCnt: f32,
-    pub(super) tauntLevel: u32,
-    pub(super) massLevel: u32,
-    pub(super) baseForceLevel: u32,
+    pub(super) tauntLevel: i64,
+    pub(super) massLevel: i64,
+    pub(super) baseForceLevel: i64,
     pub(super) stunImmune: bool,
     pub(super) silenceImmune: bool,
     pub(super) sleepImmune: bool ,
@@ -80,7 +80,7 @@ struct OfficalSkill{
     rangeId:String,
     skillType:String,
     durationType:String,
-    duration:f32,
+    duration:f64,
     spData:OfficalSpData,
     blackboard:Vec<OfficalBlackBoard>,
 }
@@ -98,7 +98,7 @@ struct OfficalSpData{
 #[derive(Deserialize,Default,Debug)]
 struct OfficalBlackBoard{
     key:String,
-    value:f32,
+    value:f64,
     valueStr:Option<String>,
 }
 
@@ -122,9 +122,9 @@ impl Into<UnitInfo> for OfficalData{
 impl Into<Skill> for OfficalSkill{
     fn into(self) -> Skill {
         let trigger_type:TriggerType = match self.skillType.as_str(){
-            "AUTO"=>TriggerType::AUTO,
-            "MANUAL"=>TriggerType::MANUAL,
-            "PASSIVE"=>TriggerType::PASSIVE,
+            "AUTO"=>TriggerType::Auto,
+            "MANUAL"=>TriggerType::Manual,
+            "PASSIVE"=>TriggerType::Passive,
             _=>TriggerType::None
         };
         let charge_type:ChargeType = match self.spData.spType.as_str(){
@@ -135,8 +135,8 @@ impl Into<Skill> for OfficalSkill{
         };
         Skill{
             duration:self.duration,
-            sp:self.spData.initSp as f32,
-            sp_cost:self.spData.spCost as f32,
+            sp:self.spData.initSp as f64,
+            sp_cost:self.spData.spCost as f64,
             trigger_type,
             charge_type,
             ..Default::default()
@@ -176,10 +176,10 @@ impl Loader{
             let mut o =Operator::default();
             let upper = &op.attributesKeyFrames[1].data;
             let mut data = op.attributesKeyFrames[0].data.clone();
-            let change = (level - 1) as f32 / (max_level - 1) as f32;
-            data.maxHp += ((upper.maxHp - data.maxHp) as f32 * change) as u32;
-            data.atk += ((upper.atk - data.atk) as f32 * change) as u32;
-            data.def += ((upper.def - data.def) as f32 * change) as u32;
+            let change = (level - 1) as f64 / (max_level - 1) as f64;
+            data.maxHp += ((upper.maxHp - data.maxHp) as f64 * change) as i64;
+            data.atk += ((upper.atk - data.atk) as f64  * change) as i64;
+            data.def += ((upper.def - data.def) as f64 * change) as i64;
             let mut ui: UnitInfo = data.into();
             ui.attack_type = at;
             let s = Scope { 0: r.merge() };

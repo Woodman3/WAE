@@ -1,4 +1,4 @@
-use std::cell::{RefCell};
+use std::cell::RefCell;
 use std::cmp::Ordering;
 use crate::utils::math;
 use serde_json::Value;
@@ -6,14 +6,14 @@ use std::fmt;
 use std::rc::{Rc, Weak};
 use log::{error, trace, warn};
 use serde::{Deserialize, Serialize};
-use serde::ser::{Serializer};
+use serde::ser::Serializer;
 use crate::calculator::PERIOD;
 use crate::frame::{Frame, OperatorRef};
 use crate::unit::bullet::Bullet;
-use crate::unit::{skill};
+use crate::unit::skill;
 use crate::unit::code::DIE;
 use crate::unit::skill::effect::FixedDamage;
-use crate::unit::operator::{OperatorShared};
+use crate::unit::operator::OperatorShared;
 use crate::utils::math::{Point, to_target};
 
 #[cfg(test)]
@@ -25,7 +25,7 @@ pub(crate)type EnemyShared = Weak<RefCell<Enemy>>;
 #[serde(default)]
 pub struct Enemy {
     pub(crate) name:String,
-    pub(crate) move_speed: f32,
+    pub(crate) move_speed: f64,
     pub(crate) info: super::UnitInfo,
     pub(crate) stage:super::UnitInfo,
     pub(crate) location: Point, /// -1 mean haven't place
@@ -137,7 +137,7 @@ impl Enemy{
         use super::skill::effect::DamageType::*;
         match d.damage_type {
             MAGICAL =>{
-                let damage=(d.value as f64*(1.0-self.stage.magic_resist)) as u32;
+                let damage=(d.value as f64*(1.0-self.stage.magic_resist)) as i64;
                 self.stage.hp -=damage;
             }
             PHYSICAL=>{

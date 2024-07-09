@@ -5,7 +5,7 @@ pub mod bullet;
 pub mod skill;
 pub(super) mod operator;
 
-use std::cell::{RefCell};
+use std::cell::RefCell;
 use std::fmt::Debug;
 use std::rc::Rc;
 use serde::de::IntoDeserializer;
@@ -23,15 +23,15 @@ use crate::utils::math::Point;
 #[derive(Debug, Clone,Default, Deserialize,Serialize)]
 pub struct UnitInfo {
     pub(super) damage_type: DamageType,
-    pub(super) hp: u32,
+    pub(super) hp: i64,
     #[serde(skip)]
-    pub(super) max_hp:u32,
+    pub(super) max_hp:i64,
     pub(super) aspd: f64,
-    pub(super) atk: u32,
-    pub(super) def: u32,
+    pub(super) atk: i64,
+    pub(super) def: i64,
     pub(super) magic_resist: f64,
-    pub(super) attack_time:f32,
-    pub(super) block_num:u32,
+    pub(super) attack_time:f64,
+    pub(super) block_num:i64,
     pub(super) attack_type:AttackType,
 }
 
@@ -61,16 +61,16 @@ impl UnitInfo {
                 self.aspd=f(self.aspd,b.value);
             }
             ATK => {
-                self.atk=f(self.atk.into(),b.value) as u32;
+                self.atk=f(self.atk as f64,b.value) as i64;
             }
             DEF => {
-                self.def=f(self.def.into(),b.value) as u32;
+                self.def=f(self.def as f64,b.value) as i64;
             }
             MaxHP => {
-                self.max_hp=f(self.max_hp.into(),b.value) as u32;
+                self.max_hp=f(self.max_hp as f64,b.value) as i64;
             }
             Hp => {
-                self.hp=f(self.hp.into(),b.value) as u32;
+                self.hp=f(self.hp as f64,b.value) as i64;
             }
         }
     }

@@ -20,10 +20,10 @@ pub struct Skill{
     pub charge_type: ChargeType,
     pub trigger_type:TriggerType,
     pub schedule_type:ScheduleType,
-    pub duration:f32, ///skill time
-    pub last:f32,///if in skill ,it show time remain,or is 0
-    pub sp_cost:f32,
-    pub sp:f32,
+    pub duration:f64, ///skill time
+    pub last:f64,///if in skill ,it show time remain,or is 0
+    pub sp_cost:f64,
+    pub sp:f64,
     pub(crate) overcharge:bool,
     pub(crate) skill_entity:SkillEntity,
 }
@@ -67,7 +67,7 @@ impl Skill{
         self.last!=0.0&&self.sp>=self.sp_cost
     }
     pub fn can_charge(&self)->bool{ self.sp<self.sp_cost||self.overcharge }
-    pub fn charge(&mut self,value:f32){
+    pub fn charge(&mut self,value:f64){
         if self.can_charge(){
             self.sp+=value
         }

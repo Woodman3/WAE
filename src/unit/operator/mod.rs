@@ -2,10 +2,10 @@ use std::cell::RefCell;
 use super::scope::{Scope, Toward};
 use std::fmt;
 use std::fmt::{Display, Formatter};
-use std::rc::{Weak};
+use std::rc::Weak;
 use log::{trace, warn};
 use serde::{Deserialize, Serialize};
-use serde::ser::{Serializer};
+use serde::ser::Serializer;
 use serde_json::Value;
 use crate::frame::Frame;
 use crate::unit::skill::Skill;
@@ -91,7 +91,7 @@ impl Operator {
         use super::skill::effect::DamageType::*;
         match d.damage_type {
             MAGICAL =>{
-                let damage=(d.value as f64*(1f64-self.stage.magic_resist)) as u32;
+                let damage=(d.value as f64*(1f64-self.stage.magic_resist)) as i64;
                 self.stage.hp -=damage;
             }
             PHYSICAL=>{

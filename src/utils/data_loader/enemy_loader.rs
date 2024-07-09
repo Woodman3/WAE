@@ -1,9 +1,12 @@
 use serde::Deserialize;
+use serde_json::from_value;
 
-use crate::unit::enemy::Enemy;
+use crate::unit::{enemy::{self, Enemy}, UnitInfo};
+use super::Loader;
+use super::Result;
 
 #[derive(Deserialize,Default,Debug)]
-struct OfficalEnemy{
+pub(super) struct OfficalEnemy{
     pub(super) Key:String,
     pub(super) Value:Vec<OfficalEnemyValue>
 }
@@ -19,32 +22,32 @@ struct OfficalEnemyData{
     pub(super) name:OfficalEnemyDataTemplate<String>,
     pub(super) applyWay:OfficalEnemyDataTemplate<String>,
     pub(super) motion:OfficalEnemyDataTemplate<String>,
-    pub(super) lifePointReduce:OfficalEnemyDataTemplate<u32>,
+    pub(super) lifePointReduce:OfficalEnemyDataTemplate<u64>,
     pub(super) attributes:OfficalEnemyAttribute,
 }
 
 #[derive(Deserialize,Default,Debug)]
 struct OfficalEnemyAttribute{
-    pub(super) maxHp:OfficalEnemyDataTemplate<i32>,
-    pub(super) atk:OfficalEnemyDataTemplate<i32>,
-    pub(super) def:OfficalEnemyDataTemplate<i32>,
-    pub(super) magicResistance:OfficalEnemyDataTemplate<f32>,
-    pub(super) cost:OfficalEnemyDataTemplate<i32>,
-    pub(super) blockCnt:OfficalEnemyDataTemplate<i32>,
-    pub(super) moveSpeed:OfficalEnemyDataTemplate<f32>,
-    pub(super) attackSpeed:OfficalEnemyDataTemplate<f32>,
-    pub(super) baseAttackTime:OfficalEnemyDataTemplate<f32>,
-    pub(super) respawnTime:OfficalEnemyDataTemplate<i32>,
-    pub(super) hpRecoveryPerSec:OfficalEnemyDataTemplate<f32>,
-    pub(super) spRecoveryPerSec:OfficalEnemyDataTemplate<f32>,
-    pub(super) maxDeployCount:OfficalEnemyDataTemplate<i32>,
-    pub(super) massLevel:OfficalEnemyDataTemplate<i32>,
-    pub(super) baseForceLevel:OfficalEnemyDataTemplate<i32>,
-    pub(super) tauntLevel:OfficalEnemyDataTemplate<i32>,
-    pub(super) epDamageResistance:OfficalEnemyDataTemplate<f32>,
-    pub(super) epResistance:OfficalEnemyDataTemplate<f32>,
-    pub(super) damageHitratePhysical:OfficalEnemyDataTemplate<f32>,
-    pub(super) damageHitrateMagical:OfficalEnemyDataTemplate<f32>,
+    pub(super) maxHp:OfficalEnemyDataTemplate<i64>,
+    pub(super) atk:OfficalEnemyDataTemplate<i64>,
+    pub(super) def:OfficalEnemyDataTemplate<i64>,
+    pub(super) magicResistance:OfficalEnemyDataTemplate<f64>,
+    pub(super) cost:OfficalEnemyDataTemplate<i64>,
+    pub(super) blockCnt:OfficalEnemyDataTemplate<i64>,
+    pub(super) moveSpeed:OfficalEnemyDataTemplate<f64>,
+    pub(super) attackSpeed:OfficalEnemyDataTemplate<f64>,
+    pub(super) baseAttackTime:OfficalEnemyDataTemplate<f64>,
+    pub(super) respawnTime:OfficalEnemyDataTemplate<i64>,
+    pub(super) hpRecoveryPerSec:OfficalEnemyDataTemplate<f64>,
+    pub(super) spRecoveryPerSec:OfficalEnemyDataTemplate<f64>,
+    pub(super) maxDeployCount:OfficalEnemyDataTemplate<i64>,
+    pub(super) massLevel:OfficalEnemyDataTemplate<i64>,
+    pub(super) baseForceLevel:OfficalEnemyDataTemplate<i64>,
+    pub(super) tauntLevel:OfficalEnemyDataTemplate<i64>,
+    pub(super) epDamageResistance:OfficalEnemyDataTemplate<f64>,
+    pub(super) epResistance:OfficalEnemyDataTemplate<f64>,
+    pub(super) damageHitratePhysical:OfficalEnemyDataTemplate<f64>,
+    pub(super) damageHitrateMagical:OfficalEnemyDataTemplate<f64>,
     pub(super) stunImmune:OfficalEnemyDataTemplate<bool>,
     pub(super) silenceImmune:OfficalEnemyDataTemplate<bool>,
     pub(super) sleepImmune:OfficalEnemyDataTemplate<bool>,
@@ -60,11 +63,67 @@ struct OfficalEnemyDataTemplate<T>
     pub(super) m_value:Option<T>,
 }
 
-impl Into<Enemy> for OfficalEnemy {
+impl Into<Enemy> for OfficalEnemyData {
     fn into(self) -> Enemy {
-
-        todo!()
+        let name = self.name.m_value.unwrap();
+        let att = self.attributes;
+        let move_speed = att.moveSpeed.m_value.unwrap();
+        let info:UnitInfo = att.into(); 
+        let stage = info.clone();
+        Enemy{
+            name,
+            move_speed,
+            info,
+            stage,
+            ..Default::default()
+        }
     }
+}
+
+impl Into<UnitInfo> for OfficalEnemyAttribute{
+    fn into(self) -> UnitInfo {
+        use crate::unit::skill::effect::DamageType;
+        use crate::unit::skill::skill_type::AttackType;
+    
+        let max_hp = self.maxHp.m_value.unwrap();
+        let atk = self.atk.m_value.unwrap();
+        let def = self.def.m_value.unwrap();
+        let magic_resist = self.magicResistance.m_value.unwrap();
+        let attack_time = self.baseAttackTime.m_value.unwrap();
+        let block_num = self.blockCnt.m_value.unwrap();
+        let aspd = self.attackSpeed.m_value.unwrap();
+        let damage_type = DamageType::None;
+        let attack_type = AttackType::None;
+        UnitInfo{
+            damage_type,
+            hp:max_hp,
+            max_hp,
+            aspd,
+            atk,
+            def,
+            magic_resist,
+            attack_time,
+            block_num,
+            attack_type,
+        }
+    
+    }
+}
+
+impl Loader{
+    pub(crate) fn load_offical_enemy(&self,key:String) -> Result<Enemy> {
+        if let Some(data) = self.enemy_database.get(&key){
+            let enemy = from_value::<OfficalEnemy>(data.clone())?;
+            Ok(enemy.Value[0].enemyData.into())
+        }
+        else{
+            Err("Key not found".into())
+        }
+        // let mut data = self.enemy_database["enemies"].clone();
+        // let enemies = from_value::<Vec<OfficalEnemy>>(data).unwrap();
+        // enemies.into_iter().map(|enemy| enemy.Value.into_iter().map(|value| value.enemyData.into()).collect::<Vec<Enemy>>()).flatten().collect()
+    }
+    
 }
 
 #[cfg(test)]

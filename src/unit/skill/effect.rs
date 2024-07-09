@@ -52,14 +52,14 @@ pub(crate) enum Effect{
 
 #[derive(Debug,Clone,Deserialize,Serialize)]
 pub struct FixedDamage {
-    pub value:u32,
+    pub value:i64,
     pub damage_type:DamageType,
 }
 
 #[derive(Clone,Deserialize,Debug,Serialize)]
 pub(crate) struct Damage{
     #[serde(skip)]//from operator ,don't need to set
-    pub(super) value:u32,
+    pub(super) value:i64,
     pub(super) change:Option<Change>,
 }
 #[derive(Debug,Clone,Copy,Deserialize,Default,Serialize)]

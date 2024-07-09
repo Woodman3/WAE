@@ -5,7 +5,7 @@ use crate::frame::Frame;
 use crate::unit::bullet::Bullet;
 use crate::unit::operator::Operator;
 use crate::unit::skill::{Skill, SkillEntity, ToEnemySkill};
-use crate::unit::skill::effect::{FixedDamage};
+use crate::unit::skill::effect::FixedDamage;
 use crate::unit::skill::effect::Effect::Damage;
 use crate::unit::skill::skill_type::ChargeType;
 use crate::unit::Unit;
@@ -31,7 +31,7 @@ impl Operator{
                                 f.bullet_set.push(Bullet::new(
                                     Unit::Enemy(Rc::clone(&u)),
                                     Point::from(self.location),
-                                    2f32,
+                                    2f64,
                                     self.stage.damage_type,
                                     self.stage.atk,
                                 ));

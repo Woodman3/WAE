@@ -12,8 +12,8 @@ pub struct Bullet {
     pub target: Unit,
     direction: Point,
     pub location: Point,
-    move_speed: f32,
-    pub distance: f32,
+    move_speed: f64,
+    pub distance: f64,
     pub damage: FixedDamage,
 }
 
@@ -24,14 +24,14 @@ impl Bullet {
         self.distance = distance_from_segment_to_point(self.location, new, target_point);
         self.location=new;
     }
-    pub fn new(target:Unit, location: Point, move_speed: f32,
-    damage_type:DamageType,damage:u32) -> Self {
+    pub fn new(target:Unit, location: Point, move_speed: f64,
+    damage_type:DamageType,damage:i64) -> Self {
         Bullet {
             target,
             direction: (0.0, 0.0).into(),
             location,
             move_speed,
-            distance: f32::MAX,
+            distance: f64::MAX,
             damage: FixedDamage {
                 value:damage,
                 damage_type,
