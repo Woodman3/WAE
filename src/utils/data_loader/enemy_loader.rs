@@ -5,20 +5,20 @@ use crate::unit::{enemy::{self, Enemy}, UnitInfo};
 use super::Loader;
 use super::Result;
 
-#[derive(Deserialize,Default,Debug)]
+#[derive(Deserialize,Default,Debug,Clone)]
 pub(super) struct OfficalEnemy{
     pub(super) Key:String,
     pub(super) Value:Vec<OfficalEnemyValue>
 }
 
-#[derive(Deserialize,Default,Debug)]
-struct OfficalEnemyValue{
+#[derive(Deserialize,Default,Debug,Clone)]
+pub(super) struct OfficalEnemyValue{
     pub(super) level:i32,
     pub(super) enemyData:OfficalEnemyData, 
 }
 
-#[derive(Deserialize,Default,Debug)]
-struct OfficalEnemyData{
+#[derive(Deserialize,Default,Debug,Clone)]
+pub(super) struct OfficalEnemyData{
     pub(super) name:OfficalEnemyDataTemplate<String>,
     pub(super) applyWay:OfficalEnemyDataTemplate<String>,
     pub(super) motion:OfficalEnemyDataTemplate<String>,
@@ -26,8 +26,8 @@ struct OfficalEnemyData{
     pub(super) attributes:OfficalEnemyAttribute,
 }
 
-#[derive(Deserialize,Default,Debug)]
-struct OfficalEnemyAttribute{
+#[derive(Deserialize,Default,Debug,Clone)]
+pub(super) struct OfficalEnemyAttribute{
     pub(super) maxHp:OfficalEnemyDataTemplate<i64>,
     pub(super) atk:OfficalEnemyDataTemplate<i64>,
     pub(super) def:OfficalEnemyDataTemplate<i64>,
@@ -56,8 +56,8 @@ struct OfficalEnemyAttribute{
     pub(super) disarmedCombatImmune:OfficalEnemyDataTemplate<bool>,
 }
 
-#[derive(Deserialize,Default,Debug)]
-struct OfficalEnemyDataTemplate<T>
+#[derive(Deserialize,Default,Debug,Clone)]
+pub(super) struct OfficalEnemyDataTemplate<T>
 {
     pub(super) m_defined:bool,
     pub(super) m_value:Option<T>,
@@ -111,14 +111,13 @@ impl Into<UnitInfo> for OfficalEnemyAttribute{
 }
 
 impl Loader{
-    pub(crate) fn load_offical_enemy(&self,key:String) -> Result<Enemy> {
+    pub(crate) fn load_offical_enemy(&self,key:String,level:usize) -> Result<Enemy> {
         if let Some(data) = self.enemy_database.get(&key){
-            let enemy = from_value::<OfficalEnemy>(data.clone())?;
-            Ok(enemy.Value[0].enemyData.into())
+            if let Some(enemy) = self.enemy_database[&key].get(level){
+                return Ok(enemy.enemyData.clone().into())
+            }
         }
-        else{
-            Err("Key not found".into())
-        }
+        Err("Key not found".into())
         // let mut data = self.enemy_database["enemies"].clone();
         // let enemies = from_value::<Vec<OfficalEnemy>>(data).unwrap();
         // enemies.into_iter().map(|enemy| enemy.Value.into_iter().map(|value| value.enemyData.into()).collect::<Vec<Enemy>>()).flatten().collect()

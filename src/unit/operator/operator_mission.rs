@@ -11,7 +11,7 @@ use crate::unit::Unit;
 use crate::utils::math::Point;
 
 impl Operator{
-    pub fn attack(&mut self,f:&mut Frame){
+    pub(super) fn attack(&mut self,f:&mut Frame){
         if let Some(e)=self.target.upgrade(){
             use super::super::skill::skill_type::AttackType::*;
             match self.stage.attack_type {
@@ -55,7 +55,7 @@ impl Operator{
     //         self.stage.attack_time=self.info.attack_time;
     //     }
     // }
-    pub fn attack_mission(&mut self,f:&mut Frame){
+    pub(super) fn attack_mission(&mut self,f:&mut Frame){
         // if let Some(skill) = &mut self.skill {
         //     if skill.ready(){
         //         self.skill(f);
@@ -104,7 +104,7 @@ impl Operator{
     }
     /// try to block enemy
     /// make sure all element in block_vec can be find
-    pub fn block(&mut self,f:&mut Frame){
+    pub(super) fn block(&mut self,f:&mut Frame){
         self.block_vec.retain(|e|{
             if let Some(_e)=e.upgrade(){
                 true
@@ -132,7 +132,7 @@ impl Operator{
             }
         }
     }
-    pub fn get_target(&mut self,f:&mut Frame){
+    pub(super) fn get_target(&mut self,f:&mut Frame){
         if self.block_vec.len()!=0{
             self.target=self.block_vec[0].clone();
             return

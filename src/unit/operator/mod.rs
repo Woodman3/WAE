@@ -43,18 +43,18 @@ pub struct Operator{
 }
 
 impl Operator {
-    pub fn next(&mut self,f:&mut Frame){
+    pub(crate) fn next(&mut self,f:&mut Frame){
         for i in 0..self.mission_vec.len(){
             self.mission_vec[i](self,f);
         }
     }
-    pub fn arrange_mission(&mut self){
+    pub(super) fn arrange_mission(&mut self){
         self.mission_vec.push(Self::block);
         // self.mission_vec.push(Self::get_target);
         // self.mission_vec.push(Self::attack_mission);
         self.mission_vec.push(Self::skill);
     }
-    pub fn new(v:&Value)->Result<Operator>{
+    pub(crate) fn new(v:&Value)->Result<Operator>{
         let mut o:Operator = serde_json::from_value(v.clone())?;
         o.stage=o.info.clone();
         o.search_scope=o.attack_scope.clone();
@@ -62,7 +62,7 @@ impl Operator {
         Ok(o)
     }
 
-    pub fn deep_clone(&self)->Self{
+    pub(crate) fn deep_clone(&self)->Self{
         Operator{
             enemy_find:Vec::<EnemyWithPriority>::new(),
             target:Weak::new(),

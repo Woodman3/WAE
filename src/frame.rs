@@ -28,7 +28,7 @@ pub(super) struct Frame {
 }
 
 impl Frame {
-    pub fn step(&mut self,_c:&mut Calculator) {
+    pub(super) fn step(&mut self,_c:&mut Calculator) {
         self.map.update_enemy_map(self.enemy_set.clone());
         self.operator_step();
         self.enemy_step();
@@ -63,7 +63,7 @@ impl Frame {
         self.bullet_set.retain(|b| b.distance>code::BULLET_HIT_DISTANCE);
     }
     // Todo
-    pub fn deep_clone(&self)->Self{
+    pub(super) fn deep_clone(&self)->Self{
         let mut enemy_set=Vec::<Rc<RefCell<Enemy>>>::new();
         for e in &self.enemy_set{
             enemy_set.push(Rc::new(RefCell::clone(&e)));
@@ -88,7 +88,7 @@ impl Frame {
         }
     }
 
-    pub fn no_enemy(&self)->bool{
+    pub(super) fn no_enemy(&self)->bool{
         self.enemy_set.len()==0
     }
 

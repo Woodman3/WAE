@@ -10,23 +10,23 @@ use crate::utils::math::Grid;
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 #[derive(Debug,Clone,Default)]
-pub struct OperatorDeployEvent{
+pub(super) struct OperatorDeployEvent{
     operator_key:String,
     location:Grid,
     toward:Toward,
 }
 #[derive(Debug,Deserialize,Default)]
-pub struct OperatorRetreatEvent{
-    pub operator_key:String,
+pub(super) struct OperatorRetreatEvent{
+    pub(super) operator_key:String,
 }
 
 #[derive(Debug,Deserialize,Default)]
-pub struct OperatorSkillEvent{
-    pub operator_key:String,
+pub(super) struct OperatorSkillEvent{
+    pub(super) operator_key:String,
 }
 
 impl OperatorDeployEvent{
-    pub fn new(v:&Value)->Result<OperatorDeployEvent>{
+    pub(super) fn new(v:&Value)->Result<OperatorDeployEvent>{
         use serde_json::from_value;
         let location=(from_value::<i64>(v[3].clone())?,from_value::<i64>(v[4].clone())?).into();
         let t =from_value::<String>(v[5].clone())?;
@@ -61,7 +61,7 @@ impl Event for OperatorDeployEvent {
 }
 
 impl Event for OperatorRetreatEvent{
-    fn happen(&self, f: &mut Frame, _c: &Calculator) {
+    pub(super) fn happen(&self, f: &mut Frame, _c: &Calculator) {
         let or:OperatorRef=f.operator_deploy.remove(&self.operator_key).unwrap();
         let o=or.borrow_mut();
         f.map.operator[o.location.row.clone() as usize][o.location.col.clone() as usize]=None;
@@ -70,7 +70,7 @@ impl Event for OperatorRetreatEvent{
 }
 
 impl Event for OperatorSkillEvent{
-    fn happen(&self, f: &mut Frame, _c: &Calculator) {
+    pub(super) fn happen(&self, f: &mut Frame, _c: &Calculator) {
         if let Some(_o)=f.operator_deploy.get(self.operator_key.as_str()){
 
         }

@@ -9,7 +9,7 @@ use crate::frame::Frame;
 use crate::utils::error::ConfigParseError;
 type Result<T> = std::result::Result<T,Box<dyn std::error::Error>>;
 #[derive(Debug)]
-pub struct EnemyPlaceEvent {
+pub(super) struct EnemyPlaceEvent {
     enemy_key: String,
     enemy_route: usize,
 }
@@ -30,7 +30,7 @@ impl Event for EnemyPlaceEvent {
 }
 
 impl EnemyPlaceEvent{
-    pub fn new(v:&Value)->Result<EnemyPlaceEvent>{
+    pub(super) fn new(v:&Value)->Result<EnemyPlaceEvent>{
         let enemy_key=String::from(v[2].as_str().ok_or(ConfigParseError("Enemy key can't translate to str in timeline".into()))?);
         let enemy_route=v[3].as_u64().ok_or(ConfigParseError("Enemy route can't translate to u64 in timeline".into()))? as usize;
         Ok(EnemyPlaceEvent{

@@ -11,11 +11,11 @@ use crate::utils::error::ConfigParseError;
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
-pub mod hostile;
-pub mod doctor;
+pub(crate) mod hostile;
+pub(crate) mod doctor;
 
 pub trait Event: Debug {
-    fn happen(&self, f: &mut Frame, c: &Calculator);
+    pub(crate) fn happen(&self, f: &mut Frame, c: &Calculator);
 }
 #[derive(Debug)]
 pub struct EventWithTime{

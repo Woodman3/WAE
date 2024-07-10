@@ -18,23 +18,23 @@ type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 /// calculate
 #[derive(Debug)]
 pub struct Calculator {
-    pub frame_vec: Vec<Frame>,
+    pub(super) frame_vec: Vec<Frame>,
     /// star in the battle we will get
     /// -1 mean battle haven't end
     star: i8,
     /// first element refer to time
     /// second element refer to event vector
     time_line: VecDeque<EventWithTime>,
-    pub route: Vec<Rc<Vec<Point>>>,
+    pub(super) route: Vec<Rc<Vec<Point>>>,
     time_remain: i64,
     /// enemy in initial statement,if we place enemy to map,we will get enemy in it
-    pub enemy_initial: HashMap<String, Enemy>,
+    pub(super) enemy_initial: HashMap<String, Enemy>,
     /// time that lase enemy may push,it isn't certainly because some enemy place by time
     last_enemy_time:u64
 }
 
 impl Calculator {
-    pub fn step(&mut self) -> bool {
+    pub(super) fn step(&mut self) -> bool {
         if self.has_end(){
             self.star=-1;
             return false;
@@ -53,7 +53,7 @@ impl Calculator {
         self.event(f);
         f.step(self);
     }
-    pub fn new(c: &Config) -> Result<Calculator> {
+    pub(super) fn new(c: &Config) -> Result<Calculator> {
         use serde_json::from_value;
         let (mut time_line,last_enemy_time)= read_timeline(c)?;
         time_line.make_contiguous().sort_by(|a,b|{
@@ -98,7 +98,7 @@ impl Calculator {
             last_enemy_time,
         })
     }
-    pub fn goto_end(&mut self) {
+    pub(super) fn goto_end(&mut self) {
         while self.step() {
             if let Some(f) = self.frame_vec.last() {
                 if f.timestamp%10==0{

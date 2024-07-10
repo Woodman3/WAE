@@ -8,23 +8,24 @@ use std::fmt::{Display, Formatter};
 use crate::unit::skill::effect::{FixedDamage, DamageType};
 
 #[derive(Clone, Debug,Serialize,Deserialize)]
-pub struct Bullet {
-    pub target: Unit,
+pub(super)  struct Bullet {
+    pub(super) target: Unit,
     direction: Point,
-    pub location: Point,
+    pub(super) location: Point,
     move_speed: f64,
-    pub distance: f64,
-    pub damage: FixedDamage,
+    pub(super) distance: f64,
+    pub(super) damage: FixedDamage,
 }
 
 impl Bullet {
-    pub fn step(&mut self) {
+    pub(super) fn step(&mut self) {
         let target_point = self.target.get_loc();
         let (_direction, new) = to_target(self.location, target_point, self.move_speed);
         self.distance = distance_from_segment_to_point(self.location, new, target_point);
         self.location=new;
     }
-    pub fn new(target:Unit, location: Point, move_speed: f64,
+
+    pub(super) fn new(target:Unit, location: Point, move_speed: f64,
     damage_type:DamageType,damage:i64) -> Self {
         Bullet {
             target,
