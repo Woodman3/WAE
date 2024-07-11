@@ -18,7 +18,9 @@ lazy_static = "1.4.0"
 image = "0.25.1"
 
 [lib]
+name="wae"
 crate-type=["cdylib"]
 
 [[bin]]
-name="wae"
+name="wae_debuger"
+path="src/main.rs"

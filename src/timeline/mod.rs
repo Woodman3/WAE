@@ -14,16 +14,16 @@ type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 pub(crate) mod hostile;
 pub(crate) mod doctor;
 
-pub trait Event: Debug {
-    pub(crate) fn happen(&self, f: &mut Frame, c: &Calculator);
+pub(crate) trait Event: Debug {
+    fn happen(&self, f: &mut Frame, c: &Calculator);
 }
 #[derive(Debug)]
-pub struct EventWithTime{
-    pub time_stamp:u64,
-    pub e:Rc<dyn Event>
+pub(super) struct EventWithTime{
+    pub(super) time_stamp:u64,
+    pub(super) e:Rc<dyn Event>
 }
 
-pub fn read_timeline(c:&Config) ->Result<(VecDeque<EventWithTime>,u64)>{
+pub(super) fn read_timeline(c:&Config) ->Result<(VecDeque<EventWithTime>,u64)>{
     let mut time_line = VecDeque::<EventWithTime>::new();
     for v in c.doctor["timeline"].as_array().unwrap() {
         let time = from_value::<u64>(v[0].clone())?;

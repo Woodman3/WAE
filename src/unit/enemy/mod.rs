@@ -63,7 +63,7 @@ impl Enemy {
         self.direction=direction;
         self.location = new;
     }
-    pub fn attack(&mut self,_bv:&mut Vec<Bullet>,o:OperatorRef){
+    pub(super) fn attack(&mut self,_bv:&mut Vec<Bullet>,o:OperatorRef){
         if self.stage.attack_time>0.0{
             self.stage.attack_time-=PERIOD;
         }else {
@@ -92,7 +92,7 @@ impl Enemy {
             self.stage.attack_time=self.info.attack_time;
         }
     }
-    pub fn next(&mut self,f:&mut Frame){
+    pub(crate) fn next(&mut self,f:&mut Frame){
         if let Some(o)=self.be_block.upgrade(){
             self.attack(&mut f.bullet_set,o);
         }else{

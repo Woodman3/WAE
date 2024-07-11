@@ -4,7 +4,7 @@ use serde_json::Value;
 use super::Event;
 use crate::calculator::Calculator;
 use crate::frame::{Frame, OperatorRef};
-use crate::unit::scope::{Toward};
+use crate::unit::scope::Toward;
 use crate::utils::error::ConfigParseError;
 use crate::utils::math::Grid;
 
@@ -61,7 +61,7 @@ impl Event for OperatorDeployEvent {
 }
 
 impl Event for OperatorRetreatEvent{
-    pub(super) fn happen(&self, f: &mut Frame, _c: &Calculator) {
+    fn happen(&self, f: &mut Frame, _c: &Calculator) {
         let or:OperatorRef=f.operator_deploy.remove(&self.operator_key).unwrap();
         let o=or.borrow_mut();
         f.map.operator[o.location.row.clone() as usize][o.location.col.clone() as usize]=None;
@@ -70,7 +70,7 @@ impl Event for OperatorRetreatEvent{
 }
 
 impl Event for OperatorSkillEvent{
-    pub(super) fn happen(&self, f: &mut Frame, _c: &Calculator) {
+    fn happen(&self, f: &mut Frame, _c: &Calculator) {
         if let Some(_o)=f.operator_deploy.get(self.operator_key.as_str()){
 
         }
