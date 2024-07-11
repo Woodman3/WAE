@@ -111,16 +111,10 @@ impl Into<UnitInfo> for OfficalEnemyAttribute{
 }
 
 impl Loader{
-    pub(crate) fn load_offical_enemy(&self,key:String,level:usize) -> Result<Enemy> {
-        if let Some(data) = self.enemy_database.get(&key){
-            if let Some(enemy) = self.enemy_database[&key].get(level){
-                return Ok(enemy.enemyData.clone().into())
-            }
-        }
-        Err("Key not found".into())
-        // let mut data = self.enemy_database["enemies"].clone();
-        // let enemies = from_value::<Vec<OfficalEnemy>>(data).unwrap();
-        // enemies.into_iter().map(|enemy| enemy.Value.into_iter().map(|value| value.enemyData.into()).collect::<Vec<Enemy>>()).flatten().collect()
+    pub(crate) fn load_offical_enemy(&self,key:&String,level:usize) -> Result<Enemy> {
+        let data = self.enemy_database.get(key).ok_or("Key not found")?;
+        let enemy = data.get(level).ok_or("Level not found")?;
+        Ok(enemy.enemyData.clone().into())
     }
     
 }
