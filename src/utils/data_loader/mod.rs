@@ -20,15 +20,15 @@ pub(crate) struct Loader{
 
 impl Loader{
     pub(crate) fn new<P: AsRef<Path>>(path: P) -> Result<Loader> {
-        let character_table = load_json_file(path.as_ref().join("character_table.json"))?;
-        let range_table = load_json_file(path.as_ref().join("range_table.json"))?;
-        let gamedata_const = load_json_file(path.as_ref().join("gamedata_const.json"))?;
-        let skill_table = load_json_file(path.as_ref().join("skill_table.json"))?;
-        let mut enemy_database_j = load_json_file(path.as_ref().join("levels/enemydata/enemy_database.json"))?;
+        let path = path.as_ref().join("zh_CN/gamedata");
+        let character_table = load_json_file(path.join("excel/character_table.json"))?;
+        let range_table = load_json_file(path.join("excel/range_table.json"))?;
+        let gamedata_const = load_json_file(path.join("excel/gamedata_const.json"))?;
+        let skill_table = load_json_file(path.join("excel/skill_table.json"))?;
+        let mut enemy_database_j = load_json_file(path.join("levels/enemydata/enemy_database.json"))?;
         enemy_database_j = std::mem::take(&mut enemy_database_j["enemies"]); 
         let enemy_database_v =from_value::<Vec<OfficalEnemy>>(enemy_database_j)?;
         let enemy_database = enemy_database_v.into_iter().map(|enemy| (enemy.Key,enemy.Value)).collect();
-        let path = path.as_ref().to_path_buf();
         Ok(Loader {
             path,
             character_table,
@@ -38,5 +38,13 @@ impl Loader{
             enemy_database,
         })
     }
-    
+}
+
+mod test{
+    use super::*;
+    #[test]
+    fn test_loader(){
+        let path = "ArknightsGameData";
+        let loader = Loader::new(path).unwrap();
+    }
 }
