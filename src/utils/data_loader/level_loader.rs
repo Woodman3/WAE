@@ -161,7 +161,7 @@ impl Into<Map> for OfficalMapData{
     }
 }
 impl Loader{
-    fn load_level(&self, level_name: String)->Result<OfficalLevelData>{
+    fn find_level(&self, level_name: String)->Result<OfficalLevelData>{
         let path = self.path.join("levels");
         let level_file = level_name + ".json";
         let file_path = find_file_in_dir(&path, &level_file)?;
@@ -172,6 +172,11 @@ impl Loader{
     fn load_map(&self,level:&OfficalLevelData)->Result<Map>{
         let map:Map= level.mapData.clone().into();
         Ok(map)
+    }
+
+    fn load_level(&self,level_name:String)->Result<Map>{
+        let level = self.find_level(level_name)?;
+        self.load_map(&level)
     }
 }
 
