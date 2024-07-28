@@ -15,16 +15,16 @@ use crate::map;
 pub(super) type OperatorRef =Rc<RefCell<Operator>>;
 pub(super) type EnemyRef=Rc<RefCell<Enemy>>;
 
-#[derive(Debug,Clone,Deserialize,Serialize)]
+#[derive(Debug,Default,Clone,Deserialize,Serialize)]
 pub(super) struct Frame {
-    pub timestamp: u64,
-    pub enemy_set: Vec<EnemyRef>,
-    pub operator_deploy:HashMap<String,OperatorRef>,
-    pub operator_undeploy:HashMap<String,OperatorRef>,
-    pub map:map::Map,
-    pub bullet_set:Vec<Bullet>,
+    pub(super) timestamp: u64,
+    pub(super) enemy_set: Vec<EnemyRef>,
+    pub(super) operator_deploy:HashMap<String,OperatorRef>,
+    pub(super) operator_undeploy:HashMap<String,OperatorRef>,
+    pub(super) map:map::Map,
+    pub(super) bullet_set:Vec<Bullet>,
     /// start for 1
-    pub next_id:usize,
+    pub(super) next_id:usize,
 }
 
 impl Frame {

@@ -21,16 +21,16 @@ pub struct Calculator {
     pub(super) frame_vec: Vec<Frame>,
     /// star in the battle we will get
     /// -1 mean battle haven't end
-    star: i8,
+    pub(super) star: i8,
     /// first element refer to time
     /// second element refer to event vector
-    time_line: VecDeque<EventWithTime>,
+    pub(super) time_line: VecDeque<EventWithTime>,
     pub(super) route: Vec<Rc<Vec<Point>>>,
-    time_remain: i64,
+    pub(super) time_remain: i64,
     /// enemy in initial statement,if we place enemy to map,we will get enemy in it
     pub(super) enemy_initial: HashMap<String, Enemy>,
     /// time that lase enemy may push,it isn't certainly because some enemy place by time
-    last_enemy_time:u64
+    pub(super) last_enemy_time:u64
 }
 
 impl Calculator {

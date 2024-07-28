@@ -1,10 +1,16 @@
+use std::collections::HashMap;
+use std::collections::VecDeque;
+use std::i64;
 use std::path::Path;
 use std::path::PathBuf;
 
 use egui::Layout;
+use serde::de;
 use serde_json::Value;
 use serde::{ Deserialize,Serialize };
 
+use crate::calculator::Calculator;
+use crate::frame::Frame;
 use crate::map::tile::DEPLOY_HIGH;
 use crate::map::tile::DEPLOY_LOW;
 use crate::map::tile::PASS_ALL;
@@ -174,9 +180,24 @@ impl Loader{
         Ok(map)
     }
 
-    fn load_level(&self,level_name:String)->Result<Map>{
+    pub(crate) fn load_level(&self,level_name:String)->Result<Calculator>{
         let level = self.find_level(level_name)?;
-        self.load_map(&level)
+        let m = self.load_map(&level)?;
+        let f = Frame{
+            map:m,
+            ..Default::default()
+        };
+        let c= Calculator{
+            frame_vec:vec![f],
+            time_remain:i64::MAX,
+            last_enemy_time:0,
+            star:-1,
+            time_line:VecDeque::new(),
+            route:Vec::new(),
+            enemy_initial:HashMap::new(),
+        };
+        return Ok(c);
+        todo!("load level")
     }
 }
 
