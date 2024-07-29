@@ -19,8 +19,9 @@ pub(crate) const PASS_MASK_LEN:LayoutCode =1;
 
 pub(crate) const ID_MASK:LayoutCode=(1<<ID_MASK_LEN)-1;
 
+pub(crate) const DEPLOY_LOW:LayoutCode=0<<ID_MASK_LEN;
 pub(crate) const DEPLOY_HIGH:LayoutCode=1<<ID_MASK_LEN;
-pub(crate) const DEPLOY_LOW:LayoutCode=2<<ID_MASK_LEN;
+pub(crate) const DEPLOY_NONE:LayoutCode=2<<ID_MASK_LEN;
 
 pub(crate) const PASS_ALL:LayoutCode=1<<(ID_MASK_LEN+DEPLOY_MASK_LEN);
 pub(crate) const PASS_FLY:LayoutCode=0<<(ID_MASK_LEN+DEPLOY_MASK_LEN);
@@ -34,7 +35,7 @@ struct TileInfo{
     can_pass:bool  
 }
 
-#[derive(Serialize,Deserialize,Debug,Default,Clone,Copy)]
+#[derive(Serialize,Deserialize,Debug,Default,Clone,Copy,PartialEq)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub(crate) enum TileHeight{
     #[default]
@@ -42,7 +43,7 @@ pub(crate) enum TileHeight{
     Highland,
 }
 
-#[derive(Serialize,Deserialize,Debug,Default,Clone,Copy)]
+#[derive(Serialize,Deserialize,Debug,Default,Clone,Copy,PartialEq)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub(crate) enum TileBuildable{
     #[default]

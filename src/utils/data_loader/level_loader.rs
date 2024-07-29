@@ -13,6 +13,7 @@ use crate::calculator::Calculator;
 use crate::frame::Frame;
 use crate::map::tile::DEPLOY_HIGH;
 use crate::map::tile::DEPLOY_LOW;
+use crate::map::tile::DEPLOY_NONE;
 use crate::map::tile::PASS_ALL;
 use crate::map::tile::PASS_FLY;
 use crate::map::Map;
@@ -47,7 +48,7 @@ struct OfficalTile{
     pub(super) passableMask:TilePassable,
     // pub(super) blackboard:String,
     // pub(super) effects:Vec<OfficalEffect>,
-    // it also has a palyerSideMask,but all is value is "ALL",so i ignore it
+    // it also has a palyerSideMask,but up to 2024/7/29, all its value is "ALL",so i ignore it
 }
 
 #[derive(Deserialize,Default,Debug)]
@@ -126,15 +127,14 @@ impl Into<LayoutCode> for OfficalTile{
     fn into(self)->LayoutCode{
         let mut c=0;
         c |= self.tileKey as u64;
-        // l don't know why HG set both of heightype and buildabletype
-        // c |= match self.heightType {
-        //     TileHeight::Lowland => DEPLOY_LOW,
-        //     TileHeight::Highland => DEPLOY_HIGH,
-        //     _ => 0,
-        // };
+        // up to 2024/7/29,all of (TileBuildable,TilePassable)  have only 4 value :
+        // [(None, Highland), (None, Lowland), (Melee, Lowland), (Ranged, Highland)]
+        c |= match self.heightType {
+            TileHeight::Lowland => DEPLOY_LOW,
+            TileHeight::Highland => DEPLOY_HIGH,
+        };
         c |= match self.buildableType {
-            TileBuildable::Melee => DEPLOY_LOW,
-            TileBuildable::Ranged => DEPLOY_HIGH,
+            TileBuildable::None => DEPLOY_NONE,
             _ => 0,
         };
         c |= match self.passableMask {
@@ -216,7 +216,7 @@ mod test{
         println!("{:?}",data);
     }
 
-    fn find_all_file_in_dir(dir:&Path,list:&mut Vec<String>){
+    fn find_all_file_in_dir(dir:&Path,list:&mut Vec<(TileBuildable,TileHeight)>){
         if dir.is_dir(){
             for entry in std::fs::read_dir(dir).unwrap(){
                 let entry = entry.unwrap();
@@ -230,17 +230,13 @@ mod test{
         }
     }
 
-    fn get_value_by_key(path:&Path,list:&mut Vec<String>){
+    fn get_value_by_key(path:&Path,list:&mut Vec<(TileBuildable,TileHeight)>){
         let json=load_json_file(path).unwrap();
         if let Ok(data) = from_value::<OfficalLevelData>(json)
         {
-            for i in data.waves.into_iter(){
-                for j in i.fragments.into_iter(){
-                    for k in j.actions.into_iter(){
-                        if !list.contains(&k.actionType){
-                            list.push(k.actionType);
-                        }
-                    }
+            for t in data.mapData.tiles.into_iter(){
+                if !list.contains(&(t.buildableType,t.heightType)){
+                    list.push((t.buildableType,t.heightType));
                 }
             }
         }
@@ -248,8 +244,9 @@ mod test{
 
     #[test]
     fn find_all_value(){
-        let mut value_list=Vec::<String>::new();
-        let path = Path::new("data/levels/obt/main");
+        // let mut value_list=Vec::<(TileBuildable,TileHeight)>::new();
+        let mut value_list = Vec::new();
+        let path = Path::new("ArknightsGameData/zh_CN/gamedata/levels/obt");
         find_all_file_in_dir(path,&mut value_list);
         println!("{:?}",value_list); 
     }
