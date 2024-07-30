@@ -52,7 +52,7 @@ impl<'a> Render<'a> {
                     0 => 255,
                     _ => 0,
                 };
-                let mut a = 0;
+                let mut a = 255;
                 block_paint.set_color(Color::from_rgba8(r, g, b, a));
                 let mut pb = PathBuilder::new();
                 let x = PADING + j as f32 * BLOCK_SIZE;
