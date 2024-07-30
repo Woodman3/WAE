@@ -44,7 +44,7 @@ mod test{
     use super::*;
     #[test]
     fn test_loader(){
-        let path = "ArknightsGameData";
+        let path = "./ArknightsGameData";
         let loader = Loader::new(path).unwrap();
     }
 }

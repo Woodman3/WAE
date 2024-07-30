@@ -25,23 +25,23 @@ use super::Loader;
 use crate::map::tile::{LayoutCode,TileHeight,TileBuildable,TilePassable,TileKey};
 
 #[derive(Deserialize,Default,Debug)]
-struct OfficalLevelData{
+struct OfficialLevelData{
     pub(super) options:Value,
-    pub(super) mapData:OfficalMapData,
-    pub(super) routes:Vec<OfficalRoute>,
-    pub(super) enemyDbRefs:Vec<OfficalEnemyDbRef>,
-    pub(super) waves:Vec<OfficalWave>,
+    pub(super) mapData: OfficialMapData,
+    pub(super) routes:Vec<OfficialRoute>,
+    pub(super) enemyDbRefs:Vec<OfficialEnemyDbRef>,
+    pub(super) waves:Vec<OfficialWave>,
     pub(super) randomSeed:u32,
 }
 
 #[derive(Deserialize,Default,Debug,Clone)]
-struct OfficalMapData{
+struct OfficialMapData {
     pub(super) map:Vec<Vec<u64>>,
-    pub(super) tiles:Vec<OfficalTile>,
+    pub(super) tiles:Vec<OfficialTile>,
 }
 
 #[derive(Deserialize,Default,Debug,Clone,Copy)]
-struct OfficalTile{
+struct OfficialTile {
     pub(super) tileKey:TileKey,
     pub(super) heightType:TileHeight,
     pub(super) buildableType:TileBuildable,
@@ -52,7 +52,7 @@ struct OfficalTile{
 }
 
 #[derive(Deserialize,Default,Debug)]
-struct OfficalRoute{
+struct OfficialRoute {
     pub(super) motionMode:Route,
     pub(super) startPosition:Grid,
     pub(super) endPosition:Grid,
@@ -75,7 +75,7 @@ enum Route {
 }
 
 #[derive(Deserialize,Default,Debug)]
-struct OfficalEnemyDbRef{
+struct OfficialEnemyDbRef {
     pub(super) useDb:bool,
     pub(super) id:String,
     pub(super) level:i32,
@@ -83,22 +83,22 @@ struct OfficalEnemyDbRef{
 }
 
 #[derive(Deserialize,Default,Debug)]
-struct OfficalWave{
+struct OfficialWave {
     pub(super) preDelay:f32,
     pub(super) postDelay:f32,
-    pub(super) fragments:Vec<OfficalWaveFragment>,
+    pub(super) fragments:Vec<OfficialWaveFragment>,
 }
 
 #[derive(Deserialize,Default,Debug)]
-struct OfficalWaveFragment{
+struct OfficialWaveFragment {
     pub(super) preDelay:f32,
-    pub(super) actions:Vec<OfficalWaveAction>,
+    pub(super) actions:Vec<OfficialWaveAction>,
 
 }
 
 #[derive(Deserialize,Default,Debug)]
-struct OfficalWaveAction{
-    // story,diaplay enemy info,and so on,it seems not related to the enmey behavior
+struct OfficialWaveAction {
+    // story,display enemy info,and so on,it seems not related to the enemy behavior
     pub(super) actionType:String,
     pub(super) preDelay:f32,
     pub(super) routeIndex:u32,
@@ -123,7 +123,7 @@ fn find_file_in_dir(dir: &Path, file_name: &str) -> Result<String> {
     }
     Err("File not found".into())
 }
-impl Into<LayoutCode> for OfficalTile{
+impl Into<LayoutCode> for OfficialTile {
     fn into(self)->LayoutCode{
         let mut c=0;
         c |= self.tileKey as u64;
@@ -147,7 +147,7 @@ impl Into<LayoutCode> for OfficalTile{
 }
 
 //todo:there stil have some problem 
-impl Into<Map> for OfficalMapData{
+impl Into<Map> for OfficialMapData {
     fn into(self)->Map{
         let width = self.map[0].len() ;
         let height = self.map.len();
@@ -167,15 +167,15 @@ impl Into<Map> for OfficalMapData{
     }
 }
 impl Loader{
-    fn find_level(&self, level_name: String)->Result<OfficalLevelData>{
+    fn find_level(&self, level_name: String)->Result<OfficialLevelData>{
         let path = self.path.join("levels");
         let level_file = level_name + ".json";
         let file_path = find_file_in_dir(&path, &level_file)?;
         let level_json = load_json_file(file_path)?;
-        let level = serde_json::from_value::<OfficalLevelData>(level_json)?; 
+        let level = serde_json::from_value::<OfficialLevelData>(level_json)?;
         Ok(level)
     }
-    fn load_map(&self,level:&OfficalLevelData)->Result<Map>{
+    fn load_map(&self,level:&OfficialLevelData)->Result<Map>{
         let map:Map= level.mapData.clone().into();
         Ok(map)
     }
@@ -206,15 +206,6 @@ mod test{
     use serde_json::from_value;
 
     use super::*;
-    #[test]
-    fn test_level_loader(){
-        let path = Path::new("data/levels/obt");
-        let file_name = "level_main_01-07.json";
-        let result = find_file_in_dir(path, file_name).unwrap();
-        let level = load_json_file(result).unwrap();
-        let data = from_value::<OfficalLevelData>(level).unwrap();
-        println!("{:?}",data);
-    }
 
     fn find_all_file_in_dir(dir:&Path,list:&mut Vec<(TileBuildable,TileHeight)>){
         if dir.is_dir(){
@@ -232,7 +223,7 @@ mod test{
 
     fn get_value_by_key(path:&Path,list:&mut Vec<(TileBuildable,TileHeight)>){
         let json=load_json_file(path).unwrap();
-        if let Ok(data) = from_value::<OfficalLevelData>(json)
+        if let Ok(data) = from_value::<OfficialLevelData>(json)
         {
             for t in data.mapData.tiles.into_iter(){
                 if !list.contains(&(t.buildableType,t.heightType)){

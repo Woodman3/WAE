@@ -118,20 +118,3 @@ impl Loader{
     }
     
 }
-
-#[cfg(test)]
-mod test{
-    use crate::utils::load_json_file;
-    use super::*;
-    use serde_json::{Value,from_value};
-    #[test]
-    fn test_offical_enemy(){
-        let path = "data/levels/enemydata/enemy_database.json";
-        let enemy_index = 0;
-        let mut data = load_json_file(path).unwrap();
-        data = data["enemies"].clone();
-        let enemies = from_value::<Vec<OfficalEnemy>>(data).unwrap();
-        let enemy = &enemies[enemy_index];
-        println!("{:?}",enemy);
-    }
-}

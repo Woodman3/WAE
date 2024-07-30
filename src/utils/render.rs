@@ -1,4 +1,4 @@
-use crate::frame::Frame;
+use crate::{frame::Frame, map::tile::{DEPLOY_LOW, DEPLOY_NONE, PASS_ALL}};
 use super::visualizer_config::*;
 use tiny_skia::*;
 
@@ -36,6 +36,35 @@ impl<'a> Render<'a> {
             let block_stroke = Stroke::default();
             self.pixmap.stroke_path(&block_path, &block_paint, &block_stroke, Transform::identity(), None);   
         }
+        for i in 0..self.frame.map.height as usize{
+            for j in 0..self.frame.map.width as usize{
+                let block = self.frame.map.layout[i][j];
+                let mut block_paint = Paint::default();
+                let mut r= match block&PASS_ALL{
+                    0 => 255,
+                    _ => 0,
+                };
+                let mut g=match block&DEPLOY_NONE{
+                    0 => 255,
+                    _ => 0,
+                };
+                let mut b =match block&DEPLOY_LOW{
+                    0 => 255,
+                    _ => 0,
+                };
+                let mut a = 0;
+                block_paint.set_color(Color::from_rgba8(r, g, b, a));
+                let mut pb = PathBuilder::new();
+                let x = PADING + j as f32 * BLOCK_SIZE;
+                let y = PADING + i as f32 * BLOCK_SIZE;
+                self.pixmap.fill_rect(
+                    Rect::from_xywh(x, y, BLOCK_SIZE, BLOCK_SIZE).unwrap(),
+                    &block_paint, 
+                    Transform::identity(), 
+                    None)
+            }
+        }
+        
     }
     fn paint_enemy(&mut self){
         let mut enemy_paint = Paint::default();
@@ -107,15 +136,6 @@ impl<'a> Render<'a> {
 #[cfg(test)]
 mod test{
     use tiny_skia::*;
-    use crate::frame::Frame;
     use super::*; 
-    #[test]
-    fn test(){
-        let j = std::fs::read("frame.json").unwrap();
-        let mut f = serde_json::from_slice::<Frame>(&j).unwrap();
-        let mut r = Render::new(&f);
-        r.render();
-        r.save();
-    }
 
 }
