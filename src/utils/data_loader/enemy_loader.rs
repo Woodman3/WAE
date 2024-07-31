@@ -111,7 +111,7 @@ impl Into<UnitInfo> for OfficalEnemyAttribute{
 }
 
 impl Loader{
-    pub(crate) fn load_offical_enemy(&self,key:&String,level:usize) -> Result<Enemy> {
+    pub(crate) fn load_official_enemy(&self,key:&String,level:usize) -> Result<Enemy> {
         let data = self.enemy_database.get(key).ok_or("Key not found")?;
         let enemy = data.get(level).ok_or("Level not found")?;
         Ok(enemy.enemyData.clone().into())

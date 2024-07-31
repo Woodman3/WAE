@@ -1,8 +1,10 @@
+use std::cell::RefCell;
 use std::collections::HashMap;
 use std::collections::VecDeque;
 use std::i64;
 use std::path::Path;
 use std::path::PathBuf;
+use std::rc::Rc;
 
 use egui::Layout;
 use serde::de;
@@ -10,6 +12,7 @@ use serde_json::Value;
 use serde::{ Deserialize,Serialize };
 
 use crate::calculator::Calculator;
+use crate::frame::EnemyRef;
 use crate::frame::Frame;
 use crate::map::tile::DEPLOY_HIGH;
 use crate::map::tile::DEPLOY_LOW;
@@ -182,9 +185,16 @@ impl Loader{
 
     pub(crate) fn load_level(&self,level_name:String)->Result<Calculator>{
         let level = self.find_level(level_name)?;
-        let m = self.load_map(&level)?;
+        let map = self.load_map(&level)?;
+        let mut enemy_initial=HashMap::new();
+        for e in level.enemyDbRefs.iter(){
+            let enemy = self.load_official_enemy(&e.id,e.level as usize)?;
+            enemy_initial.insert(e.id.clone(),enemy );
+        }
+        
+         
         let f = Frame{
-            map:m,
+            map,
             ..Default::default()
         };
         let c= Calculator{
@@ -194,7 +204,7 @@ impl Loader{
             star:-1,
             time_line:VecDeque::new(),
             route:Vec::new(),
-            enemy_initial:HashMap::new(),
+            enemy_initial,
         };
         return Ok(c);
         todo!("load level")

@@ -5,6 +5,7 @@ pub mod visualizer;
 mod visualizer_config;
 pub(super) mod data_loader;
 pub(super) mod render;
+pub(super) mod copilot;
 
 use std::path::Path;
 use std::fs::File;
