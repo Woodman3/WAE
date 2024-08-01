@@ -108,8 +108,8 @@ impl Calculator {
         }
 
     }
-    /// an event is place event or enemy comeout or something happen like fire rain
-    /// mosttime is happen in an specify time but sometime it happen after somethine has happen
+    /// an event is place event or enemy appear or something happen like fire rain
+    /// mostly is happen in an specify time but sometime it happen after something has happen
     /// it can't be skip
     fn event(&mut self, f: &mut Frame) {
         while self.time_line.len() != 0 {

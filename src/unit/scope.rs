@@ -5,8 +5,8 @@ use crate::utils::math::GridRect;
 #[derive(Clone,Debug,Default,Deserialize,Serialize)]
 pub struct Scope(pub Vec<GridRect>);
 
-#[derive(Debug,Clone,Default,Deserialize,Serialize)]
-pub enum Toward{
+#[derive(Debug,Clone,Copy,Default,Deserialize,Serialize)]
+pub(crate) enum Toward{
     North,
     South,
     #[default]

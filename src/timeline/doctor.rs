@@ -7,22 +7,23 @@ use crate::frame::{Frame, OperatorRef};
 use crate::unit::scope::Toward;
 use crate::utils::error::ConfigParseError;
 use crate::utils::math::Grid;
+use crate::utils::copilot::{};
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 #[derive(Debug,Clone,Default)]
-pub(super) struct OperatorDeployEvent{
-    operator_key:String,
-    location:Grid,
-    toward:Toward,
+pub(crate) struct OperatorDeployEvent{
+    pub(crate) operator_key:String,
+    pub(crate) location:Grid,
+    pub(crate) toward:Toward,
 }
 #[derive(Debug,Deserialize,Default)]
-pub(super) struct OperatorRetreatEvent{
-    pub(super) operator_key:String,
+pub(crate) struct OperatorRetreatEvent{
+    pub(crate) operator_key:String,
 }
 
 #[derive(Debug,Deserialize,Default)]
-pub(super) struct OperatorSkillEvent{
-    pub(super) operator_key:String,
+pub(crate) struct OperatorSkillEvent{
+    pub(crate) operator_key:String,
 }
 
 impl OperatorDeployEvent{

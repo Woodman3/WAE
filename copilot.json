@@ -7,6 +7,10 @@
       "name": ""
     },
     {
+      "type": "Output",
+      "name": ""
+    },
+    {
       "type": "Deploy",
       "name": "风笛",
       "location": [
