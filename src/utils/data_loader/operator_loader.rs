@@ -7,6 +7,7 @@ use log::error;
 use crate::unit::scope::Scope;
 use crate::unit::skill::effect::DamageType;
 use crate::unit::skill::skill_type::{AttackType, ChargeType};
+use crate::utils::copilot::Copilot;
 use crate::utils::math::Grid;
 use crate::unit::operator::Operator;
 use crate::unit::{Unit, UnitInfo};
@@ -18,28 +19,28 @@ use super::Result;
 use super::Loader;
 
 #[derive(Deserialize,Default,Debug)]
-struct OfficalOperator{
+struct OfficialOperator{
     pub(super) name:String,
     pub(super) displayNumber:String,
     pub(super) appellation:String,
-    pub(super) phases:Vec<OfficalPhase>,
-    pub(super) skills:Vec<OfficalSkillsDescription>,
+    pub(super) phases:Vec<OfficialPhase>,
+    pub(super) skills:Vec<OfficialSkillsDescription>,
     pub(super) subProfessionId:String,
     pub(super) position:String,
 }
 #[derive(Deserialize,Default,Debug)]
-struct OfficalPhase{
+struct OfficialPhase{
     pub(super) rangeId:String,
     pub(super) maxLevel:u32,
-    pub(super) attributesKeyFrames:Vec<OfficalKeyFrame>
+    pub(super) attributesKeyFrames:Vec<OfficialKeyFrame>
 }
 #[derive(Deserialize,Default,Debug)]
-struct OfficalKeyFrame{
+struct OfficialKeyFrame{
     pub(super) level:u32,
-    pub(super) data:OfficalData 
+    pub(super) data:OfficialData 
 }
 #[derive(Deserialize,Default,Debug,Clone)]
-struct OfficalData{
+struct OfficialData{
     pub(super) maxHp:i64,
     pub(super) atk:i64,
     pub(super) def:i64,
@@ -66,27 +67,27 @@ struct OfficalData{
 }
 
 #[derive(Deserialize,Default,Debug)]
-struct OfficalRange{
+struct OfficialRange{
     grids:Vec<Grid>,
 }
 
 #[derive(Deserialize,Default,Debug)]
-struct OfficalSkillsDescription{
+struct OfficialSkillsDescription{
     pub(super) skillId:String,
 }
 
 #[derive(Deserialize,Default,Debug)]
-struct OfficalSkill{
+struct OfficialSkill{
     rangeId:String,
     skillType:String,
     durationType:String,
     duration:f64,
-    spData:OfficalSpData,
-    blackboard:Vec<OfficalBlackBoard>,
+    spData:OfficialSpData,
+    blackboard:Vec<OfficialBlackBoard>,
 }
 
 #[derive(Deserialize,Default,Debug)]
-struct OfficalSpData{
+struct OfficialSpData{
     spType:String,
     levelUpCost:Option<u32>,
     maxChargeTime:u32,
@@ -96,13 +97,13 @@ struct OfficalSpData{
 }
 
 #[derive(Deserialize,Default,Debug)]
-struct OfficalBlackBoard{
+struct OfficialBlackBoard{
     key:String,
     value:f64,
     valueStr:Option<String>,
 }
 
-impl Into<UnitInfo> for OfficalData{
+impl Into<UnitInfo> for OfficialData{
     fn into(self) -> UnitInfo {
         UnitInfo{
             hp: self.maxHp ,
@@ -119,7 +120,7 @@ impl Into<UnitInfo> for OfficalData{
     }
 }
 
-impl Into<Skill> for OfficalSkill{
+impl Into<Skill> for OfficialSkill{
     fn into(self) -> Skill {
         let trigger_type:TriggerType = match self.skillType.as_str(){
             "AUTO"=>TriggerType::Auto,
@@ -152,14 +153,17 @@ impl Loader{
     /// return None if operator not found or phase or level is wrong
     fn load_operator(&self,name:String,phase:usize,level:u32,skill_index:usize,skill_level:usize)->Result<Operator>{
         let ok = self.get_operator_key(&name).ok_or("Operator not found")?;
-        let oo= from_value::<OfficalOperator>(self.character_table[ok].clone())?;
+        let oo= from_value::<OfficialOperator>(self.character_table[ok].clone())?;
         let mut o=self.operator_phase_generate(name,phase,level,skill_index,skill_level,&oo)?;
         let sp=from_value::<DamageType>(self.gamedata_const["subProfessionDamageTypePairs"][oo.subProfessionId.clone()].clone())?;
         o.info.damage_type=sp;
         o.stage.damage_type=sp;
         return Ok(o);
     }
-    fn operator_phase_generate(&self,name:String,phase:usize,level:u32,skill_index:usize,skill_level:usize,oo:&OfficalOperator)->Result<Operator>{
+    fn load_copilot_operator(&self,copilot:Copilot)->Result<Vec<Operator>>{
+        todo!()
+    }
+    fn operator_phase_generate(&self,name:String,phase:usize,level:u32,skill_index:usize,skill_level:usize,oo:&OfficialOperator)->Result<Operator>{
         let op = oo.phases.get(phase).ok_or("Phase not found")?;
         let max_level =op.maxLevel;
         let max_skill_level = match phase{
@@ -169,7 +173,7 @@ impl Loader{
             _=>0
         }; 
         if level >= 1 && level <= max_level && skill_level >= 1 && skill_level <= max_skill_level {
-            let mut r= from_value::<OfficalRange>(self.range_table[op.rangeId.clone()].clone())?;
+            let mut r= from_value::<OfficialRange>(self.range_table[op.rangeId.clone()].clone())?;
             let mut at= from_value::<AttackType>(Value::String(oo.position.clone()))?;
             let sd=oo.skills.get(skill_index-1).ok_or("Skill not found")?;
             let mut s=self.operator_skill_generate(sd.skillId.clone(),skill_level-1)?;
@@ -196,7 +200,7 @@ impl Loader{
     }
 
     fn operator_skill_generate(&self,skill_id:String,skill_level:usize)->Result<Skill>{
-        let os=from_value::<OfficalSkill>(self.skill_table[skill_id]["levels"][skill_level].clone())?;
+        let os=from_value::<OfficialSkill>(self.skill_table[skill_id]["levels"][skill_level].clone())?;
         let mut s:Skill = os.into();
         Ok(s)
     }
@@ -214,7 +218,7 @@ impl Loader{
     }
 }
 
-impl OfficalRange{
+impl OfficialRange{
     pub(super) fn merge(&mut self)->Vec<GridRect>{
         let mut r = Vec::<GridRect>::new();
         let v = &mut self.grids;

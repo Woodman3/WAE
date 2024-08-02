@@ -7,14 +7,18 @@ pub struct Scope(pub Vec<GridRect>);
 
 #[derive(Debug,Clone,Copy,Default,Deserialize,Serialize)]
 pub(crate) enum Toward{
+    #[serde(alias="Up")]
     North,
+    #[serde(alias="Down")]
     South,
     #[default]
+    #[serde(alias="Right",alias="None")]
     East,
+    #[serde(alias="Left")]
     West
 }
 impl Scope {
-    pub fn apply_toward(&mut self,to:&Toward){
+    pub(crate) fn apply_toward(&mut self,to:&Toward){
         use std::mem::swap;
         match to {
             Toward::North => {
@@ -56,7 +60,7 @@ impl Scope {
     /// if loc is operator,it is row and col
     /// if loc is enemy,it is x and y
     /// this two is invert
-    pub fn apply_loc<T:>(&mut self,loc:(T,T),width:u32,height:u32)
+    pub(crate) fn apply_loc<T:>(&mut self,loc:(T,T),width:u32,height:u32)
     where T:Into<i64>
     {
         let (row,col):(i64,i64)=(loc.0.into(),loc.1.into());

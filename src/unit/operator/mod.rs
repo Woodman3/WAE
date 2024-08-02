@@ -29,7 +29,7 @@ pub struct Operator{
     pub attack_scope: Scope,
     pub search_scope: Scope,
     pub re_deploy:f32,
-    pub toward:Toward,
+    pub(super) toward:Toward,
     pub enemy_find:Vec<EnemyWithPriority>,
     #[serde(serialize_with = "super::enemy::serialize_enemy_shared",skip_deserializing)]
     pub target:EnemyShared,

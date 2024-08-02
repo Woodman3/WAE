@@ -26,6 +26,16 @@ pub(crate) struct OperatorSkillEvent{
     pub(crate) operator_key:String,
 }
 
+#[derive(Debug,Deserialize,Default)]
+pub(crate) struct UnitRetreatEvent{
+    pub(crate) location:Grid,
+}
+
+#[derive(Debug,Deserialize,Default)]
+pub(crate) struct UnitSkillEvent{
+    pub(crate) location:Grid,
+}
+
 impl OperatorDeployEvent{
     pub(super) fn new(v:&Value)->Result<OperatorDeployEvent>{
         use serde_json::from_value;
@@ -73,7 +83,24 @@ impl Event for OperatorRetreatEvent{
 impl Event for OperatorSkillEvent{
     fn happen(&self, f: &mut Frame, _c: &Calculator) {
         if let Some(_o)=f.operator_deploy.get(self.operator_key.as_str()){
-
+            todo!()
         }
+    }
+}
+
+impl Event for UnitRetreatEvent{
+    fn happen(&self, f: &mut Frame, _c: &Calculator) {
+        let remove_key= f.map.operator[self.location.row as usize][self.location.col as usize].clone();
+        if let Some(key)=remove_key{
+            let or:OperatorRef=f.operator_deploy.remove(&key).unwrap();
+            f.operator_undeploy.insert(key.clone(),Rc::clone(&or));
+            f.map.operator[self.location.row as usize][self.location.col as usize]=None;
+        }
+    }
+}
+
+impl Event for UnitSkillEvent{
+    fn happen(&self, f: &mut Frame, c: &Calculator) {
+        todo!()
     }
 }

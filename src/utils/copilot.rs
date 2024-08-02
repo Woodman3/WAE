@@ -2,24 +2,24 @@ use serde_json::Value;
 use serde::{Deserialize, Serialize};
 
 use super::math::Grid;
-use crate::timeline::doctor::{OperatorDeployEvent,OperatorRetreatEvent,OperatorSkillEvent};
+use crate::timeline::doctor::{OperatorDeployEvent, OperatorRetreatEvent, OperatorSkillEvent, UnitRetreatEvent, UnitSkillEvent};
 use crate::unit::scope::Toward;
 
 #[derive(Debug, Serialize, Deserialize,Default)]
 pub(super) struct Copilot{
     pub(super) stage_name: String,
     #[serde(rename = "opers")]
-    pub(super) operators:Vec<Value>,
-    pub(super) groups:Vec<Value>,
-    pub(super) actions:Vec<Value>,
+    pub(super) operators:Vec<CopilotOperator>,
+    pub(super) groups:Vec<CopilotGroup>,
+    pub(super) actions:Vec<CopilotAction>,
 }
 
 #[derive(Debug, Serialize, Deserialize,Default)]
 pub(super) struct CopilotOperator{
     pub(super) name:String,
-    pub(super) skill:u8,
-    pub(super) skill_usage:u8,
-    pub(super) skill_times:u8,
+    pub(super) skill:Option<u8>,
+    pub(super) skill_usage:Option<u8>,
+    pub(super) skill_times:Option<u8>,
     pub(super) requirement:Option<CopilotRequirement>,
 }
 
@@ -45,29 +45,13 @@ pub(super) enum CopilotAction{
     Deploy(CopilotActionDeploy),
     Skill(CopilotActionSkill),
     Retreat(CopilotActionRetreat),
-    // #[serde(alias = "SpeedUp")]
-    // Useless,
-    // BulletTime,
-    // SkillUsage,
     SkillDaemon,
+    #[serde(other)]
+    UseLess
 }
-// struct CopilotAction{
-//     #[serde(rename = "type")]
-//     action_type:Option<String>,
-//     kills:Option<u8>,
-//     costs:Option<u8>,
-//     cost_changes:Option<u8>,
-//     cooling:Option<i8>,
-//     name:Option<String>,
-//     location:Option<Grid>,
-//     direction:Option<String>,
-//     skill_usage:Option<u8>,
-//     skill_times:Option<u8>,
-//     pre_delay:Option<u8>,
-//     post_delay:Option<u8>,
-// }
 
 #[derive(Debug, Serialize, Deserialize,Default)]
+#[serde(default)]
 pub(super) struct CopilotActionDeploy{
     pub(super) name:String,
     pub(super) location:Grid,
@@ -81,40 +65,72 @@ pub(super) struct CopilotActionDeploy{
 }
 
 #[derive(Debug, Serialize, Deserialize,Default)]
+#[serde(default)]
 pub(super) struct CopilotActionSkill{
-    pub(super) name:String,
+    pub(super) name:Option<String>,
     pub(super) skill_usage:Option<u8>,
     pub(super) skill_times:Option<u8>,
+    pub(super) location:Option<Grid>,
 }
 
 #[derive(Debug, Serialize, Deserialize,Default)]
+#[serde(default)]
 pub(super) struct CopilotActionRetreat{
-    pub(super) name:String,
+    pub(super) name:Option<String>,
+    pub(super) location:Option<Grid>,
 }
 
 impl Into<OperatorDeployEvent> for CopilotActionDeploy{
-    fn into(self)->OperatorDeployEvent{
+    fn into(self) -> OperatorDeployEvent {
         OperatorDeployEvent{
             operator_key:self.name.clone(),
-            location:self.location.clone(),
+            location:self.location,
             toward:self.direction,
         }
     }
 }
 
-impl Into<OperatorRetreatEvent> for CopilotActionRetreat{
-    fn into(self)->OperatorRetreatEvent{
-        OperatorRetreatEvent{
-            operator_key:self.name.clone(),
-        }
+impl TryInto<OperatorRetreatEvent> for CopilotActionRetreat{
+    type Error=Box<dyn std::error::Error>;
+    
+    fn try_into(self) -> Result<OperatorRetreatEvent, Self::Error> {
+        let operator_key = self.name.clone().ok_or("without operator name")?;
+        Ok(OperatorRetreatEvent{
+            operator_key,
+        })
     }
 }
 
-impl Into<OperatorSkillEvent> for CopilotActionSkill{
-    fn into(self)->OperatorSkillEvent{
-        OperatorSkillEvent{
-            operator_key:self.name.clone(),
-        }
+impl TryInto<OperatorSkillEvent> for CopilotActionSkill{
+    type Error=Box<dyn std::error::Error>;
+    
+    fn try_into(self) -> Result<OperatorSkillEvent, Self::Error> {
+        let operator_key = self.name.clone().ok_or("without operator name")?;
+        Ok(OperatorSkillEvent{
+            operator_key,
+        })
+    }
+}
+
+impl TryInto<UnitSkillEvent> for CopilotActionSkill{
+    type Error=Box<dyn std::error::Error>;
+    
+    fn try_into(self) -> Result<UnitSkillEvent, Self::Error> {
+        let location = self.location.ok_or("without location")?;
+        Ok(UnitSkillEvent{
+            location,
+        })
+    }
+}
+
+impl TryInto<UnitRetreatEvent> for CopilotActionRetreat{
+    type Error=Box<dyn std::error::Error>;
+    
+    fn try_into(self) -> Result<UnitRetreatEvent, Self::Error> {
+        let location = self.location.ok_or( "without location")?;
+        Ok(UnitRetreatEvent{
+            location,
+        })
     }
 }
 
