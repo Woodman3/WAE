@@ -5,8 +5,14 @@ use super::math::Grid;
 use crate::timeline::doctor::{OperatorDeployEvent, OperatorRetreatEvent, OperatorSkillEvent, UnitRetreatEvent, UnitSkillEvent};
 use crate::unit::scope::Toward;
 
+struct Copilot{
+    copilot_data: CopilotData,
+    game_data:Loader,
+    
+}
+
 #[derive(Debug, Serialize, Deserialize,Default)]
-pub(super) struct Copilot{
+pub(super) struct CopilotData{
     pub(super) stage_name: String,
     #[serde(rename = "opers")]
     pub(super) operators:Vec<CopilotOperator>,
@@ -132,6 +138,20 @@ impl TryInto<UnitRetreatEvent> for CopilotActionRetreat{
             location,
         })
     }
+}
+
+impl Copilot {
+    pub(crate) fn new<P: AsRef<Path>>(path: P,game_data:Loader) -> Result<Self>{
+        let path = path.as_ref().join("copilot.json");
+        let json = load_json_file(path)?;
+        let copilot_data: CopilotData = serde_json::from_value(json)?; 
+        Ok(Copilot{
+            copilot_data,
+            game_data,
+        })
+    }
+
+
 }
 
 mod test{
