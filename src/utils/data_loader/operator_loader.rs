@@ -7,7 +7,6 @@ use log::error;
 use crate::unit::scope::Scope;
 use crate::unit::skill::effect::DamageType;
 use crate::unit::skill::skill_type::{AttackType, ChargeType};
-use crate::utils::copilot::Copilot;
 use crate::utils::math::Grid;
 use crate::unit::operator::Operator;
 use crate::unit::{Unit, UnitInfo};
@@ -160,9 +159,9 @@ impl Loader{
         o.stage.damage_type=sp;
         return Ok(o);
     }
-    fn load_copilot_operator(&self,copilot:Copilot)->Result<Vec<Operator>>{
-        todo!()
-    }
+    // fn load_copilot_operator(&self,copilot:Copilot)->Result<Vec<Operator>>{
+    //     todo!()
+    // }
     fn operator_phase_generate(&self,name:String,phase:usize,level:u32,skill_index:usize,skill_level:usize,oo:&OfficialOperator)->Result<Operator>{
         let op = oo.phases.get(phase).ok_or("Phase not found")?;
         let max_level =op.maxLevel;

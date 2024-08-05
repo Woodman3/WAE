@@ -1,6 +1,7 @@
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::collections::VecDeque;
+use std::default;
 use std::i64;
 use std::path::Path;
 use std::path::PathBuf;
@@ -61,22 +62,47 @@ struct OfficialRoute {
     pub(super) endPosition:Grid,
     pub(super) spawnRandomRange:Point,
     pub(super) spawnOffset:Point,
-    pub(super) checkpoints:Value,
+    pub(super) checkpoints:Vec<OfficialCheckPoint>,
     pub(super) allowDiagonalMove: bool,
     pub(super) visitEveryTileCenter: bool,
     pub(super) visitEveryNodeCenter: bool,
     pub(super) visitEveryCheckPoint: bool,
 }
 
-#[derive(Serialize,Deserialize,Debug,Default,Clone,Copy)]
+#[derive(Deserialize,Default,Debug)]
+struct OfficialCheckPoint{
+    #[serde(alias="type")]
+    pub(super) tag:CheckPoint,
+    pub(super) time :f64,
+    pub(super) position:Grid,
+    pub(super) reachOffset:Point,
+    pub(super) reachDistance:f64,
+}
+
+#[derive(Serialize,Deserialize,Debug,Default,Clone,Copy,PartialEq)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 enum Route {
+    // up to 2024/7/29, all of its value are below 
     #[default]
     ENum,
     Walk,
     Fly 
 }
 
+
+#[derive(Serialize,Deserialize,Debug,Default,Clone,Copy,PartialEq)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+enum CheckPoint{
+    // up to 2024/7/29, all of its value are below 
+    #[default]
+    Move,
+    WaitForSeconds,
+    Disappear,
+    AppearAtPos,
+    WaitCurrentFragmentTime,
+    WaitCurrentWaveTime,
+    PatrolMove
+}
 #[derive(Deserialize,Default,Debug)]
 struct OfficialEnemyDbRef {
     pub(super) useDb:bool,
@@ -108,7 +134,6 @@ struct OfficialWaveAction {
 
 }
 
-// enun OfficalP
 
 fn find_file_in_dir(dir: &Path, file_name: &str) -> Result<String> {
     if dir.is_dir() {
@@ -213,11 +238,13 @@ impl Loader{
 
 #[cfg(test)]
 mod test{
+    use std::sync::Arc;
+
     use serde_json::from_value;
 
     use super::*;
 
-    fn find_all_file_in_dir(dir:&Path,list:&mut Vec<(TileBuildable,TileHeight)>){
+    fn find_all_file_in_dir(dir:&Path,list:&mut Vec<CheckPoint>){
         if dir.is_dir(){
             for entry in std::fs::read_dir(dir).unwrap(){
                 let entry = entry.unwrap();
@@ -231,13 +258,15 @@ mod test{
         }
     }
 
-    fn get_value_by_key(path:&Path,list:&mut Vec<(TileBuildable,TileHeight)>){
+    fn get_value_by_key(path:&Path,list:&mut Vec<CheckPoint>){
         let json=load_json_file(path).unwrap();
         if let Ok(data) = from_value::<OfficialLevelData>(json)
         {
-            for t in data.mapData.tiles.into_iter(){
-                if !list.contains(&(t.buildableType,t.heightType)){
-                    list.push((t.buildableType,t.heightType));
+            for r in data.routes.iter(){
+                for c in r.checkpoints.iter(){
+                    if !list.contains(&c.tag){
+                        list.push(c.tag.clone());
+                    }
                 }
             }
         }

@@ -1,10 +1,15 @@
 use serde_json::Value;
 use serde::{Deserialize, Serialize};
 
+use std::path::Path;
+
+use super::data_loader::Loader;
+use super::load_json_file;
 use super::math::Grid;
 use crate::timeline::doctor::{OperatorDeployEvent, OperatorRetreatEvent, OperatorSkillEvent, UnitRetreatEvent, UnitSkillEvent};
 use crate::unit::scope::Toward;
 
+type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 struct Copilot{
     copilot_data: CopilotData,
     game_data:Loader,
@@ -99,7 +104,7 @@ impl Into<OperatorDeployEvent> for CopilotActionDeploy{
 impl TryInto<OperatorRetreatEvent> for CopilotActionRetreat{
     type Error=Box<dyn std::error::Error>;
     
-    fn try_into(self) -> Result<OperatorRetreatEvent, Self::Error> {
+    fn try_into(self) -> Result<OperatorRetreatEvent> {
         let operator_key = self.name.clone().ok_or("without operator name")?;
         Ok(OperatorRetreatEvent{
             operator_key,
@@ -110,7 +115,7 @@ impl TryInto<OperatorRetreatEvent> for CopilotActionRetreat{
 impl TryInto<OperatorSkillEvent> for CopilotActionSkill{
     type Error=Box<dyn std::error::Error>;
     
-    fn try_into(self) -> Result<OperatorSkillEvent, Self::Error> {
+    fn try_into(self) -> Result<OperatorSkillEvent> {
         let operator_key = self.name.clone().ok_or("without operator name")?;
         Ok(OperatorSkillEvent{
             operator_key,
@@ -121,7 +126,7 @@ impl TryInto<OperatorSkillEvent> for CopilotActionSkill{
 impl TryInto<UnitSkillEvent> for CopilotActionSkill{
     type Error=Box<dyn std::error::Error>;
     
-    fn try_into(self) -> Result<UnitSkillEvent, Self::Error> {
+    fn try_into(self) -> Result<UnitSkillEvent> {
         let location = self.location.ok_or("without location")?;
         Ok(UnitSkillEvent{
             location,
@@ -132,7 +137,7 @@ impl TryInto<UnitSkillEvent> for CopilotActionSkill{
 impl TryInto<UnitRetreatEvent> for CopilotActionRetreat{
     type Error=Box<dyn std::error::Error>;
     
-    fn try_into(self) -> Result<UnitRetreatEvent, Self::Error> {
+    fn try_into(self) -> Result<UnitRetreatEvent> {
         let location = self.location.ok_or( "without location")?;
         Ok(UnitRetreatEvent{
             location,
@@ -163,7 +168,7 @@ mod test{
     fn test_copilot(){
         let path = "copilot.json";
         let json = load_json_file(path).unwrap();
-        let copilot: Copilot = serde_json::from_value(json).unwrap();
+        let copilot: CopilotData = serde_json::from_value(json).unwrap();
         println!("{:?}",copilot.actions);
     }
 }
