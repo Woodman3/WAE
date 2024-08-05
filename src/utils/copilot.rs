@@ -1,19 +1,26 @@
 use serde_json::Value;
 use serde::{Deserialize, Serialize};
+use rand::thread_rng;
+use rand::seq::SliceRandom;
 
+use std::cell::RefCell;
 use std::path::Path;
+use std::rc::Rc;
 
 use super::data_loader::Loader;
 use super::load_json_file;
 use super::math::Grid;
+use crate::calculator::Calculator;
 use crate::timeline::doctor::{OperatorDeployEvent, OperatorRetreatEvent, OperatorSkillEvent, UnitRetreatEvent, UnitSkillEvent};
 use crate::unit::scope::Toward;
+use crate::unit::skill;
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
+#[derive(Debug)]
 struct Copilot{
     copilot_data: CopilotData,
     game_data:Loader,
-    
+    calculator:Calculator, 
 }
 
 #[derive(Debug, Serialize, Deserialize,Default)]
@@ -146,16 +153,49 @@ impl TryInto<UnitRetreatEvent> for CopilotActionRetreat{
 }
 
 impl Copilot {
-    pub(crate) fn new<P: AsRef<Path>>(path: P,game_data:Loader) -> Result<Self>{
-        let path = path.as_ref().join("copilot.json");
-        let json = load_json_file(path)?;
+    pub(crate) fn new<P: AsRef<Path>>(copilot_path: P,game_data_path:P) -> Result<Self>{
+        let json = load_json_file(copilot_path)?;
         let copilot_data: CopilotData = serde_json::from_value(json)?; 
+        let loader = Loader::new(game_data_path)?;
+        let level_name =format!("level_{}.json",copilot_data.stage_name);
+        let mut calculator = loader.load_level(level_name)?;
+        for o in copilot_data.operators.iter(){
+            let skill = o.skill.unwrap_or(1);
+            let (level,elite,skill_level)= match &o.requirement{
+                Some(r)=>(
+                    r.level.unwrap_or(1),
+                    r.elite.unwrap_or(0),
+                    r.skill_level.unwrap_or(1)),
+                None=>(1,1,1),
+            };
+            let op = loader.load_operator(o.name.clone(),
+                elite as usize,level as u32 ,skill as usize ,skill_level as usize)?;
+            calculator.frame_vec[0].operator_undeploy.insert(op.name.clone(), Rc::new(RefCell::new(op)));
+
+        }
+        for g in copilot_data.groups.iter(){
+            if let Some(o) = g.operators.choose(&mut thread_rng()){
+                let skill = o.skill.unwrap_or(1);
+                let (level,elite,skill_level)= match &o.requirement{
+                    Some(r)=>(
+                        r.level.unwrap_or(1),
+                        r.elite.unwrap_or(0),
+                        r.skill_level.unwrap_or(1)),
+                    None=>(1,1,1),
+                };
+                let op = loader.load_operator(o.name.clone(),
+                    elite as usize,level as u32 ,skill as usize ,skill_level as usize)?;
+                calculator.frame_vec[0].operator_undeploy.insert(op.name.clone(), Rc::new(RefCell::new(op)));
+            }
+        } 
         Ok(Copilot{
             copilot_data,
-            game_data,
+            game_data:loader,
+            calculator
         })
     }
 
+    
 
 }
 
@@ -166,9 +206,7 @@ mod test{
 
     #[test]
     fn test_copilot(){
-        let path = "copilot.json";
-        let json = load_json_file(path).unwrap();
-        let copilot: CopilotData = serde_json::from_value(json).unwrap();
-        println!("{:?}",copilot.actions);
+        let copilot  = Copilot::new("./copilot.json","./ArknightsGameData").unwrap();
+        println!("{:?}",copilot.calculator);
     }
 }

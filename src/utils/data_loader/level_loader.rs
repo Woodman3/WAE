@@ -62,7 +62,7 @@ struct OfficialRoute {
     pub(super) endPosition:Grid,
     pub(super) spawnRandomRange:Point,
     pub(super) spawnOffset:Point,
-    pub(super) checkpoints:Vec<OfficialCheckPoint>,
+    pub(super) checkpoints:Option<Vec<OfficialCheckPoint>>,
     pub(super) allowDiagonalMove: bool,
     pub(super) visitEveryTileCenter: bool,
     pub(super) visitEveryNodeCenter: bool,
@@ -197,7 +197,7 @@ impl Into<Map> for OfficialMapData {
 impl Loader{
     fn find_level(&self, level_name: String)->Result<OfficialLevelData>{
         let path = self.path.join("levels");
-        let level_file = level_name + ".json";
+        let level_file =format!("level_{}.json",level_name);
         let file_path = find_file_in_dir(&path, &level_file)?;
         let level_json = load_json_file(file_path)?;
         let level = serde_json::from_value::<OfficialLevelData>(level_json)?;
@@ -208,6 +208,7 @@ impl Loader{
         Ok(map)
     }
 
+    /// all level file is format as "level_*.json", so the level_name should be the * part
     pub(crate) fn load_level(&self,level_name:String)->Result<Calculator>{
         let level = self.find_level(level_name)?;
         let map = self.load_map(&level)?;
@@ -217,7 +218,6 @@ impl Loader{
             enemy_initial.insert(e.id.clone(),enemy );
         }
         
-         
         let f = Frame{
             map,
             ..Default::default()
@@ -263,11 +263,11 @@ mod test{
         if let Ok(data) = from_value::<OfficialLevelData>(json)
         {
             for r in data.routes.iter(){
-                for c in r.checkpoints.iter(){
-                    if !list.contains(&c.tag){
-                        list.push(c.tag.clone());
-                    }
-                }
+                // for c in r.checkpoints.unwrap().iter(){
+                //     if !list.contains(&c.tag){
+                //         list.push(c.tag.clone());
+                //     }
+                // }
             }
         }
     }
@@ -279,6 +279,15 @@ mod test{
         let path = Path::new("ArknightsGameData/zh_CN/gamedata/levels/obt");
         find_all_file_in_dir(path,&mut value_list);
         println!("{:?}",value_list); 
+    }
+
+    #[test]
+    fn test_load_level(){
+        let path = "./ArknightsGameData";
+        let loader = Loader::new(path).unwrap();
+        // let level = loader.load_level("level_act5d0_ex07".to_string()).unwrap();
+        let level = loader.load_level("main_00-07".to_string()).unwrap();
+        println!("{:?}",level);
     }
 
 }

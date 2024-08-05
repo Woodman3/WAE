@@ -9,6 +9,8 @@ use super::load_json_file;
 use enemy_loader::{OfficalEnemy,OfficalEnemyValue};
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
+
+#[derive(Debug)]
 pub(crate) struct Loader{
     path:PathBuf,
     character_table:Value,

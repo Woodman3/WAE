@@ -146,14 +146,14 @@ impl Into<Skill> for OfficialSkill{
 
 impl Loader{
     /// name can be english or chinese, if name is english,first letter should be upper case
-    /// phase is the phase of operator, 0 is the lowest phase, 2 is the highest phase
+    /// phase is the elite of operator, 0 is the lowest phase, 2 is the highest phase
     /// level is the level of operator, 1 is the lowest level, the highest level depend on phase and operator
     /// skill level is the level of skill, 1 is the lowest level, the highest level depend phase and operator
     /// return None if operator not found or phase or level is wrong
-    fn load_operator(&self,name:String,phase:usize,level:u32,skill_index:usize,skill_level:usize)->Result<Operator>{
+    pub(crate) fn load_operator(&self,name:String,elite:usize,level:u32,skill_index:usize,skill_level:usize)->Result<Operator>{
         let ok = self.get_operator_key(&name).ok_or("Operator not found")?;
         let oo= from_value::<OfficialOperator>(self.character_table[ok].clone())?;
-        let mut o=self.operator_phase_generate(name,phase,level,skill_index,skill_level,&oo)?;
+        let mut o=self.operator_phase_generate(name,elite,level,skill_index,skill_level,&oo)?;
         let sp=from_value::<DamageType>(self.gamedata_const["subProfessionDamageTypePairs"][oo.subProfessionId.clone()].clone())?;
         o.info.damage_type=sp;
         o.stage.damage_type=sp;
