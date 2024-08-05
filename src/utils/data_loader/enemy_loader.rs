@@ -1,3 +1,5 @@
+use std::ops::Add;
+
 use serde::Deserialize;
 use serde_json::from_value;
 
@@ -63,6 +65,25 @@ pub(super) struct OfficalEnemyDataTemplate<T>
     pub(super) m_value:Option<T>,
 }
 
+/// right value will overwrite left value if it is defined 
+impl<T> Add for OfficalEnemyDataTemplate<T>{
+    type Output = Self;
+    fn add(self,other:Self) -> Self{
+        let m_defined = self.m_defined || other.m_defined;
+        if other.m_value.is_none(){
+            return Self{
+                m_defined,
+                m_value:self.m_value,
+            }
+        }else{
+            return Self{
+                m_defined,
+                m_value:other.m_value,
+            }
+        }
+    }
+}
+
 impl Into<Enemy> for OfficalEnemyData {
     fn into(self) -> Enemy {
         let name = self.name.m_value.unwrap();
@@ -117,4 +138,23 @@ impl Loader{
         Ok(enemy.enemyData.clone().into())
     }
     
+}
+
+#[cfg(test)]
+mod test{
+
+    #[test]
+    fn test_template(){
+        let a = super::OfficalEnemyDataTemplate{
+            m_defined:true,
+            m_value:Some(1),
+        };
+        let b = super::OfficalEnemyDataTemplate{
+            m_defined:true,
+            m_value:Some(2),
+        };
+        let c =a+b;
+        assert_eq!(c.m_value,Some(2));
+    }
+
 }

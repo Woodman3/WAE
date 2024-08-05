@@ -285,8 +285,8 @@ mod test{
     fn test_load_level(){
         let path = "./ArknightsGameData";
         let loader = Loader::new(path).unwrap();
-        // let level = loader.load_level("level_act5d0_ex07".to_string()).unwrap();
-        let level = loader.load_level("main_00-07".to_string()).unwrap();
+        let level = loader.load_level("act5d0_ex07".to_string()).unwrap();
+        // let level = loader.load_level("main_00-07".to_string()).unwrap();
         println!("{:?}",level);
     }
 
