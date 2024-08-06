@@ -6,7 +6,7 @@ use std::{collections::HashMap, path::{Path, PathBuf}};
 use serde_json::{from_value, Value};
 use crate::unit::enemy;
 use super::load_json_file;
-use enemy_loader::{OfficalEnemy,OfficalEnemyValue};
+use enemy_loader::{OfficialEnemy,OfficialEnemyValue};
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
@@ -17,7 +17,7 @@ pub(crate) struct Loader{
     range_table:Value,
     gamedata_const:Value,
     skill_table:Value,
-    enemy_database:HashMap<String,Vec<OfficalEnemyValue>>,
+    enemy_database:HashMap<String,Vec<OfficialEnemyValue>>,
 }
 
 impl Loader{
@@ -29,7 +29,7 @@ impl Loader{
         let skill_table = load_json_file(path.join("excel/skill_table.json"))?;
         let mut enemy_database_j = load_json_file(path.join("levels/enemydata/enemy_database.json"))?;
         enemy_database_j = std::mem::take(&mut enemy_database_j["enemies"]); 
-        let enemy_database_v =from_value::<Vec<OfficalEnemy>>(enemy_database_j)?;
+        let enemy_database_v =from_value::<Vec<OfficialEnemy>>(enemy_database_j)?;
         let enemy_database = enemy_database_v.into_iter().map(|enemy| (enemy.Key,enemy.Value)).collect();
         Ok(Loader {
             path,

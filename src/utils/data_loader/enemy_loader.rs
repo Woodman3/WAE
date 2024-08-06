@@ -8,65 +8,65 @@ use super::Loader;
 use super::Result;
 
 #[derive(Deserialize,Default,Debug,Clone)]
-pub(super) struct OfficalEnemy{
+pub(super) struct OfficialEnemy{
     pub(super) Key:String,
-    pub(super) Value:Vec<OfficalEnemyValue>
+    pub(super) Value:Vec<OfficialEnemyValue>
 }
 
 #[derive(Deserialize,Default,Debug,Clone)]
-pub(super) struct OfficalEnemyValue{
+pub(super) struct OfficialEnemyValue{
     pub(super) level:i32,
-    pub(super) enemyData:OfficalEnemyData, 
+    pub(super) enemyData:OfficialEnemyData, 
 }
 
 #[derive(Deserialize,Default,Debug,Clone)]
-pub(super) struct OfficalEnemyData{
-    pub(super) name:OfficalEnemyDataTemplate<String>,
-    pub(super) applyWay:OfficalEnemyDataTemplate<String>,
-    pub(super) motion:OfficalEnemyDataTemplate<String>,
-    pub(super) lifePointReduce:OfficalEnemyDataTemplate<u64>,
-    pub(super) attributes:OfficalEnemyAttribute,
+pub(super) struct OfficialEnemyData{
+    pub(super) name:OfficialEnemyDataTemplate<String>,
+    pub(super) applyWay:OfficialEnemyDataTemplate<String>,
+    pub(super) motion:OfficialEnemyDataTemplate<String>,
+    pub(super) lifePointReduce:OfficialEnemyDataTemplate<u64>,
+    pub(super) attributes:OfficialEnemyAttribute,
 }
 
 #[derive(Deserialize,Default,Debug,Clone)]
-pub(super) struct OfficalEnemyAttribute{
-    pub(super) maxHp:OfficalEnemyDataTemplate<i64>,
-    pub(super) atk:OfficalEnemyDataTemplate<i64>,
-    pub(super) def:OfficalEnemyDataTemplate<i64>,
-    pub(super) magicResistance:OfficalEnemyDataTemplate<f64>,
-    pub(super) cost:OfficalEnemyDataTemplate<i64>,
-    pub(super) blockCnt:OfficalEnemyDataTemplate<i64>,
-    pub(super) moveSpeed:OfficalEnemyDataTemplate<f64>,
-    pub(super) attackSpeed:OfficalEnemyDataTemplate<f64>,
-    pub(super) baseAttackTime:OfficalEnemyDataTemplate<f64>,
-    pub(super) respawnTime:OfficalEnemyDataTemplate<i64>,
-    pub(super) hpRecoveryPerSec:OfficalEnemyDataTemplate<f64>,
-    pub(super) spRecoveryPerSec:OfficalEnemyDataTemplate<f64>,
-    pub(super) maxDeployCount:OfficalEnemyDataTemplate<i64>,
-    pub(super) massLevel:OfficalEnemyDataTemplate<i64>,
-    pub(super) baseForceLevel:OfficalEnemyDataTemplate<i64>,
-    pub(super) tauntLevel:OfficalEnemyDataTemplate<i64>,
-    pub(super) epDamageResistance:OfficalEnemyDataTemplate<f64>,
-    pub(super) epResistance:OfficalEnemyDataTemplate<f64>,
-    pub(super) damageHitratePhysical:OfficalEnemyDataTemplate<f64>,
-    pub(super) damageHitrateMagical:OfficalEnemyDataTemplate<f64>,
-    pub(super) stunImmune:OfficalEnemyDataTemplate<bool>,
-    pub(super) silenceImmune:OfficalEnemyDataTemplate<bool>,
-    pub(super) sleepImmune:OfficalEnemyDataTemplate<bool>,
-    pub(super) frozenImmune:OfficalEnemyDataTemplate<bool>,
-    pub(super) levitateImmune:OfficalEnemyDataTemplate<bool>,
-    pub(super) disarmedCombatImmune:OfficalEnemyDataTemplate<bool>,
+pub(super) struct OfficialEnemyAttribute{
+    pub(super) maxHp:OfficialEnemyDataTemplate<i64>,
+    pub(super) atk:OfficialEnemyDataTemplate<i64>,
+    pub(super) def:OfficialEnemyDataTemplate<i64>,
+    pub(super) magicResistance:OfficialEnemyDataTemplate<f64>,
+    pub(super) cost:OfficialEnemyDataTemplate<i64>,
+    pub(super) blockCnt:OfficialEnemyDataTemplate<i64>,
+    pub(super) moveSpeed:OfficialEnemyDataTemplate<f64>,
+    pub(super) attackSpeed:OfficialEnemyDataTemplate<f64>,
+    pub(super) baseAttackTime:OfficialEnemyDataTemplate<f64>,
+    pub(super) respawnTime:OfficialEnemyDataTemplate<i64>,
+    pub(super) hpRecoveryPerSec:OfficialEnemyDataTemplate<f64>,
+    pub(super) spRecoveryPerSec:OfficialEnemyDataTemplate<f64>,
+    pub(super) maxDeployCount:OfficialEnemyDataTemplate<i64>,
+    pub(super) massLevel:OfficialEnemyDataTemplate<i64>,
+    pub(super) baseForceLevel:OfficialEnemyDataTemplate<i64>,
+    pub(super) tauntLevel:OfficialEnemyDataTemplate<i64>,
+    pub(super) epDamageResistance:OfficialEnemyDataTemplate<f64>,
+    pub(super) epResistance:OfficialEnemyDataTemplate<f64>,
+    pub(super) damageHitratePhysical:OfficialEnemyDataTemplate<f64>,
+    pub(super) damageHitrateMagical:OfficialEnemyDataTemplate<f64>,
+    pub(super) stunImmune:OfficialEnemyDataTemplate<bool>,
+    pub(super) silenceImmune:OfficialEnemyDataTemplate<bool>,
+    pub(super) sleepImmune:OfficialEnemyDataTemplate<bool>,
+    pub(super) frozenImmune:OfficialEnemyDataTemplate<bool>,
+    pub(super) levitateImmune:OfficialEnemyDataTemplate<bool>,
+    pub(super) disarmedCombatImmune:OfficialEnemyDataTemplate<bool>,
 }
 
 #[derive(Deserialize,Default,Debug,Clone)]
-pub(super) struct OfficalEnemyDataTemplate<T>
+pub(super) struct OfficialEnemyDataTemplate<T>
 {
     pub(super) m_defined:bool,
     pub(super) m_value:Option<T>,
 }
 
 /// right value will overwrite left value if it is defined 
-impl<T> Add for OfficalEnemyDataTemplate<T>{
+impl<T> Add for OfficialEnemyDataTemplate<T>{
     type Output = Self;
     fn add(self,other:Self) -> Self{
         let m_defined = self.m_defined || other.m_defined;
@@ -84,7 +84,7 @@ impl<T> Add for OfficalEnemyDataTemplate<T>{
     }
 }
 
-impl Into<Enemy> for OfficalEnemyData {
+impl Into<Enemy> for OfficialEnemyData {
     fn into(self) -> Enemy {
         let name = self.name.m_value.unwrap();
         let att = self.attributes;
@@ -101,7 +101,7 @@ impl Into<Enemy> for OfficalEnemyData {
     }
 }
 
-impl Into<UnitInfo> for OfficalEnemyAttribute{
+impl Into<UnitInfo> for OfficialEnemyAttribute{
     fn into(self) -> UnitInfo {
         use crate::unit::skill::effect::DamageType;
         use crate::unit::skill::skill_type::AttackType;
@@ -145,11 +145,11 @@ mod test{
 
     #[test]
     fn test_template(){
-        let a = super::OfficalEnemyDataTemplate{
+        let a = super::OfficialEnemyDataTemplate{
             m_defined:true,
             m_value:Some(1),
         };
-        let b = super::OfficalEnemyDataTemplate{
+        let b = super::OfficialEnemyDataTemplate{
             m_defined:true,
             m_value:Some(2),
         };
