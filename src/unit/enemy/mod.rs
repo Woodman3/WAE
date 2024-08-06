@@ -66,9 +66,9 @@ impl Enemy {
         if self.stage.attack_time>0.0{
             self.stage.attack_time-=PERIOD;
         }else {
-            
+            use super::AttackType::*; 
             match self.stage.attack_type {
-                MELEE=>{
+                Melee=>{
                     let d= FixedDamage {
                         value:self.stage.atk,
                         damage_type:self.stage.damage_type.clone(),
@@ -76,7 +76,8 @@ impl Enemy {
                     o.borrow_mut().be_damage(&d);
                     // self.target.upgrade().unwrap().borrow_mut().be_damage(&d);
                 }
-                RANGE=>{
+                Ranged=>{
+                    todo!("ranged enemy");
                     //todo: ranged enemy
                     // bv.push(Bullet::new(
                     //     self.target.upgrade().unwrap(),
@@ -86,7 +87,9 @@ impl Enemy {
                     //     self.stage.damage,
                     // ));
                 }
-                // _ => {error!("unknown attack_type!")}
+                _ => {
+                    todo!("unknown attack type of enemy");
+                }
             }
             self.stage.attack_time=self.info.attack_time;
         }
@@ -133,23 +136,23 @@ impl Enemy{
         self.be_damage(&b.damage);
     }
     pub(super) fn be_damage(&mut self, d: &FixedDamage) {
-        
+        use super::DamageType::*;
         match d.damage_type {
-            MAGICAL =>{
+            Magical =>{
                 let damage=(d.value as f64*(1.0-self.stage.magic_resist)) as i64;
                 self.stage.hp -=damage;
             }
-            PHYSICAL=>{
+            Physical=>{
                 let damage=d.value-self.stage.def;
                 self.stage.hp -=damage;
             }
-            REAL=>{
+            Real=>{
                 self.stage.hp -=d.value;
             }
-            HEAL => {
+            Heal => {
                 self.stage.hp +=d.value;
             },
-            NONE => {},
+            None => {},
             // _ => {
             //     warn!("unknown attack type of bullet ,bullet has been departure");
             //     return

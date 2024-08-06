@@ -149,7 +149,7 @@ macro_rules! mul2d {
     };
 }
 ///we define A is start_point,B is end_point,P is target_point in short
-pub fn distance_from_segment_to_point(A: Point, B: Point, P: Point) -> f64 {
+pub fn distance_from_segment_to_point(a: Point, b: Point, p: Point) -> f64 {
     // let AB = sub2d!(B, A);
     // let AP = sub2d!(P, A);
     // let r = mul2d!(AB, AP) / mul2d!(AB, AB);
@@ -163,30 +163,30 @@ pub fn distance_from_segment_to_point(A: Point, B: Point, P: Point) -> f64 {
     //     let AC = (r * AB.0, r * AB.1);
     //     mul2d!(AC, AC).sqrt() // this error!
     // }
-    let AB = B-A;
-    let AP = P-A;
-    let r = (AB*AP)/(AB*AB);
+    let ab = b-a;
+    let ap = p-a;
+    let r = (ab*ap)/(ab*ab);
     if r >= 1.0 {
-        let BP = P-B;
-        (BP*BP).sqrt()
+        let bp = p-b;
+        (bp*bp).sqrt()
     } else if r <= 0.0 {
-        let AP = P-A;
-        (AP*AP).sqrt()
+        let ap = p-a;
+        (ap*ap).sqrt()
     } else {
-        let AC:Point = (r * AB.x, r * AB.y).into();
-        let CP=AP-AC;
-        (CP*CP).sqrt()
+        let ac:Point = (r * ab.x, r * ab.y).into();
+        let cp=ap-ac;
+        (cp*cp).sqrt()
     }
 }
 
-pub fn distance_p2p<T,T2>(A:&(T,T),B:&(T2,T2))->f64
+pub fn distance_p2p<T,T2>(a:&(T,T),b:&(T2,T2))->f64
 where  T:Into<f64>+Copy,
        T2:Into<f64>+Copy
 {
-    let a=(A.0.into(),A.1.into());
-    let b=(B.0.into(),B.1.into());
-    let AB=sub2d!(b,a);
-    let d=mul2d!(AB,AB);
+    let a=(a.0.into(),a.1.into());
+    let b=(b.0.into(),b.1.into());
+    let ab=sub2d!(b,a);
+    let d=mul2d!(ab,ab);
     d.sqrt()
 }
 

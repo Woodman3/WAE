@@ -113,8 +113,8 @@ struct OfficialEnemyDbRef {
 #[derive(Deserialize,Default,Debug)]
 #[serde(rename_all = "camelCase")]
 struct OfficialWave {
-    pub(super) preDelay:f32,
-    pub(super) postDelay:f32,
+    pub(super) pre_delay:f32,
+    pub(super) post_delay:f32,
     pub(super) fragments:Vec<OfficialWaveFragment>,
 }
 

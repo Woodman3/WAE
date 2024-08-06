@@ -19,15 +19,16 @@ impl Operator{
             SkillEntity::ToEnemySkill(s) => {
                 for t in s.target.iter(){
                     if let Some(u)=t.upgrade(){
+                        use crate::unit::skill::skill_type::AttackType::*;
                         match s.attack_type {
-                            MELEE=>{
+                            Melee=>{
                                 let d= FixedDamage {
                                     value:self.stage.atk,
                                     damage_type:self.stage.damage_type.clone(),
                                 };
                                 u.borrow_mut().be_damage(&d);
                             }
-                            RANGE=>{
+                            Ranged=>{
                                 f.bullet_set.push(Bullet::new(
                                     Unit::Enemy(Rc::clone(&u)),
                                     Point::from(self.location),
@@ -36,7 +37,9 @@ impl Operator{
                                     self.stage.atk,
                                 ));
                             }
-                            // _ => { log::error!("unknown attack_type!")}
+                            _ => {
+                                todo!("unknown attack type of enemy");
+                            }
                         }
                     }else{
                         self.target=Weak::new();

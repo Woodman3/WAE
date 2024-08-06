@@ -88,27 +88,23 @@ impl Operator {
 
 
     pub(super) fn be_damage(&mut self, d: &FixedDamage) {
-        
+        use super::DamageType::*; 
         match d.damage_type {
-            MAGICAL =>{
+            Magical =>{
                 let damage=(d.value as f64*(1f64-self.stage.magic_resist)) as i64;
                 self.stage.hp -=damage;
             }
-            PHYSICAL=>{
+            Physical=>{
                 let damage=d.value-self.stage.def;
                 self.stage.hp -=damage;
             }
-            REAL=>{
+            Real=>{
                 self.stage.hp -=d.value;
             }
-            HEAL => {
+            Heal => {
                 self.stage.hp +=d.value;
             },
-            NONE => {},
-            // _ => {
-            //     warn!("unknown attack type of bullet ,bullet has been departure");
-            //     return
-            // }
+            None => {},
         }
     }
 }

@@ -13,16 +13,16 @@ use crate::utils::math::Point;
 impl Operator{
     pub(super) fn attack(&mut self,f:&mut Frame){
         if let Some(e)=self.target.upgrade(){
-            
+            use crate::unit::skill::skill_type::AttackType::*; 
             match self.stage.attack_type {
-                MELEE=>{
+                Melee=>{
                     let d= FixedDamage {
                         value:self.stage.atk,
                         damage_type:self.stage.damage_type.clone(),
                     };
                     e.borrow_mut().be_damage(&d);
                 }
-                RANGE=>{
+                Ranged=>{
                     f.bullet_set.push(Bullet::new(
                         Unit::Enemy(Rc::clone(&e)),
                         Point::from(self.location),
@@ -31,7 +31,7 @@ impl Operator{
                         self.stage.atk,
                     ));
                 }
-                // _ => { log::error!("unknown attack_type!")}
+                _ => { todo!("unknown attack_type!")}
             }
         }else{
             self.target=Weak::new();

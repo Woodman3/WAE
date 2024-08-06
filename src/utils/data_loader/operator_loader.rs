@@ -102,7 +102,7 @@ struct OfficialSpData{
 struct OfficialBlackBoard{
     key:String,
     value:f64,
-    valueStr:Option<String>,
+    value_str:Option<String>,
 }
 
 impl Into<UnitInfo> for OfficialData{
