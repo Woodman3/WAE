@@ -69,29 +69,53 @@ pub(super) struct OfficialEnemyDataTemplate<T>
     pub(super) m_value:Option<T>,
 }
 
-// impl Add for OfficialEnemyAttribute{
-//     type Output = Self;
-//     fn add(self,other:Self) -> Self{
-//         let max_hp = self.maxHp+other.maxHp;
-//         let atk = self.atk+other.atk;
-//         let def = self.def+other.def;
-//         let magic_resist = self.magicResistance+other.magicResistance;
-//         let attack_time = self.baseAttackTime+other.baseAttackTime;
-//         let block_num = self.blockCnt+other.blockCnt;
-//         let aspd = self.attackSpeed+other.attackSpeed;
+impl Add for OfficialEnemyData{
+    type Output = Self;
+    fn add(self,other:Self) -> Self{
+        Self{
+            name:self.name+other.name,
+            apply_way:self.apply_way+other.apply_way,
+            motion:self.motion+other.motion,
+            life_point_reduce:self.life_point_reduce+other.life_point_reduce,
+            attributes:self.attributes+other.attributes,
+        }
+    }
+}
 
-//         Self{
-//             maxHp:max_hp,
-//             atk,
-//             def,
-//             magicResistance:magic_resist,
-//             baseAttackTime:attack_time,
-//             blockCnt:block_num,
-//             attackSpeed:aspd,
-//             ..Default::default()
-//         }
-//     }
-// }
+impl Add for OfficialEnemyAttribute{
+    type Output = Self;
+    fn add(self,other:Self) -> Self{
+        Self{
+            max_hp:self.max_hp+other.max_hp,
+            atk:self.atk+other.atk,
+            def:self.def+other.def,
+            magic_resistance:self.magic_resistance+other.magic_resistance,
+            cost:self.cost+other.cost,
+            block_cnt:self.block_cnt+other.block_cnt,
+            move_speed:self.move_speed+other.move_speed,
+            attack_speed:self.attack_speed+other.attack_speed,
+            base_attack_time:self.base_attack_time+other.base_attack_time,
+            respawn_time:self.respawn_time+other.respawn_time,
+            hp_recovery_per_sec:self.hp_recovery_per_sec+other.hp_recovery_per_sec,
+            sp_recovery_per_sec:self.sp_recovery_per_sec+other.sp_recovery_per_sec,
+            max_deploy_count:self.max_deploy_count+other.max_deploy_count,
+            mass_level:self.mass_level+other.mass_level,
+            base_force_level:self.base_force_level+other.base_force_level,
+            taunt_level:self.taunt_level+other.taunt_level,
+            ep_damage_resistance:self.ep_damage_resistance+other.ep_damage_resistance,
+            ep_resistance:self.ep_resistance+other.ep_resistance,
+            damage_hitrate_physical:self.damage_hitrate_physical+other.damage_hitrate_physical,
+            damage_hitrate_magical:self.damage_hitrate_magical+other.damage_hitrate_magical,
+            stun_immune:self.stun_immune+other.stun_immune,
+            silence_immune:self.silence_immune+other.silence_immune,
+            sleep_immune:self.sleep_immune+other.sleep_immune,
+            frozen_immune:self.frozen_immune+other.frozen_immune,
+            levitate_immune:self.levitate_immune+other.levitate_immune,
+            disarmed_combat_immune:self.disarmed_combat_immune+other.disarmed_combat_immune,
+        } 
+    }
+}
+
 
 /// right value will overwrite left value if it is defined 
 impl<T> Add for OfficialEnemyDataTemplate<T>{
@@ -111,6 +135,8 @@ impl<T> Add for OfficialEnemyDataTemplate<T>{
         }
     }
 }
+
+
 
 impl Into<Enemy> for OfficialEnemyData {
     fn into(self) -> Enemy {
@@ -162,27 +188,12 @@ impl Into<UnitInfo> for OfficialEnemyAttribute{
 impl Loader{
     pub(crate) fn load_official_enemy(&self,key:&String,level:usize) -> Result<Enemy> {
         let data = self.enemy_database.get(key).ok_or("Key not found")?;
-        let enemy = data.get(level).ok_or("Level not found")?;
-        Ok(enemy.enemy_data.clone().into())
+        let mut enemy = OfficialEnemyData::default();
+        for i in 0..=level{
+            let rhs = data.get(i).ok_or("Level not found")?;
+            enemy = enemy+rhs.enemy_data.clone();
+        }
+        Ok(enemy.into())
     }
     
-}
-
-#[cfg(test)]
-mod test{
-
-    #[test]
-    fn test_template(){
-        let a = super::OfficialEnemyDataTemplate{
-            m_defined:true,
-            m_value:Some(1),
-        };
-        let b = super::OfficialEnemyDataTemplate{
-            m_defined:true,
-            m_value:Some(2),
-        };
-        let c =a+b;
-        assert_eq!(c.m_value,Some(2));
-    }
-
 }

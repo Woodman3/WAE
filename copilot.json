@@ -141,12 +141,12 @@
     },
     {
       "name": "THRM-EX",
-      "skill": 1,
+      "skill": 0,
       "skill_usage": 0
     },
     {
       "name": "Lancet-2",
-      "skill": 1,
+      "skill": 0,
       "skill_usage": 0
     }
   ],

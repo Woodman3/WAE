@@ -83,7 +83,7 @@ struct OfficialSkillsDescription{
 #[derive(Deserialize,Default,Debug)]
 #[serde(rename_all = "camelCase")]
 struct OfficialSkill{
-    range_id:String,
+    range_id:Option<String>,
     skill_type:String,
     duration_type:String,
     duration:f64,
@@ -154,9 +154,9 @@ impl Into<Skill> for OfficialSkill{
 
 impl Loader{
     /// name can be english or chinese, if name is english,first letter should be upper case
-    /// phase is the elite of operator, 0 is the lowest phase, 2 is the highest phase
-    /// level is the level of operator, 1 is the lowest level, the highest level depend on phase and operator
-    /// skill level is the level of skill, 1 is the lowest level, the highest level depend phase and operator
+    /// elite: 0 is the lowest phase, 2 is the highest phase
+    /// level: 1 is the lowest level, the highest level depend on phase and operator
+    /// skill level: 1 is the lowest level, the highest level depend phase and operator, if set to 0 , it mean the operator don't have skill
     /// return None if operator not found or phase or level is wrong
     pub(crate) fn load_operator(&self,name:String,elite:usize,level:u32,skill_index:usize,skill_level:usize)->Result<Operator>{
         let ok = self.get_operator_key(&name).ok_or("Operator not found")?;
@@ -170,20 +170,24 @@ impl Loader{
     // fn load_copilot_operator(&self,copilot:Copilot)->Result<Vec<Operator>>{
     //     todo!()
     // }
-    fn operator_phase_generate(&self,name:String,phase:usize,level:u32,skill_index:usize,skill_level:usize,oo:&OfficialOperator)->Result<Operator>{
-        let op = oo.phases.get(phase).ok_or("Phase not found")?;
+    fn operator_phase_generate(&self,name:String,elite:usize,level:u32,skill_index:usize,skill_level:usize,oo:&OfficialOperator)->Result<Operator>{
+        let op = oo.phases.get(elite).ok_or(format!("elite set wrong, elite is {elite} , operator is {name}"))?;
         let max_level =op.max_level;
-        let max_skill_level = match phase{
+        let max_skill_level = match elite{
             0=>4,
             1=>7,
             2=>10,
             _=>0
         }; 
-        if level >= 1 && level <= max_level && skill_level >= 1 && skill_level <= max_skill_level {
+        if level >= 1 && level <= max_level && skill_level>=1 && skill_level <= max_skill_level {
             let mut r= from_value::<OfficialRange>(self.range_table[op.range_id.clone()].clone())?;
             let mut at= from_value::<AttackType>(Value::String(oo.position.clone()))?;
-            let sd=oo.skills.get(skill_index-1).ok_or("Skill not found")?;
-            let mut s=self.operator_skill_generate(sd.skill_id.clone(),skill_level-1)?;
+            let mut skill = if skill_index==0{
+                Skill::default()
+            }else{
+                let sd=oo.skills.get(skill_index-1).ok_or(format!("Skill not found, operator is {name} skill index is {skill_index}"))?;
+                self.operator_skill_generate(sd.skill_id.clone(),skill_level-1)?
+            };
             let mut o =Operator::default();
             let upper = &op.attributes_key_frames[1].data;
             let mut data = op.attributes_key_frames[0].data.clone();
@@ -202,8 +206,9 @@ impl Loader{
             o.name=name;
             return  Ok(o);
         }else{
-            Err("Level or skill level out of range,max_level is {max_level},max_skill_level is {max_skill_level}".into())
+            return Err("Level or skill level out of range,max_level is {max_level},max_skill_level is {max_skill_level}".into())
         }
+        todo!("skill not implement")
     }
 
     fn operator_skill_generate(&self,skill_id:String,skill_level:usize)->Result<Skill>{
@@ -269,11 +274,8 @@ mod test{
     use super::Loader;
     #[test]
     fn loader_test(){
-        if let Ok(l)=Loader::new("./ArknightsGameData"){
-            let oo=l.load_operator("Shu".into(),2,30,2,8).unwrap();
-            println!("{:?}",oo)  ;
-        }else{
-            println!("wrong data path in loader test");
-        }
+        let l=Loader::new("./ArknightsGameData").unwrap();
+        let oo=l.load_operator("风笛".into(),2,30,2,8).unwrap();
+        println!("{:?}",oo)  ;
     }
 }

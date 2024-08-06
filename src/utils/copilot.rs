@@ -157,34 +157,39 @@ impl Copilot {
         let json = load_json_file(copilot_path)?;
         let copilot_data: CopilotData = serde_json::from_value(json)?; 
         let loader = Loader::new(game_data_path)?;
-        let level_name =format!("level_{}.json",copilot_data.stage_name);
-        let mut calculator = loader.load_level(level_name)?;
+        let mut calculator = loader.load_level(copilot_data.stage_name.clone())?;
         for o in copilot_data.operators.iter(){
-            let skill = o.skill.unwrap_or(1);
+            let skill_index = o.skill.unwrap_or(0);
             let (level,elite,skill_level)= match &o.requirement{
                 Some(r)=>(
                     r.level.unwrap_or(1),
                     r.elite.unwrap_or(0),
                     r.skill_level.unwrap_or(1)),
-                None=>(1,1,1),
+                None=>(1,0,1),
             };
             let op = loader.load_operator(o.name.clone(),
-                elite as usize,level as u32 ,skill as usize ,skill_level as usize)?;
+                elite as usize,
+                level as u32 ,
+                skill_index as usize ,
+                skill_level as usize)?;
             calculator.frame_vec[0].operator_undeploy.insert(op.name.clone(), Rc::new(RefCell::new(op)));
 
         }
         for g in copilot_data.groups.iter(){
             if let Some(o) = g.operators.choose(&mut thread_rng()){
-                let skill = o.skill.unwrap_or(1);
+                let skill_index = o.skill.unwrap_or(0);
                 let (level,elite,skill_level)= match &o.requirement{
                     Some(r)=>(
                         r.level.unwrap_or(1),
                         r.elite.unwrap_or(0),
                         r.skill_level.unwrap_or(1)),
-                    None=>(1,1,1),
+                    None=>(1,0,1),
                 };
                 let op = loader.load_operator(o.name.clone(),
-                    elite as usize,level as u32 ,skill as usize ,skill_level as usize)?;
+                    elite as usize,
+                    level as u32 ,
+                    skill_index as usize ,
+                    skill_level as usize)?;
                 calculator.frame_vec[0].operator_undeploy.insert(op.name.clone(), Rc::new(RefCell::new(op)));
             }
         } 
