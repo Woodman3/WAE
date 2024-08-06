@@ -30,7 +30,7 @@ impl Loader{
         let mut enemy_database_j = load_json_file(path.join("levels/enemydata/enemy_database.json"))?;
         enemy_database_j = std::mem::take(&mut enemy_database_j["enemies"]); 
         let enemy_database_v =from_value::<Vec<OfficialEnemy>>(enemy_database_j)?;
-        let enemy_database = enemy_database_v.into_iter().map(|enemy| (enemy.Key,enemy.Value)).collect();
+        let enemy_database = enemy_database_v.into_iter().map(|enemy| (enemy.key,enemy.value)).collect();
         Ok(Loader {
             path,
             character_table,

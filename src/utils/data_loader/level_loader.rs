@@ -29,54 +29,59 @@ use super::Loader;
 use crate::map::tile::{LayoutCode,TileHeight,TileBuildable,TilePassable,TileKey};
 
 #[derive(Deserialize,Default,Debug)]
+#[serde(rename_all = "camelCase")]
 struct OfficialLevelData{
     pub(super) options:Value,
-    pub(super) mapData: OfficialMapData,
+    pub(super) map_data: OfficialMapData,
     pub(super) routes:Vec<OfficialRoute>,
-    pub(super) enemyDbRefs:Vec<OfficialEnemyDbRef>,
+    pub(super) enemy_db_refs:Vec<OfficialEnemyDbRef>,
     pub(super) waves:Vec<OfficialWave>,
-    pub(super) randomSeed:u32,
+    pub(super) random_seed:u32,
 }
 
 #[derive(Deserialize,Default,Debug,Clone)]
+#[serde(rename_all = "camelCase")]
 struct OfficialMapData {
     pub(super) map:Vec<Vec<u64>>,
     pub(super) tiles:Vec<OfficialTile>,
 }
 
 #[derive(Deserialize,Default,Debug,Clone,Copy)]
+#[serde(rename_all = "camelCase")]
 struct OfficialTile {
-    pub(super) tileKey:TileKey,
-    pub(super) heightType:TileHeight,
-    pub(super) buildableType:TileBuildable,
-    pub(super) passableMask:TilePassable,
+    pub(super) tile_key:TileKey,
+    pub(super) height_type:TileHeight,
+    pub(super) buildable_type:TileBuildable,
+    pub(super) passable_mask:TilePassable,
     // pub(super) blackboard:String,
     // pub(super) effects:Vec<OfficalEffect>,
     // it also has a palyerSideMask,but up to 2024/7/29, all its value is "ALL",so i ignore it
 }
 
 #[derive(Deserialize,Default,Debug)]
+#[serde(rename_all = "camelCase")]
 struct OfficialRoute {
-    pub(super) motionMode:Route,
-    pub(super) startPosition:Grid,
-    pub(super) endPosition:Grid,
-    pub(super) spawnRandomRange:Point,
-    pub(super) spawnOffset:Point,
+    pub(super) motion_mode:Route,
+    pub(super) start_position:Grid,
+    pub(super) end_position:Grid,
+    pub(super) spawn_random_range:Point,
+    pub(super) spawn_offset:Point,
     pub(super) checkpoints:Option<Vec<OfficialCheckPoint>>,
-    pub(super) allowDiagonalMove: bool,
-    pub(super) visitEveryTileCenter: bool,
-    pub(super) visitEveryNodeCenter: bool,
-    pub(super) visitEveryCheckPoint: bool,
+    pub(super) allow_diagonal_move: bool,
+    pub(super) visit_every_tile_center: bool,
+    pub(super) visit_every_node_center: bool,
+    pub(super) visit_every_check_point: bool,
 }
 
 #[derive(Deserialize,Default,Debug)]
+#[serde(rename_all = "camelCase")]
 struct OfficialCheckPoint{
     #[serde(alias="type")]
     pub(super) tag:CheckPoint,
     pub(super) time :f64,
     pub(super) position:Grid,
-    pub(super) reachOffset:Point,
-    pub(super) reachDistance:f64,
+    pub(super) reach_offset:Point,
+    pub(super) reach_distance:f64,
 }
 
 #[derive(Serialize,Deserialize,Debug,Default,Clone,Copy,PartialEq)]
@@ -104,14 +109,16 @@ enum CheckPoint{
     PatrolMove
 }
 #[derive(Deserialize,Default,Debug)]
+#[serde(rename_all = "camelCase")]
 struct OfficialEnemyDbRef {
-    pub(super) useDb:bool,
+    pub(super) use_db:bool,
     pub(super) id:String,
     pub(super) level:i32,
-    pub(super) overwrittenData:Option<Value>,
+    pub(super) overwritten_data:Option<Value>,
 }
 
 #[derive(Deserialize,Default,Debug)]
+#[serde(rename_all = "camelCase")]
 struct OfficialWave {
     pub(super) preDelay:f32,
     pub(super) postDelay:f32,
@@ -119,18 +126,20 @@ struct OfficialWave {
 }
 
 #[derive(Deserialize,Default,Debug)]
+#[serde(rename_all = "camelCase")]
 struct OfficialWaveFragment {
-    pub(super) preDelay:f32,
+    pub(super) pre_delay:f32,
     pub(super) actions:Vec<OfficialWaveAction>,
 
 }
 
 #[derive(Deserialize,Default,Debug)]
+#[serde(rename_all = "camelCase")]
 struct OfficialWaveAction {
     // story,display enemy info,and so on,it seems not related to the enemy behavior
-    pub(super) actionType:String,
-    pub(super) preDelay:f32,
-    pub(super) routeIndex:u32,
+    pub(super) action_type:String,
+    pub(super) pre_delay:f32,
+    pub(super) route_index:u32,
 
 }
 
@@ -154,18 +163,18 @@ fn find_file_in_dir(dir: &Path, file_name: &str) -> Result<String> {
 impl Into<LayoutCode> for OfficialTile {
     fn into(self)->LayoutCode{
         let mut c=0;
-        c |= self.tileKey as u64;
+        c |= self.tile_key as u64;
         // up to 2024/7/29,all of (TileBuildable,TilePassable)  have only 4 value :
         // [(None, Highland), (None, Lowland), (Melee, Lowland), (Ranged, Highland)]
-        c |= match self.heightType {
+        c |= match self.height_type {
             TileHeight::Lowland => DEPLOY_LOW,
             TileHeight::Highland => DEPLOY_HIGH,
         };
-        c |= match self.buildableType {
+        c |= match self.buildable_type {
             TileBuildable::None => DEPLOY_NONE,
             _ => 0,
         };
-        c |= match self.passableMask {
+        c |= match self.passable_mask {
             TilePassable::FlyOnly => PASS_FLY,
             TilePassable::All => PASS_ALL,
             _ => 0,
@@ -204,7 +213,7 @@ impl Loader{
         Ok(level)
     }
     fn load_map(&self,level:&OfficialLevelData)->Result<Map>{
-        let map:Map= level.mapData.clone().into();
+        let map:Map= level.map_data.clone().into();
         Ok(map)
     }
 
@@ -213,7 +222,7 @@ impl Loader{
         let level = self.find_level(level_name)?;
         let map = self.load_map(&level)?;
         let mut enemy_initial=HashMap::new();
-        for e in level.enemyDbRefs.iter(){
+        for e in level.enemy_db_refs.iter(){
             let enemy = self.load_official_enemy(&e.id,e.level as usize)?;
             enemy_initial.insert(e.id.clone(),enemy );
         }
@@ -285,8 +294,8 @@ mod test{
     fn test_load_level(){
         let path = "./ArknightsGameData";
         let loader = Loader::new(path).unwrap();
-        let level = loader.load_level("act5d0_ex07".to_string()).unwrap();
-        // let level = loader.load_level("main_00-07".to_string()).unwrap();
+        // let level = loader.load_level("act5d0_ex07".to_string()).unwrap();
+        let level = loader.load_level("main_00-07".to_string()).unwrap();
         println!("{:?}",level);
     }
 

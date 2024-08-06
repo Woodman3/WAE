@@ -8,54 +8,58 @@ use super::Loader;
 use super::Result;
 
 #[derive(Deserialize,Default,Debug,Clone)]
+#[serde(rename_all = "PascalCase")]
 pub(super) struct OfficialEnemy{
-    pub(super) Key:String,
-    pub(super) Value:Vec<OfficialEnemyValue>
+    pub(super) key:String,
+    pub(super) value:Vec<OfficialEnemyValue>
 }
 
 #[derive(Deserialize,Default,Debug,Clone)]
+#[serde(rename_all = "camelCase")]
 pub(super) struct OfficialEnemyValue{
     pub(super) level:i32,
-    pub(super) enemyData:OfficialEnemyData, 
+    pub(super) enemy_data:OfficialEnemyData, 
 }
 
 #[derive(Deserialize,Default,Debug,Clone)]
+#[serde(rename_all = "camelCase")]
 pub(super) struct OfficialEnemyData{
     pub(super) name:OfficialEnemyDataTemplate<String>,
-    pub(super) applyWay:OfficialEnemyDataTemplate<String>,
+    pub(super) apply_way:OfficialEnemyDataTemplate<String>,
     pub(super) motion:OfficialEnemyDataTemplate<String>,
-    pub(super) lifePointReduce:OfficialEnemyDataTemplate<u64>,
+    pub(super) life_point_reduce:OfficialEnemyDataTemplate<u64>,
     pub(super) attributes:OfficialEnemyAttribute,
 }
 
 #[derive(Deserialize,Default,Debug,Clone)]
+#[serde(rename_all = "camelCase")]
 pub(super) struct OfficialEnemyAttribute{
-    pub(super) maxHp:OfficialEnemyDataTemplate<i64>,
+    pub(super) max_hp:OfficialEnemyDataTemplate<i64>,
     pub(super) atk:OfficialEnemyDataTemplate<i64>,
     pub(super) def:OfficialEnemyDataTemplate<i64>,
-    pub(super) magicResistance:OfficialEnemyDataTemplate<f64>,
+    pub(super) magic_resistance:OfficialEnemyDataTemplate<f64>,
     pub(super) cost:OfficialEnemyDataTemplate<i64>,
-    pub(super) blockCnt:OfficialEnemyDataTemplate<i64>,
-    pub(super) moveSpeed:OfficialEnemyDataTemplate<f64>,
-    pub(super) attackSpeed:OfficialEnemyDataTemplate<f64>,
-    pub(super) baseAttackTime:OfficialEnemyDataTemplate<f64>,
-    pub(super) respawnTime:OfficialEnemyDataTemplate<i64>,
-    pub(super) hpRecoveryPerSec:OfficialEnemyDataTemplate<f64>,
-    pub(super) spRecoveryPerSec:OfficialEnemyDataTemplate<f64>,
-    pub(super) maxDeployCount:OfficialEnemyDataTemplate<i64>,
-    pub(super) massLevel:OfficialEnemyDataTemplate<i64>,
-    pub(super) baseForceLevel:OfficialEnemyDataTemplate<i64>,
-    pub(super) tauntLevel:OfficialEnemyDataTemplate<i64>,
-    pub(super) epDamageResistance:OfficialEnemyDataTemplate<f64>,
-    pub(super) epResistance:OfficialEnemyDataTemplate<f64>,
-    pub(super) damageHitratePhysical:OfficialEnemyDataTemplate<f64>,
-    pub(super) damageHitrateMagical:OfficialEnemyDataTemplate<f64>,
-    pub(super) stunImmune:OfficialEnemyDataTemplate<bool>,
-    pub(super) silenceImmune:OfficialEnemyDataTemplate<bool>,
-    pub(super) sleepImmune:OfficialEnemyDataTemplate<bool>,
-    pub(super) frozenImmune:OfficialEnemyDataTemplate<bool>,
-    pub(super) levitateImmune:OfficialEnemyDataTemplate<bool>,
-    pub(super) disarmedCombatImmune:OfficialEnemyDataTemplate<bool>,
+    pub(super) block_cnt:OfficialEnemyDataTemplate<i64>,
+    pub(super) move_speed:OfficialEnemyDataTemplate<f64>,
+    pub(super) attack_speed:OfficialEnemyDataTemplate<f64>,
+    pub(super) base_attack_time:OfficialEnemyDataTemplate<f64>,
+    pub(super) respawn_time:OfficialEnemyDataTemplate<i64>,
+    pub(super) hp_recovery_per_sec:OfficialEnemyDataTemplate<f64>,
+    pub(super) sp_recovery_per_sec:OfficialEnemyDataTemplate<f64>,
+    pub(super) max_deploy_count:OfficialEnemyDataTemplate<i64>,
+    pub(super) mass_level:OfficialEnemyDataTemplate<i64>,
+    pub(super) base_force_level:OfficialEnemyDataTemplate<i64>,
+    pub(super) taunt_level:OfficialEnemyDataTemplate<i64>,
+    pub(super) ep_damage_resistance:OfficialEnemyDataTemplate<f64>,
+    pub(super) ep_resistance:OfficialEnemyDataTemplate<f64>,
+    pub(super) damage_hitrate_physical:OfficialEnemyDataTemplate<f64>,
+    pub(super) damage_hitrate_magical:OfficialEnemyDataTemplate<f64>,
+    pub(super) stun_immune:OfficialEnemyDataTemplate<bool>,
+    pub(super) silence_immune:OfficialEnemyDataTemplate<bool>,
+    pub(super) sleep_immune:OfficialEnemyDataTemplate<bool>,
+    pub(super) frozen_immune:OfficialEnemyDataTemplate<bool>,
+    pub(super) levitate_immune:OfficialEnemyDataTemplate<bool>,
+    pub(super) disarmed_combat_immune:OfficialEnemyDataTemplate<bool>,
 }
 
 #[derive(Deserialize,Default,Debug,Clone)]
@@ -64,6 +68,30 @@ pub(super) struct OfficialEnemyDataTemplate<T>
     pub(super) m_defined:bool,
     pub(super) m_value:Option<T>,
 }
+
+// impl Add for OfficialEnemyAttribute{
+//     type Output = Self;
+//     fn add(self,other:Self) -> Self{
+//         let max_hp = self.maxHp+other.maxHp;
+//         let atk = self.atk+other.atk;
+//         let def = self.def+other.def;
+//         let magic_resist = self.magicResistance+other.magicResistance;
+//         let attack_time = self.baseAttackTime+other.baseAttackTime;
+//         let block_num = self.blockCnt+other.blockCnt;
+//         let aspd = self.attackSpeed+other.attackSpeed;
+
+//         Self{
+//             maxHp:max_hp,
+//             atk,
+//             def,
+//             magicResistance:magic_resist,
+//             baseAttackTime:attack_time,
+//             blockCnt:block_num,
+//             attackSpeed:aspd,
+//             ..Default::default()
+//         }
+//     }
+// }
 
 /// right value will overwrite left value if it is defined 
 impl<T> Add for OfficialEnemyDataTemplate<T>{
@@ -88,7 +116,7 @@ impl Into<Enemy> for OfficialEnemyData {
     fn into(self) -> Enemy {
         let name = self.name.m_value.unwrap();
         let att = self.attributes;
-        let move_speed = att.moveSpeed.m_value.unwrap();
+        let move_speed = att.move_speed.m_value.unwrap();
         let info:UnitInfo = att.into(); 
         let stage = info.clone();
         Enemy{
@@ -106,13 +134,13 @@ impl Into<UnitInfo> for OfficialEnemyAttribute{
         use crate::unit::skill::effect::DamageType;
         use crate::unit::skill::skill_type::AttackType;
     
-        let max_hp = self.maxHp.m_value.unwrap();
+        let max_hp = self.max_hp.m_value.unwrap();
         let atk = self.atk.m_value.unwrap();
         let def = self.def.m_value.unwrap();
-        let magic_resist = self.magicResistance.m_value.unwrap();
-        let attack_time = self.baseAttackTime.m_value.unwrap();
-        let block_num = self.blockCnt.m_value.unwrap();
-        let aspd = self.attackSpeed.m_value.unwrap();
+        let magic_resist = self.magic_resistance.m_value.unwrap();
+        let attack_time = self.base_attack_time.m_value.unwrap();
+        let block_num = self.block_cnt.m_value.unwrap();
+        let aspd = self.attack_speed.m_value.unwrap();
         let damage_type = DamageType::None;
         let attack_type = AttackType::None;
         UnitInfo{
@@ -135,7 +163,7 @@ impl Loader{
     pub(crate) fn load_official_enemy(&self,key:&String,level:usize) -> Result<Enemy> {
         let data = self.enemy_database.get(key).ok_or("Key not found")?;
         let enemy = data.get(level).ok_or("Level not found")?;
-        Ok(enemy.enemyData.clone().into())
+        Ok(enemy.enemy_data.clone().into())
     }
     
 }

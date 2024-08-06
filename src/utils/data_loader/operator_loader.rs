@@ -18,51 +18,55 @@ use super::Result;
 use super::Loader;
 
 #[derive(Deserialize,Default,Debug)]
+#[serde(rename_all = "camelCase")]
 struct OfficialOperator{
     pub(super) name:String,
-    pub(super) displayNumber:String,
+    pub(super) display_number:String,
     pub(super) appellation:String,
     pub(super) phases:Vec<OfficialPhase>,
     pub(super) skills:Vec<OfficialSkillsDescription>,
-    pub(super) subProfessionId:String,
+    pub(super) sub_profession_id:String,
     pub(super) position:String,
 }
 #[derive(Deserialize,Default,Debug)]
+#[serde(rename_all = "camelCase")]
 struct OfficialPhase{
-    pub(super) rangeId:String,
-    pub(super) maxLevel:u32,
-    pub(super) attributesKeyFrames:Vec<OfficialKeyFrame>
+    pub(super) range_id:String,
+    pub(super) max_level:u32,
+    pub(super) attributes_key_frames:Vec<OfficialKeyFrame>
 }
 #[derive(Deserialize,Default,Debug)]
+#[serde(rename_all = "camelCase")]
 struct OfficialKeyFrame{
     pub(super) level:u32,
     pub(super) data:OfficialData 
 }
 #[derive(Deserialize,Default,Debug,Clone)]
+#[serde(rename_all = "camelCase")]
 struct OfficialData{
-    pub(super) maxHp:i64,
+    pub(super) max_hp:i64,
     pub(super) atk:i64,
     pub(super) def:i64,
-    pub(super) magicResistance:f64,
+    pub(super) magic_resistance:f64,
     pub(super) cost:i64,
-    pub(super) blockCnt: i64,
-    pub(super) moveSpeed: f64,
-    pub(super) attackSpeed: f64,
-    pub(super) baseAttackTime: f64,
-    pub(super) respawnTime: i64,
-    pub(super) hpRecoveryPerSec: f32,
-    pub(super) spRecoveryPerSec: f32,
-    pub(super) maxDeployCount: f32,
-    pub(super) maxDeckStackCnt: f32,
-    pub(super) tauntLevel: i64,
-    pub(super) massLevel: i64,
-    pub(super) baseForceLevel: i64,
-    pub(super) stunImmune: bool,
-    pub(super) silenceImmune: bool,
-    pub(super) sleepImmune: bool ,
-    pub(super) frozenImmune: bool,
-    pub(super) levitateImmune: bool,
-    pub(super) disarmedCombatImmune: bool,
+    pub(super) block_cnt: i64,
+    pub(super) move_speed: f64,
+    pub(super) attack_speed: f64,
+    pub(super) base_attack_time: f64,
+    pub(super) respawn_time: i64,
+    pub(super) hp_recovery_per_sec: f32,
+    pub(super) sp_recovery_per_sec: f32,
+    pub(super) max_deploy_count: f32,
+    pub(super) max_deck_stack_cnt: f32,
+    pub(super) taunt_level: i64,
+    pub(super) mass_level: i64,
+    pub(super) base_force_level: i64,
+    pub(super) stun_immune: bool,
+    pub(super) silence_immune: bool,
+    pub(super) sleep_immune: bool ,
+    pub(super) frozen_immune: bool,
+    pub(super) levitate_immune: bool,
+    pub(super) disarmed_combat_immune: bool,
 }
 
 #[derive(Deserialize,Default,Debug)]
@@ -71,31 +75,35 @@ struct OfficialRange{
 }
 
 #[derive(Deserialize,Default,Debug)]
+#[serde(rename_all = "camelCase")]
 struct OfficialSkillsDescription{
-    pub(super) skillId:String,
+    pub(super) skill_id:String,
 }
 
 #[derive(Deserialize,Default,Debug)]
+#[serde(rename_all = "camelCase")]
 struct OfficialSkill{
-    rangeId:String,
-    skillType:String,
-    durationType:String,
+    range_id:String,
+    skill_type:String,
+    duration_type:String,
     duration:f64,
-    spData:OfficialSpData,
+    sp_data:OfficialSpData,
     blackboard:Vec<OfficialBlackBoard>,
 }
 
 #[derive(Deserialize,Default,Debug)]
+#[serde(rename_all = "camelCase")]
 struct OfficialSpData{
-    spType:String,
-    levelUpCost:Option<u32>,
-    maxChargeTime:u32,
-    spCost:u32,
-    initSp:u32,
+    sp_type:String,
+    level_up_cost:Option<u32>,
+    max_charge_time:u32,
+    sp_cost:u32,
+    init_sp:u32,
     increment:f32,
 }
 
 #[derive(Deserialize,Default,Debug)]
+#[serde(rename_all = "camelCase")]
 struct OfficialBlackBoard{
     key:String,
     value:f64,
@@ -105,14 +113,14 @@ struct OfficialBlackBoard{
 impl Into<UnitInfo> for OfficialData{
     fn into(self) -> UnitInfo {
         UnitInfo{
-            hp: self.maxHp ,
-            max_hp: self.maxHp,
-            aspd: self.attackSpeed,
+            hp: self.max_hp ,
+            max_hp: self.max_hp,
+            aspd: self.attack_speed,
             atk: self.atk,
             def: self.def,
-            magic_resist: self.magicResistance,
-            attack_time: self.baseAttackTime,
-            block_num: self.blockCnt,
+            magic_resist: self.magic_resistance,
+            attack_time: self.base_attack_time,
+            block_num: self.block_cnt,
             //damage_type and attack_type should init by other way
             ..Default::default()
         }
@@ -121,13 +129,13 @@ impl Into<UnitInfo> for OfficialData{
 
 impl Into<Skill> for OfficialSkill{
     fn into(self) -> Skill {
-        let trigger_type:TriggerType = match self.skillType.as_str(){
+        let trigger_type:TriggerType = match self.skill_type.as_str(){
             "AUTO"=>TriggerType::Auto,
             "MANUAL"=>TriggerType::Manual,
             "PASSIVE"=>TriggerType::Passive,
             _=>TriggerType::None
         };
-        let charge_type:ChargeType = match self.spData.spType.as_str(){
+        let charge_type:ChargeType = match self.sp_data.sp_type.as_str(){
             "INCREASE_WITH_TIME"=>ChargeType::Time,
             "INCREASE_WITH_ATTACK"=>ChargeType::Attack,
             "INCREASE_WITH_BE_HIT"=>ChargeType::BeHit,
@@ -135,8 +143,8 @@ impl Into<Skill> for OfficialSkill{
         };
         Skill{
             duration:self.duration,
-            sp:self.spData.initSp as f64,
-            sp_cost:self.spData.spCost as f64,
+            sp:self.sp_data.init_sp as f64,
+            sp_cost:self.sp_data.sp_cost as f64,
             trigger_type,
             charge_type,
             ..Default::default()
@@ -154,7 +162,7 @@ impl Loader{
         let ok = self.get_operator_key(&name).ok_or("Operator not found")?;
         let oo= from_value::<OfficialOperator>(self.character_table[ok].clone())?;
         let mut o=self.operator_phase_generate(name,elite,level,skill_index,skill_level,&oo)?;
-        let sp=from_value::<DamageType>(self.gamedata_const["subProfessionDamageTypePairs"][oo.subProfessionId.clone()].clone())?;
+        let sp=from_value::<DamageType>(self.gamedata_const["subProfessionDamageTypePairs"][oo.sub_profession_id.clone()].clone())?;
         o.info.damage_type=sp;
         o.stage.damage_type=sp;
         return Ok(o);
@@ -164,7 +172,7 @@ impl Loader{
     // }
     fn operator_phase_generate(&self,name:String,phase:usize,level:u32,skill_index:usize,skill_level:usize,oo:&OfficialOperator)->Result<Operator>{
         let op = oo.phases.get(phase).ok_or("Phase not found")?;
-        let max_level =op.maxLevel;
+        let max_level =op.max_level;
         let max_skill_level = match phase{
             0=>4,
             1=>7,
@@ -172,15 +180,15 @@ impl Loader{
             _=>0
         }; 
         if level >= 1 && level <= max_level && skill_level >= 1 && skill_level <= max_skill_level {
-            let mut r= from_value::<OfficialRange>(self.range_table[op.rangeId.clone()].clone())?;
+            let mut r= from_value::<OfficialRange>(self.range_table[op.range_id.clone()].clone())?;
             let mut at= from_value::<AttackType>(Value::String(oo.position.clone()))?;
             let sd=oo.skills.get(skill_index-1).ok_or("Skill not found")?;
-            let mut s=self.operator_skill_generate(sd.skillId.clone(),skill_level-1)?;
+            let mut s=self.operator_skill_generate(sd.skill_id.clone(),skill_level-1)?;
             let mut o =Operator::default();
-            let upper = &op.attributesKeyFrames[1].data;
-            let mut data = op.attributesKeyFrames[0].data.clone();
+            let upper = &op.attributes_key_frames[1].data;
+            let mut data = op.attributes_key_frames[0].data.clone();
             let change = (level - 1) as f64 / (max_level - 1) as f64;
-            data.maxHp += ((upper.maxHp - data.maxHp) as f64 * change) as i64;
+            data.max_hp += ((upper.max_hp - data.max_hp) as f64 * change) as i64;
             data.atk += ((upper.atk - data.atk) as f64  * change) as i64;
             data.def += ((upper.def - data.def) as f64 * change) as i64;
             let mut ui: UnitInfo = data.into();
@@ -188,7 +196,7 @@ impl Loader{
             let s = Scope { 0: r.merge() };
             o.attack_scope = s.clone();
             o.search_scope = s;
-            o.re_deploy=upper.respawnTime as f32;
+            o.re_deploy=upper.respawn_time as f32;
             o.info=ui.clone();
             o.stage=ui;
             o.name=name;
@@ -261,7 +269,7 @@ mod test{
     use super::Loader;
     #[test]
     fn loader_test(){
-        if let Ok(l)=Loader::new("./data"){
+        if let Ok(l)=Loader::new("./ArknightsGameData"){
             let oo=l.load_operator("Shu".into(),2,30,2,8).unwrap();
             println!("{:?}",oo)  ;
         }else{
