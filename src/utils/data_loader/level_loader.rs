@@ -1,19 +1,12 @@
-use std::cell::RefCell;
 use std::collections::HashMap;
 use std::collections::VecDeque;
-use std::default;
 use std::i64;
 use std::path::Path;
-use std::path::PathBuf;
-use std::rc::Rc;
 
-use egui::Layout;
-use serde::de;
 use serde_json::Value;
 use serde::{ Deserialize,Serialize };
 
 use crate::calculator::Calculator;
-use crate::frame::EnemyRef;
 use crate::frame::Frame;
 use crate::map::tile::DEPLOY_HIGH;
 use crate::map::tile::DEPLOY_LOW;
@@ -245,7 +238,7 @@ impl Loader{
 
 #[cfg(test)]
 mod test{
-    use std::sync::Arc;
+    
 
     use serde_json::from_value;
 

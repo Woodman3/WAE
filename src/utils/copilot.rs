@@ -1,4 +1,3 @@
-use serde_json::Value;
 use serde::{Deserialize, Serialize};
 use rand::thread_rng;
 use rand::seq::SliceRandom;
@@ -13,7 +12,6 @@ use super::math::Grid;
 use crate::calculator::Calculator;
 use crate::timeline::doctor::{OperatorDeployEvent, OperatorRetreatEvent, OperatorSkillEvent, UnitRetreatEvent, UnitSkillEvent};
 use crate::unit::scope::Toward;
-use crate::unit::skill;
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 #[derive(Debug)]
@@ -206,8 +204,6 @@ impl Copilot {
 
 mod test{
     use super::*;
-    use serde_json::json;
-    use crate::utils::load_json_file;
 
     #[test]
     fn test_copilot(){

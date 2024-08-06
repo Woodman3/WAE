@@ -1,18 +1,13 @@
-use serde::{Deserialize, Serialize};
-use serde_json::{from_str, from_value, Value};
-use std::fs::File;
-use std::io::BufReader;
-use std::path::Path;
-use log::error;
+use serde::{Deserialize};
+use serde_json::{from_value, Value};
 use crate::unit::scope::Scope;
 use crate::unit::skill::effect::DamageType;
 use crate::unit::skill::skill_type::{AttackType, ChargeType};
 use crate::utils::math::Grid;
 use crate::unit::operator::Operator;
-use crate::unit::{Unit, UnitInfo};
+use crate::unit::{UnitInfo};
 use crate::unit::skill::Skill;
 use crate::unit::skill::skill_type::TriggerType;
-use crate::utils::load_json_file;
 use crate::utils::math::GridRect;
 use super::Result;
 use super::Loader;
@@ -181,8 +176,8 @@ impl Loader{
         }; 
         if level >= 1 && level <= max_level && skill_level>=1 && skill_level <= max_skill_level {
             let mut r= from_value::<OfficialRange>(self.range_table[op.range_id.clone()].clone())?;
-            let mut at= from_value::<AttackType>(Value::String(oo.position.clone()))?;
-            let mut skill = if skill_index==0{
+            let at= from_value::<AttackType>(Value::String(oo.position.clone()))?;
+            let skill = if skill_index==0{
                 Skill::default()
             }else{
                 let sd=oo.skills.get(skill_index-1).ok_or(format!("Skill not found, operator is {name} skill index is {skill_index}"))?;
@@ -213,7 +208,7 @@ impl Loader{
 
     fn operator_skill_generate(&self,skill_id:String,skill_level:usize)->Result<Skill>{
         let os=from_value::<OfficialSkill>(self.skill_table[skill_id]["levels"][skill_level].clone())?;
-        let mut s:Skill = os.into();
+        let s:Skill = os.into();
         Ok(s)
     }
 
@@ -222,7 +217,7 @@ impl Loader{
             let en =v["appellation"].as_str().unwrap();
             let cn =v["name"].as_str().unwrap();
             let nr=name.as_str();
-            if(nr==en||nr==cn){
+            if nr==en||nr==cn {
                 return Some(k.clone());
             }
         }
@@ -235,7 +230,7 @@ impl OfficialRange{
         let mut r = Vec::<GridRect>::new();
         let v = &mut self.grids;
         v.sort_by(|a,b| {
-            if(a.col!=b.col){
+            if a.col!=b.col {
                 a.col.cmp(&b.col)
             }else{
                 a.row.cmp(&b.row)

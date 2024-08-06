@@ -3,7 +3,7 @@ use super::scope::{Scope, Toward};
 use std::fmt;
 use std::fmt::{Display, Formatter};
 use std::rc::Weak;
-use log::{trace, warn};
+use log::{trace};
 use serde::{Deserialize, Serialize};
 use serde::ser::Serializer;
 use serde_json::Value;
@@ -88,7 +88,7 @@ impl Operator {
 
 
     pub(super) fn be_damage(&mut self, d: &FixedDamage) {
-        use super::skill::effect::DamageType::*;
+        
         match d.damage_type {
             MAGICAL =>{
                 let damage=(d.value as f64*(1f64-self.stage.magic_resist)) as i64;

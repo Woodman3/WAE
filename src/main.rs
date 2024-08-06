@@ -2,7 +2,6 @@
 // #![allow(unused)]
 // #![allow(dead_code)]
 
-use log::{info, trace, warn};
 use utils::visualizer::Visualizer;
 use utils::data_loader::Loader;
 
@@ -27,7 +26,7 @@ fn main() {
     //     Box::new(Visualizer::new(cc,Ca))}));
     
     let l = Loader::new("ArknightsGameData").unwrap();
-    let mut Ca = l.load_level("level_main_01-01".to_string()).unwrap();
+    let Ca = l.load_level("level_main_01-01".to_string()).unwrap();
     let mut native_config = eframe::NativeOptions::default();
     native_config.viewport.inner_size = vec2(1000.0, 500.0).into();
     eframe::run_native("BEC", native_config, Box::new(|cc| {
@@ -39,10 +38,10 @@ fn main() {
 #[cfg(test)]
 mod test{
     use super::*;
-    use log::{info, trace, warn};
-    use utils::data_loader::Loader;
-    use crate::utils::visualizer::Visualizer;
-    use eframe::egui::vec2;
+    
+    
+    
+    
     // #[test]
     // fn test_loader(){
     //     env_logger::init();

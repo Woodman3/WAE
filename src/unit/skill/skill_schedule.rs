@@ -14,7 +14,7 @@ use crate::utils::math::Point;
 
 impl Operator{
     fn shoot(&mut self, idx:usize, f:&mut Frame){
-        use crate::unit::skill::skill_type::AttackType::*;
+        
         match &self.skill_ready[idx].skill_entity {
             SkillEntity::ToEnemySkill(s) => {
                 for t in s.target.iter(){

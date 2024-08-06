@@ -1,5 +1,4 @@
 use crate::map::ENEMY_TOUCH_SIZE;
-use eframe::egui::Color32;
 use tiny_skia::Color;
 use lazy_static::lazy_static;
 

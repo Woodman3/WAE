@@ -7,7 +7,6 @@ use crate::frame::{Frame, OperatorRef};
 use crate::unit::scope::Toward;
 use crate::utils::error::ConfigParseError;
 use crate::utils::math::Grid;
-use crate::utils::copilot::{};
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 #[derive(Debug,Clone,Default)]

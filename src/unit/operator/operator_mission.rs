@@ -13,7 +13,7 @@ use crate::utils::math::Point;
 impl Operator{
     pub(super) fn attack(&mut self,f:&mut Frame){
         if let Some(e)=self.target.upgrade(){
-            use super::super::skill::skill_type::AttackType::*;
+            
             match self.stage.attack_type {
                 MELEE=>{
                     let d= FixedDamage {

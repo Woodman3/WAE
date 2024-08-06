@@ -12,7 +12,7 @@ impl<'a> Render<'a> {
         let map_height = f.map.height;
         let figure_width = map_width as u32 * BLOCK_SIZE as u32 + PADING as u32 * 2;
         let figure_height = map_height as u32 * BLOCK_SIZE as u32 + PADING as u32 * 2;
-        let mut pixmap = Pixmap::new(figure_width, figure_height).unwrap();
+        let pixmap = Pixmap::new(figure_width, figure_height).unwrap();
         Self {
             frame: f,
             pixmap,
@@ -40,21 +40,21 @@ impl<'a> Render<'a> {
             for j in 0..self.frame.map.width as usize{
                 let block = self.frame.map.layout[i][j];
                 let mut block_paint = Paint::default();
-                let mut r= match block&PASS_ALL{
+                let r= match block&PASS_ALL{
                     0 => 255,
                     _ => 0,
                 };
-                let mut g=match block&DEPLOY_NONE{
+                let g=match block&DEPLOY_NONE{
                     0 => 255,
                     _ => 0,
                 };
-                let mut b =match block&DEPLOY_LOW{
+                let b =match block&DEPLOY_LOW{
                     0 => 255,
                     _ => 0,
                 };
-                let mut a = 255;
+                let a = 255;
                 block_paint.set_color(Color::from_rgba8(r, g, b, a));
-                let mut pb = PathBuilder::new();
+                let pb = PathBuilder::new();
                 let x = PADING + j as f32 * BLOCK_SIZE;
                 let y = PADING + i as f32 * BLOCK_SIZE;
                 self.pixmap.fill_rect(
@@ -135,7 +135,7 @@ impl<'a> Render<'a> {
 
 #[cfg(test)]
 mod test{
-    use tiny_skia::*;
-    use super::*; 
+    
+     
 
 }

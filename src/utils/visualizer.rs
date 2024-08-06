@@ -1,15 +1,9 @@
 use eframe::egui;
-use egui::epaint::textures;
-use egui::include_image;
-use egui::load::Bytes;
 use crate::frame::Frame;
-use eframe::egui::{Context, Painter, pos2, Pos2, Rangef, Rect, Sense, Stroke, TextFormat, Ui, vec2};
-use eframe::epaint::{Color32};
+use eframe::egui::{Context, Painter, TextFormat, Ui};
 use egui_extras::install_image_loaders;
 use crate::calculator::Calculator;
-use super::visualizer_config::*;
 use super::render::Render;
-use std::env;
 
 pub struct Visualizer{
     pub c:Calculator,

@@ -1,9 +1,8 @@
 use std::ops::Add;
 
 use serde::Deserialize;
-use serde_json::from_value;
 
-use crate::unit::{enemy::{self, Enemy}, UnitInfo};
+use crate::unit::{enemy::{Enemy}, UnitInfo};
 use super::Loader;
 use super::Result;
 

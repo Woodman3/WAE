@@ -4,7 +4,6 @@ pub(crate) mod enemy_loader;
 
 use std::{collections::HashMap, path::{Path, PathBuf}};
 use serde_json::{from_value, Value};
-use crate::unit::enemy;
 use super::load_json_file;
 use enemy_loader::{OfficialEnemy,OfficialEnemyValue};
 
@@ -43,7 +42,7 @@ impl Loader{
 }
 
 mod test{
-    use super::*;
+    use super::*; 
     #[test]
     fn test_loader(){
         let path = "./ArknightsGameData";

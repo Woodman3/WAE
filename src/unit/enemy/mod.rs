@@ -4,13 +4,12 @@ use crate::utils::math;
 use serde_json::Value;
 use std::fmt;
 use std::rc::{Rc, Weak};
-use log::{error, trace, warn};
+use log::{trace};
 use serde::{Deserialize, Serialize};
 use serde::ser::Serializer;
 use crate::calculator::PERIOD;
 use crate::frame::{Frame, OperatorRef};
 use crate::unit::bullet::Bullet;
-use crate::unit::skill;
 use crate::unit::code::DIE;
 use crate::unit::skill::effect::FixedDamage;
 use crate::unit::operator::OperatorShared;
@@ -67,7 +66,7 @@ impl Enemy {
         if self.stage.attack_time>0.0{
             self.stage.attack_time-=PERIOD;
         }else {
-            use skill::skill_type::AttackType::*;
+            
             match self.stage.attack_type {
                 MELEE=>{
                     let d= FixedDamage {
@@ -134,7 +133,7 @@ impl Enemy{
         self.be_damage(&b.damage);
     }
     pub(super) fn be_damage(&mut self, d: &FixedDamage) {
-        use super::skill::effect::DamageType::*;
+        
         match d.damage_type {
             MAGICAL =>{
                 let damage=(d.value as f64*(1.0-self.stage.magic_resist)) as i64;
