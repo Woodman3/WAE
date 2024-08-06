@@ -140,7 +140,6 @@ struct OfficialWaveAction {
     pub(super) action_type:String,
     pub(super) pre_delay:f32,
     pub(super) route_index:u32,
-
 }
 
 
@@ -177,7 +176,6 @@ impl Into<LayoutCode> for OfficialTile {
         c |= match self.passable_mask {
             TilePassable::FlyOnly => PASS_FLY,
             TilePassable::All => PASS_ALL,
-            _ => 0,
         }; 
         c
     }
@@ -241,7 +239,7 @@ impl Loader{
             enemy_initial,
         };
         return Ok(c);
-        todo!("load level")
+        todo!("load route")
     }
 }
 

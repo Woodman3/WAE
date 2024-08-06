@@ -1,6 +1,6 @@
-#![allow(non_snake_case)]
-#![allow(unused)]
-#![allow(dead_code)]
+// #![allow(non_snake_case)]
+// #![allow(unused)]
+// #![allow(dead_code)]
 
 use log::{info, trace, warn};
 use utils::visualizer::Visualizer;
