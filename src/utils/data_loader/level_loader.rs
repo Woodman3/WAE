@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::collections::VecDeque;
 use std::i64;
 use std::path::Path;
+use std::rc::Rc;
 
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -17,6 +18,12 @@ use crate::map::tile::PASS_ALL;
 use crate::map::tile::PASS_FLY;
 use crate::map::tile::{LayoutCode, TileBuildable, TileHeight, TileKey, TilePassable};
 use crate::map::Map;
+use crate::route::CheckPoint;
+use crate::route::Route;
+use crate::timeline;
+use crate::timeline::hostile::EnemyPlaceEvent;
+use crate::timeline::EventWithTime;
+use crate::unit::enemy::Enemy;
 use crate::utils::load_json_file;
 use crate::utils::math::Grid;
 use crate::utils::math::Point;
@@ -51,7 +58,7 @@ struct OfficialTile {
     // it also has a palyerSideMask,but up to 2024/7/29, all its value is "ALL",so i ignore it
 }
 
-#[derive(Deserialize, Default, Debug)]
+#[derive(Deserialize, Default, Debug,Clone)]
 #[serde(rename_all = "camelCase")]
 struct OfficialRoute {
     pub(super) motion_mode: OfficialRouteType,
@@ -66,7 +73,7 @@ struct OfficialRoute {
     pub(super) visit_every_check_point: bool,
 }
 
-#[derive(Deserialize, Default, Debug)]
+#[derive(Deserialize, Default, Debug,Clone)]
 #[serde(rename_all = "camelCase")]
 struct OfficialCheckPoint {
     #[serde(alias = "type")]
@@ -127,10 +134,11 @@ struct OfficialWaveFragment {
 #[derive(Deserialize, Default, Debug)]
 #[serde(rename_all = "camelCase")]
 struct OfficialWaveAction {
-    // story,display enemy info,and so on,it seems not related to the enemy behavior
+    //the value of action type are story,play bgm,display enemy info,and so on,it seems not related to the enemy behavior
     pub(super) action_type: String,
     pub(super) pre_delay: f32,
     pub(super) route_index: u32,
+    pub(super) key:String,
 }
 
 fn find_file_in_dir(dir: &Path, file_name: &str) -> Result<String> {
@@ -149,6 +157,33 @@ fn find_file_in_dir(dir: &Path, file_name: &str) -> Result<String> {
     }
     Err("File not found".into())
 }
+
+impl Into<CheckPoint> for OfficialCheckPoint{
+    fn into(self) -> CheckPoint {
+        match self.tag {
+            OfficialCheckPointType::Move => CheckPoint::Move(self.position.into()),
+            _ => CheckPoint::None,
+        }
+    }
+}
+
+impl Into<Route> for OfficialRoute{
+    fn into(self) -> Route {
+        let mut checkpoints = Vec::new();
+        if let Some(c) = self.checkpoints {
+            for cp in c {
+                checkpoints.push(cp.into());
+            }
+        }
+        Route {
+            start: self.start_position.into(),
+            end: self.end_position.into(),
+            checkpoints,
+        }
+    }
+}
+
+
 impl Into<LayoutCode> for OfficialTile {
     fn into(self) -> LayoutCode {
         let mut c = 0;
@@ -170,6 +205,8 @@ impl Into<LayoutCode> for OfficialTile {
         c
     }
 }
+
+
 
 //todo:there stil have some problem
 impl Into<Map> for OfficialMapData {
@@ -213,8 +250,30 @@ impl Loader {
         for e in level.enemy_db_refs.iter() {
             let enemy = self.load_official_enemy(&e.id, e.level as usize)?;
             enemy_initial.insert(e.id.clone(), enemy);
+        };
+        let mut route = Vec::new();
+        for r in level.routes.iter(){
+            route.push(Rc::new(r.clone().into()));
         }
-
+        let mut timeline = VecDeque::new();
+        for w in level.waves.iter(){
+            for f in w.fragments.iter(){
+                for a in f.actions.iter(){
+                    if a.route_index>=level.routes.len() as u32{
+                        return Err("route index out of range".into());
+                    }
+                    let e = EnemyPlaceEvent{
+                        enemy_key:a.key.clone(),
+                        enemy_route:a.route_index as usize,
+                    };
+                    let e = EventWithTime{
+                        time_stamp:(f.pre_delay+a.pre_delay) as u64,
+                        event:Rc::new(e),
+                    };
+                    timeline.push_back(e);
+                }
+            }
+        };
         let f = Frame {
             map,
             ..Default::default()
@@ -224,8 +283,8 @@ impl Loader {
             time_remain: i64::MAX,
             last_enemy_time: 0,
             star: -1,
-            time_line: VecDeque::new(),
-            route: Vec::new(),
+            timeline,
+            route,
             enemy_initial,
         };
         return Ok(c);
@@ -240,7 +299,7 @@ mod test {
 
     use super::*;
 
-    fn find_all_file_in_dir(dir: &Path, list: &mut Vec<OfficialCheckPoint>) {
+    fn find_all_file_in_dir(dir: &Path, list: &mut Vec<String>) {
         if dir.is_dir() {
             for entry in std::fs::read_dir(dir).unwrap() {
                 let entry = entry.unwrap();
@@ -254,15 +313,17 @@ mod test {
         }
     }
 
-    fn get_value_by_key(path: &Path, list: &mut Vec<OfficialCheckPoint>) {
+    fn get_value_by_key(path: &Path, list: &mut Vec<String>) {
         let json = load_json_file(path).unwrap();
         if let Ok(data) = from_value::<OfficialLevelData>(json) {
-            for r in data.routes.iter() {
-                // for c in r.checkpoints.unwrap().iter(){
-                //     if !list.contains(&c.tag){
-                //         list.push(c.tag.clone());
-                //     }
-                // }
+            for w in data.waves.iter() {
+                for f in w.fragments.iter() {
+                    for a in f.actions.iter() {
+                        if !list.contains(&a.action_type){
+                            list.push(a.action_type.clone());
+                        }
+                    }
+                }
             }
         }
     }
@@ -271,7 +332,7 @@ mod test {
     fn find_all_value() {
         // let mut value_list=Vec::<(TileBuildable,TileHeight)>::new();
         let mut value_list = Vec::new();
-        let path = Path::new("ArknightsGameData/zh_CN/gamedata/levels/obt");
+        let path = Path::new("ArknightsGameData/zh_CN/gamedata/levels");
         find_all_file_in_dir(path, &mut value_list);
         println!("{:?}", value_list);
     }

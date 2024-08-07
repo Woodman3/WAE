@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 use std::ops::{Add, Mul, Sub};
-#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize,PartialEq)]
 pub struct Point {
     pub x: f64,
     pub y: f64,

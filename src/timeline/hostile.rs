@@ -6,12 +6,13 @@ use serde_json::Value;
 use super::Event;
 use crate::calculator::Calculator;
 use crate::frame::Frame;
+use crate::route::CheckPoint;
 use crate::utils::error::ConfigParseError;
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 #[derive(Debug)]
-pub(super) struct EnemyPlaceEvent {
-    enemy_key: String,
-    enemy_route: usize,
+pub(crate) struct EnemyPlaceEvent {
+    pub(crate) enemy_key: String,
+    pub(crate) enemy_route: usize,
 }
 impl Event for EnemyPlaceEvent {
     fn happen(&self, f: &mut Frame, c: &Calculator) {
@@ -20,9 +21,17 @@ impl Event for EnemyPlaceEvent {
             .get(self.enemy_key.as_str())
             .cloned()
             .unwrap();
-        e.route = Some(Rc::clone(&c.route[self.enemy_route]));
-        e.location = c.route[self.enemy_route][0];
-        e.next_point = c.route[self.enemy_route][1];
+        e.route = Rc::clone(&c.route[self.enemy_route]);
+        e.location = e.route.start;
+        e.next_point = match e.route.checkpoints.iter().position(|c| matches!(c, CheckPoint::Move(_))) {
+            Some(p) => {
+                match e.route.checkpoints[p] {
+                    CheckPoint::Move(p) => p,
+                    _ => e.route.end,
+                }
+            }
+            None => e.route.end,
+        };
         e.id = f.next_id;
         f.next_id += 1;
         f.enemy_set.push(Rc::new(RefCell::new(e)));

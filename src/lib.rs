@@ -15,6 +15,7 @@ pub mod map;
 pub mod timeline;
 pub mod unit;
 pub mod utils;
+pub mod route;
 
 static mut INSTANCE: OnceCell<Calculator> = OnceCell::new();
 

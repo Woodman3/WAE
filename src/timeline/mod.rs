@@ -20,7 +20,7 @@ pub(crate) trait Event: Debug {
 #[derive(Debug)]
 pub(super) struct EventWithTime {
     pub(super) time_stamp: u64,
-    pub(super) e: Rc<dyn Event>,
+    pub(super) event: Rc<dyn Event>,
 }
 
 pub(super) fn read_timeline(c: &Config) -> Result<(VecDeque<EventWithTime>, u64)> {
@@ -30,7 +30,7 @@ pub(super) fn read_timeline(c: &Config) -> Result<(VecDeque<EventWithTime>, u64)
         let e = action_to_event(v)?;
         time_line.push_back(EventWithTime {
             time_stamp: time,
-            e: Rc::clone(&e),
+            event: Rc::clone(&e),
         });
     }
     let mut last_enemy_time: u64 = 0;
@@ -48,7 +48,7 @@ pub(super) fn read_timeline(c: &Config) -> Result<(VecDeque<EventWithTime>, u64)
         }
         time_line.push_back(EventWithTime {
             time_stamp: time,
-            e: Rc::clone(&e),
+            event: Rc::clone(&e),
         });
     }
     Ok((time_line, last_enemy_time))

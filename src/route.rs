@@ -5,14 +5,14 @@ use serde::{Deserialize, Serialize};
 use super::utils::math::Point;
 
 #[derive(Debug, Serialize, Deserialize, Default, Clone)]
-struct Route {
-    start: Point,
-    end: Point,
-    checkpoints: Vec<CheckPoint>,
+pub(super) struct Route {
+    pub(super) start: Point,
+    pub(super) end: Point,
+    pub(super) checkpoints: Vec<CheckPoint>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Default, Clone)]
-enum CheckPoint {
+#[derive(Debug, Serialize, Deserialize, Default, Clone,PartialEq)]
+pub(super) enum CheckPoint {
     Move(Point),
     // WaitForSeconds(f64),
     // Disappear,

@@ -6,6 +6,7 @@ use crate::unit::operator::OperatorShared;
 use crate::unit::skill::effect::FixedDamage;
 use crate::utils::math;
 use crate::utils::math::{to_target, Point};
+use crate::route::Route;
 use log::trace;
 use serde::ser::Serializer;
 use serde::{Deserialize, Serialize};
@@ -34,7 +35,7 @@ pub struct Enemy {
     pub(crate) route_stage: usize,
     pub(crate) die_code: u32,
     /// 0 mean haven't die
-    pub(crate) route: Option<Rc<Vec<Point>>>,
+    pub(crate) route: Rc<Route>,
     #[serde(
         serialize_with = "super::operator::serialize_operator_shared",
         skip_deserializing
@@ -56,12 +57,20 @@ impl Enemy {
         let distance = math::distance_from_segment_to_point(self.location, new, self.next_point);
         if distance <= super::code::MIN_DISTANCE {
             self.route_stage += 1;
-            if let Some(route) = &self.route {
-                if let Some(target) = route.get(self.route_stage) {
-                    self.next_point = target.clone();
-                } else {
-                    self.die_code = super::code::INTO_END;
+            if(self.route_stage<self.route.checkpoints.len()){
+                use crate::route::CheckPoint::*;
+                match self.route.checkpoints[self.route_stage] {
+                    Move(p) => {
+                        self.next_point = p;
+                    }
+                    None => {
+                        todo!("enemy route");
+                    }
                 }
+            } else if(self.route_stage == self.route.checkpoints.len()){
+                self.next_point=self.route.end;
+            }else{
+                self.die_code = super::code::INTO_END;
             }
         }
         self.direction = direction;
