@@ -1,16 +1,16 @@
 pub mod config;
+pub(super) mod copilot;
+pub(super) mod data_loader;
 pub mod error;
 pub mod math;
+pub(super) mod render;
 pub mod visualizer;
 mod visualizer_config;
-pub(super) mod data_loader;
-pub(super) mod render;
-pub(super) mod copilot;
 
-use std::path::Path;
+use serde_json::Value;
 use std::fs::File;
 use std::io::BufReader;
-use serde_json::Value;
+use std::path::Path;
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 pub fn get_short_type_name<'a, T>() -> &'a str {

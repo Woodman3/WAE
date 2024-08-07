@@ -5,10 +5,10 @@ use crate::utils::math::{distance_from_segment_to_point, to_target, Point};
 
 use std::fmt::{Display, Formatter};
 
-use crate::unit::skill::effect::{FixedDamage, DamageType};
+use crate::unit::skill::effect::{DamageType, FixedDamage};
 
-#[derive(Clone, Debug,Serialize,Deserialize)]
-pub(crate)  struct Bullet {
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub(crate) struct Bullet {
     pub(crate) target: Unit,
     direction: Point,
     pub(crate) location: Point,
@@ -22,11 +22,16 @@ impl Bullet {
         let target_point = self.target.get_loc();
         let (_direction, new) = to_target(self.location, target_point, self.move_speed);
         self.distance = distance_from_segment_to_point(self.location, new, target_point);
-        self.location=new;
+        self.location = new;
     }
 
-    pub(super) fn new(target:Unit, location: Point, move_speed: f64,
-    damage_type:DamageType,damage:i64) -> Self {
+    pub(super) fn new(
+        target: Unit,
+        location: Point,
+        move_speed: f64,
+        damage_type: DamageType,
+        damage: i64,
+    ) -> Self {
         Bullet {
             target,
             direction: (0.0, 0.0).into(),
@@ -34,17 +39,20 @@ impl Bullet {
             move_speed,
             distance: f64::MAX,
             damage: FixedDamage {
-                value:damage,
+                value: damage,
                 damage_type,
-            }
+            },
         }
     }
 }
 
-impl Display for Bullet{
+impl Display for Bullet {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f,"\
+        write!(
+            f,
+            "\
         distance to target:{}\n",
-        self.distance)
+            self.distance
+        )
     }
 }

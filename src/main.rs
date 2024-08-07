@@ -2,14 +2,15 @@
 #![allow(unused)]
 #![allow(dead_code)]
 
-use utils::visualizer::Visualizer;
 use utils::data_loader::Loader;
+use utils::visualizer::Visualizer;
 
 //mod block;
 mod calculator;
 mod demo;
 mod frame;
 mod map;
+mod route;
 mod timeline;
 mod unit;
 mod utils;
@@ -24,24 +25,22 @@ fn main() {
     // native_config.viewport.inner_size = vec2(1000.0, 500.0).into();
     // eframe::run_native("BEC", native_config, Box::new(|cc| {
     //     Box::new(Visualizer::new(cc,Ca))}));
-    
+
     let l = Loader::new("ArknightsGameData").unwrap();
     let ca = l.load_level("level_main_01-01".to_string()).unwrap();
     let mut native_config = eframe::NativeOptions::default();
     native_config.viewport.inner_size = vec2(1000.0, 500.0).into();
-    eframe::run_native("BEC", native_config, Box::new(|cc| {
-        Box::new(Visualizer::new(cc,ca))}));
-
-
+    eframe::run_native(
+        "BEC",
+        native_config,
+        Box::new(|cc| Box::new(Visualizer::new(cc, ca))),
+    );
 }
 
 #[cfg(test)]
-mod test{
+mod test {
     use super::*;
-    
-    
-    
-    
+
     // #[test]
     // fn test_loader(){
     //     env_logger::init();

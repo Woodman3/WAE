@@ -1,7 +1,7 @@
+use super::load_json_file;
 use serde::Deserialize;
 use serde_json::Value;
 use std::path::Path;
-use super::load_json_file;
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 pub fn construct_info_from_json<T: for<'a> Deserialize<'a>>(
@@ -28,11 +28,11 @@ pub fn construct_info_from_json<T: for<'a> Deserialize<'a>>(
 pub struct Config {
     pub hostile: Value,
     pub enemy: Value,
-    pub operator :Value,
-    pub doctor:Value,
-    pub map:Value,
-    pub skill:Value,
-    pub demo:Value,
+    pub operator: Value,
+    pub doctor: Value,
+    pub map: Value,
+    pub skill: Value,
+    pub demo: Value,
 }
 impl Config {
     pub fn new<P: AsRef<Path>>(path: P) -> Result<Config> {

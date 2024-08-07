@@ -7,7 +7,7 @@ use super::Event;
 use crate::calculator::Calculator;
 use crate::frame::Frame;
 use crate::utils::error::ConfigParseError;
-type Result<T> = std::result::Result<T,Box<dyn std::error::Error>>;
+type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 #[derive(Debug)]
 pub(super) struct EnemyPlaceEvent {
     enemy_key: String,
@@ -23,19 +23,23 @@ impl Event for EnemyPlaceEvent {
         e.route = Some(Rc::clone(&c.route[self.enemy_route]));
         e.location = c.route[self.enemy_route][0];
         e.next_point = c.route[self.enemy_route][1];
-        e.id=f.next_id;
-        f.next_id+=1;
+        e.id = f.next_id;
+        f.next_id += 1;
         f.enemy_set.push(Rc::new(RefCell::new(e)));
     }
 }
 
-impl EnemyPlaceEvent{
-    pub(super) fn new(v:&Value)->Result<EnemyPlaceEvent>{
-        let enemy_key=String::from(v[2].as_str().ok_or(ConfigParseError("Enemy key can't translate to str in timeline".into()))?);
-        let enemy_route=v[3].as_u64().ok_or(ConfigParseError("Enemy route can't translate to u64 in timeline".into()))? as usize;
-        Ok(EnemyPlaceEvent{
+impl EnemyPlaceEvent {
+    pub(super) fn new(v: &Value) -> Result<EnemyPlaceEvent> {
+        let enemy_key = String::from(v[2].as_str().ok_or(ConfigParseError(
+            "Enemy key can't translate to str in timeline".into(),
+        ))?);
+        let enemy_route = v[3].as_u64().ok_or(ConfigParseError(
+            "Enemy route can't translate to u64 in timeline".into(),
+        ))? as usize;
+        Ok(EnemyPlaceEvent {
             enemy_key,
-            enemy_route
+            enemy_route,
         })
     }
 }
