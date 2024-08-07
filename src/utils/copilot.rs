@@ -74,6 +74,7 @@ pub(super) struct CopilotActionDeploy {
     pub(super) name: String,
     pub(super) location: Grid,
     pub(super) direction: Toward,
+    /// after how many kill, cost, or cost change we deploy this operator
     pub(super) kills: Option<u8>,
     pub(super) costs: Option<u8>,
     pub(super) cost_changes: Option<u8>,
@@ -199,6 +200,30 @@ impl Copilot {
             game_data: loader,
             calculator,
         })
+    }
+    pub(crate) fn run(&mut self){
+        let c = &mut self.calculator;
+        while c.step() {
+            if let Some(f) = c.frame_vec.last() {
+                for a in self.copilot_data.actions.iter(){
+                    match a {
+                        CopilotAction::Deploy(d) => {
+                            todo!()
+                        }
+                        CopilotAction::Skill(s) => {
+                            todo!()
+                        }
+                        CopilotAction::Retreat(r) => {
+                            todo!()
+                        }
+                        CopilotAction::SkillDaemon => {
+                            todo!()
+                        }
+                        CopilotAction::UseLess => {}
+                    }
+                }
+            }
+        }
     }
 }
 

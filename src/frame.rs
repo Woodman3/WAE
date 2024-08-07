@@ -25,6 +25,7 @@ pub(super) struct Frame {
     pub(super) bullet_set: Vec<Bullet>,
     /// start for 1
     pub(super) next_id: usize,
+    pub(super) kill_count: u32,
 }
 
 impl Frame {
@@ -50,6 +51,7 @@ impl Frame {
             let mut eb = e.borrow_mut();
             eb.next(self);
             if eb.die_code == code::INTO_END {
+                self.kill_count += 1;
                 info!("An enemy has enter to blue point");
             }
         }
@@ -69,7 +71,7 @@ impl Frame {
         self.bullet_set
             .retain(|b| b.distance > code::BULLET_HIT_DISTANCE);
     }
-    // Todo
+
     pub(super) fn deep_clone(&self) -> Self {
         let mut enemy_set = Vec::<Rc<RefCell<Enemy>>>::new();
         for e in &self.enemy_set {
@@ -84,6 +86,7 @@ impl Frame {
             operator_undeploy.insert(key.clone(), Rc::new(RefCell::new(o.borrow().deep_clone())));
         }
         let bullet_set = self.bullet_set.clone();
+        todo!();
         Frame {
             timestamp: self.timestamp,
             enemy_set,
@@ -92,6 +95,7 @@ impl Frame {
             map: self.map.deep_clone(),
             bullet_set,
             next_id: self.next_id,
+            ..Default::default()
         }
     }
 

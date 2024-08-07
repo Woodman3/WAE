@@ -79,13 +79,10 @@ impl Calculator {
         }
         crate::unit::skill::config_skill(c, &operator_undeploy);
         frame_vec.push(Frame {
-            timestamp: 0,
-            enemy_set: Vec::<Rc::<RefCell::<Enemy>>>::new(),
-            operator_deploy: HashMap::<String,OperatorRef>::new(),
             operator_undeploy,
             map:map::Map::new(&c.map)?,
-            bullet_set:Vec::<Bullet>::new(),
             next_id:0,
+            ..Default::default()
         });
         let mut enemy_initial = HashMap::<String, unit::enemy::Enemy>::new();
         for (key, v) in c.enemy.as_object().unwrap() {
@@ -109,7 +106,6 @@ impl Calculator {
                 }
             }
         }
-
     }
     /// an event is place event or enemy appear or something happen like fire rain
     /// mostly is happen in an specify time but sometime it happen after something has happen
