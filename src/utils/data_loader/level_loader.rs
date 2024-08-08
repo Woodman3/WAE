@@ -2,7 +2,8 @@ use std::collections::HashMap;
 use std::collections::VecDeque;
 use std::i64;
 use std::path::Path;
-use std::rc::Rc;
+use std::rc::{Rc,Weak};
+use std::cell::RefCell;
 
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -134,7 +135,8 @@ struct OfficialWaveFragment {
 #[derive(Deserialize, Default, Debug)]
 #[serde(rename_all = "camelCase")]
 struct OfficialWaveAction {
-    //the value of action type are story,play bgm,display enemy info,and so on,it seems not related to the enemy behavior
+    //up to 2024/8/8 ["SPAWN", "STORY", "DISPLAY_ENEMY_INFO", "PREVIEW_CURSOR", "ACTIVATE_PREDEFINED", "PLAY_OPERA", "PLAY_BGM", "DIALOG", "TRIGGER_PREDEFINED", "BATTLE_EVENTS", "WITHDRAW_PREDEFINED"]
+    //it seems only "spawn" related to the enemy behavior
     pub(super) action_type: String,
     pub(super) pre_delay: f32,
     pub(super) route_index: u32,
@@ -219,12 +221,15 @@ impl Into<Map> for OfficialMapData {
                 layout[i][j] = self.tiles[self.map[i][j] as usize].into();
             }
         }
+        let enemy =
+            vec![vec![Vec::<Weak<RefCell<Enemy>>>::new(); width as usize]; height as usize];
+        let operator = vec![vec![None; width as usize]; height as usize];
         Map {
             width: width as u32,
             height: height as u32,
             layout,
-            enemy: Vec::new(),
-            operator: Vec::new(),
+            enemy,
+            operator,
         }
     }
 }
@@ -261,6 +266,9 @@ impl Loader {
                 for a in f.actions.iter(){
                     if a.route_index>=level.routes.len() as u32{
                         return Err("route index out of range".into());
+                    }
+                    if !matches!(a.action_type.as_str(),"SPAWN"){
+                        continue;
                     }
                     let e = EnemyPlaceEvent{
                         enemy_key:a.key.clone(),
@@ -341,9 +349,10 @@ mod test {
     fn test_load_level() {
         let path = "./ArknightsGameData";
         let loader = Loader::new(path).unwrap();
-        let c = loader.load_level("act5d0_ex07".to_string()).unwrap();
-        // let level = loader.load_level("main_00-07".to_string()).unwrap();
-        println!("{:?}", c.enemy_initial);
-        println!("{:?}", c.timeline);
+        // let c = loader.load_level("act5d0_ex07".to_string()).unwrap();
+        let level = loader.load_level("main_01-01".to_string()).unwrap();
+        for t in level.timeline.iter(){
+            println!("{:?}",t);
+        }
     }
 }
