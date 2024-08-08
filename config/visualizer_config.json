@@ -1,0 +1,11 @@
+{
+    "enemy_radius": 25.0,
+    "operator_radius": 2.0,
+    "bullet_radius": 1.0,
+    "block_size": 50.0,
+    "padding": 10.0,
+    "operator_color": [0, 0, 255, 200],
+    "bullet_color": [0, 0, 0, 255],
+    "enemy_color": [50, 127, 150, 200],
+    "block_color": [0, 0, 0, 255]
+}

@@ -180,6 +180,18 @@ impl TryInto<Event> for CopilotAction{
     }
 }
 
+impl CopilotAction{
+    fn check(&self, f: &Frame) -> bool {
+        match self {
+            CopilotAction::Deploy(d) => d.condition.as_ref().map_or(true, |c| c.check(f)),
+            CopilotAction::Skill(s) => true,
+            CopilotAction::Retreat(r) => true,
+            CopilotAction::SkillDaemon => true,
+            CopilotAction::UseLess => false,
+        }
+    }
+}
+
 impl CopilotActionCondition{
     //todo: different condition may conflict 
     pub(crate) fn check(&self, f: &Frame) -> bool {
@@ -256,10 +268,15 @@ impl Copilot {
     pub(crate) fn run(&mut self){
         let c = &mut self.calculator;
         while c.step() {
-            if let Some(f) = c.frame_vec.last() {
+            if let Some(f) = c.frame_vec.pop() {
                 for a in self.copilot_data.actions.iter(){
-                    todo!("copilot action");
+                    if a.check(&f){
+                        if let Ok(e) = a.clone().try_into(){
+                            c.insert_event(Rc::new(e));
+                        }
+                    }
                 }
+                c.frame_vec.push(f);
             }
         }
     }

@@ -135,10 +135,14 @@ impl fmt::Display for Frame {
             f,
             "\
 timestamp:{timestamp}
+time:{time}
 num of enemy:{enemy_len}
+cost:{cost}
 enemy info:",
             timestamp = self.timestamp,
-            enemy_len = self.enemy_set.len()
+            time = self.timestamp as f64 *PERIOD,
+            enemy_len = self.enemy_set.len(),
+            cost = self.cost
         )?;
         for e in self.enemy_set.iter() {
             writeln!(f, "{}", e.borrow())?;
