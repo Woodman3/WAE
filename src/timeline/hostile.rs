@@ -1,5 +1,6 @@
 use std::cell::RefCell;
 use std::rc::Rc;
+use serde::{Deserialize, Serialize};
 // use std::collections::HashMap;
 use serde_json::Value;
 // use serde_json::Value;
@@ -9,13 +10,13 @@ use crate::frame::Frame;
 use crate::route::CheckPoint;
 use crate::utils::error::ConfigParseError;
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
-#[derive(Debug)]
+#[derive(Debug,Deserialize,Serialize,Clone,Default)]
 pub(crate) struct EnemyPlaceEvent {
     pub(crate) enemy_key: String,
     pub(crate) enemy_route: usize,
 }
-impl Event for EnemyPlaceEvent {
-    fn happen(&self, f: &mut Frame, c: &Calculator) {
+impl EnemyPlaceEvent {
+    pub(super) fn happen(&self, f: &mut Frame, c: &Calculator) {
         let mut e = c
             .enemy_initial
             .get(self.enemy_key.as_str())
@@ -36,9 +37,6 @@ impl Event for EnemyPlaceEvent {
         f.next_id += 1;
         f.enemy_set.push(Rc::new(RefCell::new(e)));
     }
-}
-
-impl EnemyPlaceEvent {
     pub(super) fn new(v: &Value) -> Result<EnemyPlaceEvent> {
         let enemy_key = String::from(v[2].as_str().ok_or(ConfigParseError(
             "Enemy key can't translate to str in timeline".into(),

@@ -4,33 +4,33 @@ use crate::frame::{Frame, OperatorRef};
 use crate::unit::scope::Toward;
 use crate::utils::error::ConfigParseError;
 use crate::utils::math::Grid;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::rc::Rc;
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
-#[derive(Debug, Clone, Default)]
+#[derive(Debug,Deserialize,Serialize,Clone,Default)]
 pub(crate) struct OperatorDeployEvent {
     pub(crate) operator_key: String,
     pub(crate) location: Grid,
     pub(crate) toward: Toward,
 }
-#[derive(Debug, Deserialize, Default)]
+#[derive(Debug,Deserialize,Serialize,Clone,Default)]
 pub(crate) struct OperatorRetreatEvent {
     pub(crate) operator_key: String,
 }
 
-#[derive(Debug, Deserialize, Default)]
+#[derive(Debug,Deserialize,Serialize,Clone,Default)]
 pub(crate) struct OperatorSkillEvent {
     pub(crate) operator_key: String,
 }
 
-#[derive(Debug, Deserialize, Default)]
+#[derive(Debug,Deserialize,Serialize,Clone,Default)]
 pub(crate) struct UnitRetreatEvent {
     pub(crate) location: Grid,
 }
 
-#[derive(Debug, Deserialize, Default)]
+#[derive(Debug,Deserialize,Serialize,Clone,Default)]
 pub(crate) struct UnitSkillEvent {
     pub(crate) location: Grid,
 }
@@ -63,8 +63,8 @@ impl OperatorDeployEvent {
         })
     }
 }
-impl Event for OperatorDeployEvent {
-    fn happen(&self, f: &mut Frame, _c: &Calculator) {
+impl OperatorDeployEvent {
+    pub(super) fn happen(&self, f: &mut Frame, _c: &Calculator) {
         let or = f.operator_undeploy.remove(&self.operator_key).unwrap();
         let mut o = or.borrow_mut();
         o.location = self.location;
@@ -83,8 +83,8 @@ impl Event for OperatorDeployEvent {
     }
 }
 
-impl Event for OperatorRetreatEvent {
-    fn happen(&self, f: &mut Frame, _c: &Calculator) {
+impl OperatorRetreatEvent {
+    pub(super) fn happen(&self, f: &mut Frame, _c: &Calculator) {
         let or: OperatorRef = f.operator_deploy.remove(&self.operator_key).unwrap();
         let o = or.borrow_mut();
         f.map.operator[o.location.row.clone() as usize][o.location.col.clone() as usize] = None;
@@ -93,16 +93,16 @@ impl Event for OperatorRetreatEvent {
     }
 }
 
-impl Event for OperatorSkillEvent {
-    fn happen(&self, f: &mut Frame, _c: &Calculator) {
+impl OperatorSkillEvent {
+    pub(super) fn happen(&self, f: &mut Frame, _c: &Calculator) {
         if let Some(_o) = f.operator_deploy.get(self.operator_key.as_str()) {
             todo!()
         }
     }
 }
 
-impl Event for UnitRetreatEvent {
-    fn happen(&self, f: &mut Frame, _c: &Calculator) {
+impl UnitRetreatEvent {
+    pub(super) fn happen(&self, f: &mut Frame, _c: &Calculator) {
         let remove_key =
             f.map.operator[self.location.row as usize][self.location.col as usize].clone();
         if let Some(key) = remove_key {
@@ -113,8 +113,8 @@ impl Event for UnitRetreatEvent {
     }
 }
 
-impl Event for UnitSkillEvent {
-    fn happen(&self, f: &mut Frame, c: &Calculator) {
+impl UnitSkillEvent {
+    pub(super) fn happen(&self, f: &mut Frame, c: &Calculator) {
         todo!()
     }
 }

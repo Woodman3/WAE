@@ -10,9 +10,11 @@ use super::data_loader::Loader;
 use super::load_json_file;
 use super::math::Grid;
 use crate::calculator::Calculator;
+use crate::frame::Frame;
 use crate::timeline::doctor::{
     OperatorDeployEvent, OperatorRetreatEvent, OperatorSkillEvent, UnitRetreatEvent, UnitSkillEvent,
 };
+use crate::timeline::Event;
 use crate::unit::scope::Toward;
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
@@ -57,7 +59,7 @@ pub(super) struct CopilotGroup {
     pub(super) operators: Vec<CopilotOperator>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize,Clone)]
 #[serde(tag = "type")]
 pub(super) enum CopilotAction {
     Deploy(CopilotActionDeploy),
@@ -68,22 +70,29 @@ pub(super) enum CopilotAction {
     UseLess,
 }
 
-#[derive(Debug, Serialize, Deserialize, Default)]
+//todo: may be all condition can warp into a single struct?
+#[derive(Debug, Serialize, Deserialize, Default,Clone)]
 #[serde(default)]
 pub(super) struct CopilotActionDeploy {
     pub(super) name: String,
     pub(super) location: Grid,
     pub(super) direction: Toward,
-    /// after how many kill, cost, or cost change we deploy this operator
-    pub(super) kills: Option<u8>,
-    pub(super) costs: Option<u8>,
-    pub(super) cost_changes: Option<u8>,
-    pub(super) cooling: Option<i8>,
+    #[serde(flatten)]
+    pub(super) condition: Option<CopilotActionCondition>,
     pub(super) pre_delay: Option<u8>,
     pub(super) post_delay: Option<u8>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Default)]
+#[derive(Debug, Serialize, Deserialize, Default,Clone)]
+#[serde(default)]
+pub(super) struct CopilotActionCondition {
+    pub(super) kills: Option<u8>,
+    pub(super) costs: Option<u8>,
+    pub(super) cost_changes: Option<u8>,
+    pub(super) cooling: Option<i8>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default,Clone)]
 #[serde(default)]
 pub(super) struct CopilotActionSkill {
     pub(super) name: Option<String>,
@@ -92,7 +101,7 @@ pub(super) struct CopilotActionSkill {
     pub(super) location: Option<Grid>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Default)]
+#[derive(Debug, Serialize, Deserialize, Default,Clone)]
 #[serde(default)]
 pub(super) struct CopilotActionRetreat {
     pub(super) name: Option<String>,
@@ -142,6 +151,49 @@ impl TryInto<UnitRetreatEvent> for CopilotActionRetreat {
     fn try_into(self) -> Result<UnitRetreatEvent> {
         let location = self.location.ok_or("without location")?;
         Ok(UnitRetreatEvent { location })
+    }
+}
+
+impl TryInto<Event> for CopilotAction{
+    type Error = Box<dyn std::error::Error>;
+
+    fn try_into(self) -> Result<Event> {
+        match self {
+            CopilotAction::Deploy(d) => Ok(Event::OperatorDeployEvent(d.into())),
+            CopilotAction::Skill(s) => {
+                if s.name.is_some() {
+                    Ok(Event::OperatorSkillEvent(s.try_into()?))
+                } else {
+                    Ok(Event::UnitSkillEvent(s.try_into()?))
+                }
+            }
+            CopilotAction::Retreat(r) => {
+                if r.name.is_some() {
+                    Ok(Event::OperatorRetreatEvent(r.try_into()?))
+                } else {
+                    Ok(Event::UnitRetreatEvent(r.try_into()?))
+                }
+            }
+            CopilotAction::SkillDaemon => todo!("skill daemon"),
+            CopilotAction::UseLess => Err("useless action".into()),
+        }
+    }
+}
+
+impl CopilotActionCondition{
+    //todo: different condition may conflict 
+    pub(crate) fn check(&self, f: &Frame) -> bool {
+        if let Some(k) = self.kills {
+            if f.kill_count >= k.into() {
+                return true;
+            }
+        }
+        if let Some(c) = self.costs {
+            if f.cost >= c.into() {
+                return true;
+            }
+        }
+        false
     }
 }
 
@@ -206,21 +258,7 @@ impl Copilot {
         while c.step() {
             if let Some(f) = c.frame_vec.last() {
                 for a in self.copilot_data.actions.iter(){
-                    match a {
-                        CopilotAction::Deploy(d) => {
-                            todo!()
-                        }
-                        CopilotAction::Skill(s) => {
-                            todo!()
-                        }
-                        CopilotAction::Retreat(r) => {
-                            todo!()
-                        }
-                        CopilotAction::SkillDaemon => {
-                            todo!()
-                        }
-                        CopilotAction::UseLess => {}
-                    }
+                    todo!("copilot action");
                 }
             }
         }

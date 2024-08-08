@@ -1,4 +1,4 @@
-use crate::calculator::Calculator;
+use crate::calculator::{Calculator, PERIOD};
 use crate::map;
 use crate::unit::bullet::Bullet;
 use crate::unit::code;
@@ -26,6 +26,7 @@ pub(super) struct Frame {
     /// start for 1
     pub(super) next_id: usize,
     pub(super) kill_count: u32,
+    pub(super) cost: f32,
 }
 
 impl Frame {
@@ -35,6 +36,7 @@ impl Frame {
         self.enemy_step();
         self.bullet_step();
         self.enemy_set.retain(|e| e.borrow().die_code != code::DIE);
+        self.cost+=PERIOD as f32; 
     }
     fn operator_step(&mut self) {
         let ov = self.operator_deploy.clone();

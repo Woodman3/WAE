@@ -152,7 +152,7 @@ impl Calculator {
         self.frame_vec.last()
     }
 
-    pub(super) fn insert_event(&mut self,e:Rc<dyn Event>)->bool{
+    pub(super) fn insert_event(&mut self,e:Rc<Event>)->bool{
         if let Some(f) = self.frame_vec.last(){
             let time = f.timestamp+1;
             let et =EventWithTime{time_stamp:time,event:e};

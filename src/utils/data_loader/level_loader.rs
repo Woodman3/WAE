@@ -276,7 +276,7 @@ impl Loader {
                     };
                     let e = EventWithTime{
                         time_stamp:(f.pre_delay+a.pre_delay) as u64,
-                        event:Rc::new(e),
+                        event:Rc::new(timeline::Event::EnemyPlaceEvent(e)),
                     };
                     timeline.push_back(e);
                 }
@@ -336,14 +336,14 @@ mod test {
         }
     }
 
-    #[test]
-    fn find_all_value() {
-        // let mut value_list=Vec::<(TileBuildable,TileHeight)>::new();
-        let mut value_list = Vec::new();
-        let path = Path::new("ArknightsGameData/zh_CN/gamedata/levels");
-        find_all_file_in_dir(path, &mut value_list);
-        println!("{:?}", value_list);
-    }
+    // #[test]
+    // fn find_all_value() {
+    //     // let mut value_list=Vec::<(TileBuildable,TileHeight)>::new();
+    //     let mut value_list = Vec::new();
+    //     let path = Path::new("ArknightsGameData/zh_CN/gamedata/levels");
+    //     find_all_file_in_dir(path, &mut value_list);
+    //     println!("{:?}", value_list);
+    // }
 
     #[test]
     fn test_load_level() {
