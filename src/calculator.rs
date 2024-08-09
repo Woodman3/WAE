@@ -8,7 +8,7 @@ use crate::unit;
 use crate::unit::operator::Operator;
 use crate::utils::config::Config;
 use crate::map;
-use log::{trace, warn};
+use log::{debug, trace, warn};
 use serde_json::Value;
 use std::collections::{HashMap, VecDeque};
 use std::rc::Rc;
@@ -110,9 +110,7 @@ impl Calculator {
     pub(super) fn goto_end(&mut self) {
         while self.step() {
             if let Some(f) = self.frame_vec.last() {
-                if f.timestamp%10==0{
-                    trace!("{}", f);
-                }
+                debug!("{}", f);
             }
         }
     }

@@ -22,7 +22,7 @@ pub(crate) struct DebugLogger{
 
 impl log::Log for DebugLogger {
     fn enabled(&self, metadata: &Metadata) -> bool {
-        metadata.level() <= Level::Info
+        metadata.level() <= Level::Debug
     }
 
     fn log(&self, record: &Record) {
@@ -66,7 +66,6 @@ impl Debugger {
         while let Ok(message) = receiver.try_recv() {
             self.log_messages.lock().unwrap().push(message);
         }
-        ui.heading("Log Messages");
         for message in self.log_messages.lock().unwrap().iter() {
             ui.label(message);
         };
@@ -93,7 +92,10 @@ impl eframe::App for Debugger {
             .min_width(400.0)
             .resizable(true)
             .show(ctx, |ui| {
-                self.paint_log(ui);
+                ui.heading("Log Messages");
+                egui::ScrollArea::vertical().show(ui, |ui| {
+                    self.paint_log(ui);
+                });
             });
         egui::SidePanel::right("debug")
             .min_width(200.0)
@@ -109,8 +111,9 @@ impl eframe::App for Debugger {
                         std::fs::write("frame.json", j).unwrap();
                     }
                 }
-                self.paint_info(&self.c.frame_vec[0], ui);
-                // self.paint_log(ui);
+                egui::ScrollArea::vertical().show(ui, |ui| {
+                    self.paint_info(&self.c.frame_vec[0], ui);
+                });
             });
         egui::CentralPanel::default()
             .show(ctx, |ui| {

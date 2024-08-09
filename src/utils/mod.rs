@@ -4,8 +4,8 @@ pub(super) mod data_loader;
 pub mod error;
 pub mod math;
 pub(super) mod render;
-pub mod visualizer;
-mod visualizer_config;
+pub mod debugger;
+mod render_config;
 
 use serde_json::Value;
 use std::fs::File;

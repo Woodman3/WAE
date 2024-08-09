@@ -8,7 +8,7 @@ use std::sync::{Arc, Mutex};
 use log::LevelFilter;
 use utils::copilot::Copilot;
 use utils::data_loader::Loader;
-use utils::visualizer::{Debugger, DebugLogger};
+use utils::debugger::{Debugger, DebugLogger};
 
 //mod block;
 mod calculator;
@@ -26,7 +26,7 @@ fn main() {
     let (sender, receiver) = mpsc::channel();
     let logger = DebugLogger { sender };
     log::set_boxed_logger(Box::new(logger)).unwrap();
-    log::set_max_level(LevelFilter::Info);
+    log::set_max_level(LevelFilter::Debug);
 
 
     let l = Loader::new("ArknightsGameData").unwrap();
@@ -37,12 +37,12 @@ fn main() {
     eframe::run_native(
         "BEC",
         native_config,
-        Box::new(|cc| Box::new(Debugger{
+        Box::new(|cc| Ok(Box::new(Debugger{
             c: ca,
             run: false,
             log_receiver: Arc::new(Mutex::new(receiver)),
             log_messages: Arc::new(Mutex::new(Vec::new())),
-        })),
+        }))),
     );
 }
 

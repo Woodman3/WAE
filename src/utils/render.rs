@@ -1,4 +1,4 @@
-use super::visualizer_config::*;
+use super::render_config::*;
 use crate::{
     frame::Frame,
     map::tile::{DEPLOY_LOW, DEPLOY_NONE, PASS_ALL},
