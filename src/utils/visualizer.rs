@@ -89,15 +89,15 @@ impl eframe::App for Debugger {
     fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
         egui::Context::request_repaint(ctx);
         install_image_loaders(ctx);
-        egui::CentralPanel::default()
+        egui::SidePanel::left("log")
+            .min_width(400.0)
+            .resizable(true)
             .show(ctx, |ui| {
-            if(self.c.frame_vec[0].timestamp%100==0){
-                self.paint_frame(ctx, ui);
-            }
-            // self.paint_frame(ctx, ui);
-        });
+                self.paint_log(ui);
+            });
         egui::SidePanel::right("debug")
-            .min_width(300.0)
+            .min_width(200.0)
+            .resizable(true)
             .show(ctx, |ui| {
                 ui.checkbox(&mut self.run, "run");
                 if ui.button("next").clicked() || self.run {
@@ -109,13 +109,15 @@ impl eframe::App for Debugger {
                         std::fs::write("frame.json", j).unwrap();
                     }
                 }
-                // self.paint_info(&self.c.frame_vec[0], ui);
-                self.paint_log(ui);
+                self.paint_info(&self.c.frame_vec[0], ui);
+                // self.paint_log(ui);
             });
-        // egui::SidePanel::left("log")
-        //     .min_width(400.0)
-        //     .show(ctx, |ui| {
-        //         self.paint_log(ui);
-        //     });
+        egui::CentralPanel::default()
+            .show(ctx, |ui| {
+            if(self.c.frame_vec[0].timestamp%100==0){
+                self.paint_frame(ctx, ui);
+            }
+            // self.paint_frame(ctx, ui);
+        });
     }
 }
