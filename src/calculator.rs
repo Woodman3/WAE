@@ -15,11 +15,12 @@ use std::rc::Rc;
 use crate::unit::bullet::Bullet;
 use crate::unit::enemy::Enemy;
 use crate::utils::math::Point;
+use crate::utils::copilot::{self, Copilot};
 
 pub(crate) static PERIOD:f64=0.0166;
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 /// calculate
-#[derive(Debug)]
+#[derive(Debug,Default)]
 pub struct Calculator {
     pub(super) frame_vec: Vec<Frame>,
     /// star in the battle we will get
@@ -33,7 +34,8 @@ pub struct Calculator {
     /// enemy in initial statement,if we place enemy to map,we will get enemy in it
     pub(super) enemy_initial: HashMap<String, Enemy>,
     /// time that lase enemy may push,it isn't certainly because some enemy place by time
-    pub(super) last_enemy_time:u64
+    pub(super) last_enemy_time:u64,
+    pub(super) copilot: Option<Copilot>,
 }
 
 impl Calculator {
@@ -53,6 +55,12 @@ impl Calculator {
         }
     }
     fn process_frame(&mut self, f: &mut Frame) {
+        if let Some(copilot) = &self.copilot {
+            let ev = copilot.query(f);
+            for e in ev{
+                self.insert_event(Rc::new(e));
+            }
+        }
         self.event(f);
         f.step(self);
     }
@@ -96,6 +104,7 @@ impl Calculator {
             time_remain,
             enemy_initial,
             last_enemy_time,
+            ..Default::default()
         })
     }
     pub(super) fn goto_end(&mut self) {

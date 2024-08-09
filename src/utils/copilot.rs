@@ -18,11 +18,9 @@ use crate::timeline::Event;
 use crate::unit::scope::Toward;
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
-#[derive(Debug)]
-struct Copilot {
+#[derive(Debug,Default)]
+pub(crate) struct Copilot {
     copilot_data: CopilotData,
-    game_data: Loader,
-    calculator: Calculator,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -210,7 +208,7 @@ impl CopilotActionCondition{
 }
 
 impl Copilot {
-    pub(crate) fn new<P: AsRef<Path>>(copilot_path: P, game_data_path: P) -> Result<Self> {
+    pub(crate) fn build_calculator<P: AsRef<Path>>(copilot_path: P, game_data_path: P) -> Result<Calculator> {
         let json = load_json_file(copilot_path)?;
         let copilot_data: CopilotData = serde_json::from_value(json)?;
         let loader = Loader::new(game_data_path)?;
@@ -259,35 +257,50 @@ impl Copilot {
                     .insert(op.name.clone(), Rc::new(RefCell::new(op)));
             }
         }
-        Ok(Copilot {
+        calculator.copilot = Some(Copilot {
             copilot_data,
-            game_data: loader,
-            calculator,
-        })
+            // game_data: loader,
+        });
+        Ok(calculator)
     }
-    pub(crate) fn run(&mut self){
-        let c = &mut self.calculator;
-        while c.step() {
-            if let Some(f) = c.frame_vec.pop() {
-                for a in self.copilot_data.actions.iter(){
-                    if a.check(&f){
-                        if let Ok(e) = a.clone().try_into(){
-                            c.insert_event(Rc::new(e));
-                        }
-                    }
+    // pub(crate) fn run(&mut self){
+    //     let c = &mut self.calculator;
+    //     while c.step() {
+    //         if let Some(f) = c.frame_vec.pop() {
+    //             for a in self.copilot_data.actions.iter(){
+    //                 if a.check(&f){
+    //                     if let Ok(e) = a.clone().try_into(){
+    //                         c.insert_event(Rc::new(e));
+    //                     }
+    //                 }
+    //             }
+    //             c.frame_vec.push(f);
+    //         }
+    //     }
+    // }
+    pub(crate) fn query(&self,f:&Frame) -> Vec<Event> {
+        let mut v = Vec::new();
+        for a in self.copilot_data.actions.iter(){
+            if a.check(f){
+                if let Ok(e) = a.clone().try_into(){
+                    v.push(e);
                 }
-                c.frame_vec.push(f);
             }
         }
+        v
     }
 }
 
 mod test {
-    use super::*;
+    use crate::calculator;
 
+    use super::*;
+    use std::time::{Duration, Instant};
     #[test]
     fn test_copilot() {
-        let copilot = Copilot::new("./copilot.json", "./ArknightsGameData").unwrap();
-        println!("{:?}", copilot.calculator);
+        let start = Instant::now();
+        let mut calculator = Copilot::build_calculator("./copilot.json", "./ArknightsGameData").unwrap();
+        calculator.goto_end(); 
+        let duration = start.elapsed();
     }
 }

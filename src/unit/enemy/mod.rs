@@ -58,15 +58,24 @@ impl Enemy {
         if distance <= super::code::MIN_DISTANCE {
             self.route_stage += 1;
             if(self.route_stage<self.route.checkpoints.len()){
-                use crate::route::CheckPoint::*;
-                match self.route.checkpoints[self.route_stage] {
-                    Move(p) => {
-                        self.next_point = p;
+                use crate::route::CheckPoint;
+                self.next_point = match self.route.checkpoints.iter().position(|c| matches!(c, CheckPoint::Move(_))) {
+                    Some(p) => {
+                        match self.route.checkpoints[p] {
+                            CheckPoint::Move(p) => p,
+                            _ => self.route.end,
+                        }
                     }
-                    None => {
-                        todo!("enemy route");
-                    }
-                }
+                    None => self.route.end,
+                };
+                // match self.route.checkpoints[self.route_stage] {
+                //     Move(p) => {
+                //         self.next_point = p;
+                //     }
+                //     None => {
+                //         todo!("enemy route");
+                //     }
+                // }
             } else if(self.route_stage == self.route.checkpoints.len()){
                 self.next_point=self.route.end;
             }else{

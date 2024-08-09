@@ -12,7 +12,7 @@ use std::{
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
-#[derive(Debug)]
+#[derive(Debug,Default)]
 pub(crate) struct Loader {
     path: PathBuf,
     character_table: Value,

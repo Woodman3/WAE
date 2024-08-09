@@ -289,11 +289,11 @@ impl Loader {
         let c = Calculator {
             frame_vec: vec![f],
             time_remain: i64::MAX,
-            last_enemy_time: 0,
             star: -1,
             timeline,
             route,
             enemy_initial,
+            ..Default::default()
         };
         return Ok(c);
         todo!("load route")
