@@ -33,7 +33,7 @@ fn main() {
     // let ca = l.load_level("main_01-01".to_string()).unwrap();
     let mut ca = Copilot::build_calculator("./copilot.json", "./ArknightsGameData").unwrap();
     let mut native_config = eframe::NativeOptions::default();
-    native_config.viewport.inner_size = vec2(1000.0, 500.0).into();
+    native_config.viewport.inner_size = vec2(1300.0, 500.0).into();
     eframe::run_native(
         "BEC",
         native_config,

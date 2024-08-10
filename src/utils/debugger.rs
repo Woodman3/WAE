@@ -117,9 +117,9 @@ impl eframe::App for Debugger {
             });
         egui::CentralPanel::default()
             .show(ctx, |ui| {
-            if(self.c.frame_vec[0].timestamp%100==0){
+            // if(self.c.frame_vec[0].timestamp%100==0){
                 self.paint_frame(ctx, ui);
-            }
+            // }
             // self.paint_frame(ctx, ui);
         });
     }
