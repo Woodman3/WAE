@@ -1,5 +1,3 @@
-#[cfg(test)]
-mod test;
 pub(super) mod tile;
 
 use crate::unit::enemy::Enemy;
