@@ -5,7 +5,7 @@ pub struct Point {
     pub x: f64,
     pub y: f64,
 }
-#[derive(Clone, Debug, Copy, Default, Deserialize, Serialize)]
+#[derive(Clone, Debug, Copy, Default, Deserialize, Serialize,PartialEq)]
 pub struct Grid {
     pub row: i64,
     pub col: i64,
@@ -144,6 +144,13 @@ impl Mul for Point {
 
     fn mul(self, rhs: Self) -> Self::Output {
         self.x * rhs.x + self.y * rhs.y
+    }
+}
+
+impl Add for Grid{
+    type Output = Self;
+    fn add(self, rhs: Self) -> Self::Output {
+        (self.row + rhs.row, self.col + rhs.col).into()
     }
 }
 #[macro_export]

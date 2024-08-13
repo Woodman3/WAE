@@ -2,10 +2,12 @@ pub(super) mod tile;
 
 use crate::unit::enemy::Enemy;
 use crate::unit::scope::Scope;
-use crate::utils::math::distance_p2p;
+use crate::utils::math::{distance_p2p, Grid, Point};
 use serde::{Deserialize, Serialize};
 use serde_json::{from_value, Value};
+use tile::PASS_ALL;
 use std::cell::RefCell;
+use std::collections::VecDeque;
 use std::rc::{Rc, Weak};
 
 use self::tile::generate_layout;
@@ -129,5 +131,39 @@ impl Map {
         }
         ve
     }
-    pub(super) fn update_layout(&mut self) {}
+    pub(super) fn update_layout(&mut self) {
+        unimplemented!("update layout")
+    }
+    fn grid_in_map(&self, p:&Grid)->bool{
+        p.row>=0 && p.row<self.height as i64 && p.col>=0 && p.col<self.width as i64
+    }
+
+    fn grid_can_pass(&self,p:&Grid)->bool{
+        self.grid_in_map(p) &&
+            ( self.layout[p.row as usize][p.col as usize]|PASS_ALL == PASS_ALL)
+    }
+
+    pub(super) fn spfa(&self,start:Grid,end:Grid)->u32{
+        let mut queue = VecDeque::new();
+        queue.push_back(start);
+        let mut dis = vec![vec![std::u32::MAX;self.width as usize];self.height as usize];
+        dis[start.row as usize][start.col as usize] = 0;
+        let dir = vec![Grid{row:0,col:1},Grid{row:0,col:-1},Grid{row:1,col:0},Grid{row:-1,col:0}];
+        while !queue.is_empty(){
+            let cur = queue.pop_front().unwrap();
+            for d in dir.iter(){
+                let next = cur + d.clone();
+                if ! self.grid_can_pass(&next){
+                    continue;
+                }
+                if dis[next.row as usize][next.col as usize]>dis[cur.row as usize][cur.col as usize]+1{
+                    dis[next.row as usize][next.col as usize] = dis[cur.row as usize][cur.col as usize]+1;
+                    if queue.iter().all(|p|*p!=next){
+                        queue.push_back(next);
+                    }
+                }
+            }
+        }
+        dis[end.row as usize][end.col as usize]
+    }
 }

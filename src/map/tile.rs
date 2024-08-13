@@ -1,8 +1,5 @@
 use std::collections::HashMap;
 
-// const VEC_LEN:usize=1024;
-// mod blockinfo;
-// mod placeinfo;
 use super::Map;
 use serde::{Deserialize, Serialize};
 use serde_json::{from_value, Value};
