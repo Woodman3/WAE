@@ -143,27 +143,35 @@ impl Map {
             ( self.layout[p.row as usize][p.col as usize]|PASS_ALL == PASS_ALL)
     }
 
-    pub(super) fn spfa(&self,start:Grid,end:Grid)->u32{
+    pub(super) fn spfa(&self,start:Grid,end:Grid)->Vec<Grid>{
         let mut queue = VecDeque::new();
         queue.push_back(start);
         let mut dis = vec![vec![std::u32::MAX;self.width as usize];self.height as usize];
+        let mut path = vec![vec![start;self.width as usize];self.height as usize];
         dis[start.row as usize][start.col as usize] = 0;
         let dir = vec![Grid{row:0,col:1},Grid{row:0,col:-1},Grid{row:1,col:0},Grid{row:-1,col:0}];
         while !queue.is_empty(){
             let cur = queue.pop_front().unwrap();
             for d in dir.iter(){
-                let next = cur + d.clone();
+                let next = cur + *d;
                 if ! self.grid_can_pass(&next){
                     continue;
                 }
                 if dis[next.row as usize][next.col as usize]>dis[cur.row as usize][cur.col as usize]+1{
                     dis[next.row as usize][next.col as usize] = dis[cur.row as usize][cur.col as usize]+1;
+                    path[next.row as usize][next.col as usize] = cur;
                     if queue.iter().all(|p|*p!=next){
                         queue.push_back(next);
                     }
                 }
             }
         }
-        dis[end.row as usize][end.col as usize]
+        let mut route = Vec::new();
+        let mut p = end;
+        while(p!=start){
+            route.push(p);
+            p = path[p.row as usize][p.col as usize];
+        }
+        route
     }
 }

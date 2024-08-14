@@ -55,6 +55,7 @@ mod test {
         env_logger::init();
         let mut ca = Copilot::build_calculator("./copilot.json", "./ArknightsGameData").unwrap();
         let mut f = ca.frame_vec.pop().unwrap();
+        let r = f.enemy_set[0].borrow().route.clone();
         let dis = f.map.spfa((0,10).into(),(2,0).into()); 
         println!("{:?}",dis);
     }
