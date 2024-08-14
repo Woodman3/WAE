@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::collections::VecDeque;
 use std::i64;
 use std::path::Path;
+use std::path::PathBuf;
 use std::rc::{Rc,Weak};
 use std::cell::RefCell;
 
@@ -246,19 +247,31 @@ impl Loader {
         let map: Map = level.map_data.clone().into();
         Ok(map)
     }
+    
+    pub(super) fn load_level_by_path(&self, path: &PathBuf) -> Result<Calculator> {
+        let level_json = load_json_file(path)?;
+        let level = serde_json::from_value::<OfficialLevelData>(level_json)?;
+        self.load_level(level)
+    }
 
     /// all level file is format as "level_*.json", so the level_name should be the * part
-    pub(crate) fn load_level(&self, level_name: String) -> Result<Calculator> {
+    pub(crate) fn load_level_by_name(&self, level_name: String) -> Result<Calculator> {
         let level = self.find_level(level_name)?;
+        self.load_level(level)
+    }
+
+    fn load_level(&self,level:OfficialLevelData)-> Result<Calculator>{
         let map = self.load_map(&level)?;
         let mut enemy_initial = HashMap::new();
         for e in level.enemy_db_refs.iter() {
-            let enemy = self.load_official_enemy(&e.id, e.level as usize)?;
+            let enemy = self.load_enemy(&e.id, e.level as usize)?;
             enemy_initial.insert(e.id.clone(), enemy);
         };
         let mut route = Vec::new();
         for r in level.routes.iter(){
-            route.push(Rc::new(r.clone().into()));
+            let mut r:Route = r.clone().into(); 
+            r.complete(&map); 
+            route.push(Rc::new(r));
         }
         let mut timeline = VecDeque::new();
         for w in level.waves.iter(){
@@ -297,62 +310,5 @@ impl Loader {
         };
         return Ok(c);
         todo!("load route")
-    }
-}
-
-#[cfg(test)]
-mod test {
-
-    use serde_json::from_value;
-
-    use super::*;
-
-    fn find_all_file_in_dir(dir: &Path, list: &mut Vec<String>) {
-        if dir.is_dir() {
-            for entry in std::fs::read_dir(dir).unwrap() {
-                let entry = entry.unwrap();
-                let path = entry.path();
-                if path.is_file() {
-                    get_value_by_key(&path, list);
-                } else if path.is_dir() {
-                    find_all_file_in_dir(&path, list);
-                }
-            }
-        }
-    }
-
-    fn get_value_by_key(path: &Path, list: &mut Vec<String>) {
-        let json = load_json_file(path).unwrap();
-        if let Ok(data) = from_value::<OfficialLevelData>(json) {
-            for w in data.waves.iter() {
-                for f in w.fragments.iter() {
-                    for a in f.actions.iter() {
-                        if !list.contains(&a.action_type){
-                            list.push(a.action_type.clone());
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    // #[test]
-    // fn find_all_value() {
-    //     // let mut value_list=Vec::<(TileBuildable,TileHeight)>::new();
-    //     let mut value_list = Vec::new();
-    //     let path = Path::new("ArknightsGameData/zh_CN/gamedata/levels");
-    //     find_all_file_in_dir(path, &mut value_list);
-    //     println!("{:?}", value_list);
-    // }
-
-    #[test]
-    fn test_load_level() {
-        let path = "./ArknightsGameData";
-        let loader = Loader::new(path).unwrap();
-        // let c = loader.load_level("act5d0_ex07".to_string()).unwrap();
-        let level = loader.load_level("main_01-01".to_string()).unwrap();
-        for t in level.timeline.iter(){
-            println!("{:?}",t);
-        }
     }
 }

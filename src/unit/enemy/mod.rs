@@ -68,14 +68,6 @@ impl Enemy {
                     }
                     None => self.route.end,
                 };
-                // match self.route.checkpoints[self.route_stage] {
-                //     Move(p) => {
-                //         self.next_point = p;
-                //     }
-                //     None => {
-                //         todo!("enemy route");
-                //     }
-                // }
             } else if(self.route_stage == self.route.checkpoints.len()){
                 self.next_point=self.route.end;
             }else{

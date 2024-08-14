@@ -29,7 +29,7 @@ fn main() {
     log::set_max_level(LevelFilter::Debug);
 
 
-    let l = Loader::new("ArknightsGameData").unwrap();
+    // let l = Loader::new("ArknightsGameData").unwrap();
     // let ca = l.load_level("main_01-01".to_string()).unwrap();
     let mut ca = Copilot::build_calculator("./copilot.json", "./ArknightsGameData").unwrap();
     let mut native_config = eframe::NativeOptions::default();
@@ -50,14 +50,13 @@ fn main() {
 mod test {
     use super::*;
 
-    // #[test]
-    // fn test_loader(){
-    //     env_logger::init();
-    //     let l = Loader::new("ArknightsGameData").unwrap();
-    //     let mut Ca = l.load_level("level_main_01-07".to_string()).unwrap();
-    //     let mut native_config = eframe::NativeOptions::default();
-    //     native_config.viewport.inner_size = vec2(1000.0, 500.0).into();
-    //     eframe::run_native("BEC", native_config, Box::new(|cc| {
-    //         Box::new(Visualizer::new(cc,Ca))}));
-    // }
+    #[test]
+    fn test_loader(){
+        env_logger::init();
+        let mut ca = Copilot::build_calculator("./copilot.json", "./ArknightsGameData").unwrap();
+        let mut f = ca.frame_vec.pop().unwrap();
+        let r = f.enemy_set[0].borrow().route.clone();
+        let dis = f.map.spfa((0,10).into(),(2,0).into()); 
+        println!("{:?}",dis);
+    }
 }

@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use super::render_config::*;
 use crate::{
     frame::Frame,
@@ -48,6 +50,7 @@ impl<'a> Render<'a> {
                 None,
             );
         }
+        let mut p: HashMap<(u8, u8, u8), PathBuilder> = HashMap::new();
         for i in 0..self.frame.map.height as usize {
             for j in 0..self.frame.map.width as usize {
                 let block = self.frame.map.layout[i][j];
@@ -65,18 +68,61 @@ impl<'a> Render<'a> {
                     _ => 0,
                 };
                 let a = 255;
-                block_paint.set_color(Color::from_rgba8(r, g, b, a));
-                let pb = PathBuilder::new();
                 let x = *PADDING + j as f32 * *BLOCK_SIZE;
                 let y = *PADDING + i as f32 * *BLOCK_SIZE;
-                self.pixmap.fill_rect(
-                    Rect::from_xywh(x, y, *BLOCK_SIZE, *BLOCK_SIZE).unwrap(),
-                    &block_paint,
-                    Transform::identity(),
-                    None,
-                )
+                block_paint.set_color(Color::from_rgba8(r, g, b, a));
+                if let Some(pb) =p.get_mut(&(r,g,b)){
+                    pb.push_rect(Rect::from_xywh(x, y, *BLOCK_SIZE, *BLOCK_SIZE).unwrap());
+                }else{
+                    let mut pb = PathBuilder::new();
+                    pb.push_rect(Rect::from_xywh(x, y, *BLOCK_SIZE, *BLOCK_SIZE).unwrap());
+                    p.insert((r,g,b),pb);
+                }
             }
         }
+        for ((r,g,b),path) in p{
+            if let Some(path) = path.finish(){
+                let mut block_paint = Paint::default();
+                block_paint.set_color(Color::from_rgba8(r, g, b, 255));
+                self.pixmap.fill_path(
+                    &path,
+                    &block_paint,
+                    FillRule::EvenOdd,
+                    Transform::identity(),
+                    None,
+                );
+            }
+        }
+        // a different way to paint block , doc say it will slower than the above way,but i seem no difference, so i keep it here
+        // for i in 0..self.frame.map.height as usize {
+        //     for j in 0..self.frame.map.width as usize {
+        //         let block = self.frame.map.layout[i][j];
+        //         let mut block_paint = Paint::default();
+        //         let r = match block & PASS_ALL {
+        //             0 => 255,
+        //             _ => 0,
+        //         };
+        //         let g = match block & DEPLOY_NONE {
+        //             0 => 255,
+        //             _ => 0,
+        //         };
+        //         let b = match block & DEPLOY_LOW {
+        //             0 => 255,
+        //             _ => 0,
+        //         };
+        //         let a = 255;
+        //         block_paint.set_color(Color::from_rgba8(r, g, b, a));
+        //         let pb = PathBuilder::new();
+        //         let x = *PADDING + j as f32 * *BLOCK_SIZE;
+        //         let y = *PADDING + i as f32 * *BLOCK_SIZE;
+        //         self.pixmap.fill_rect(
+        //             Rect::from_xywh(x, y, *BLOCK_SIZE, *BLOCK_SIZE).unwrap(),
+        //             &block_paint,
+        //             Transform::identity(),
+        //             None,
+        //         )
+        //     }
+        // }
     }
     fn paint_enemy(&mut self) {
         let mut enemy_paint = Paint::default();

@@ -1,6 +1,8 @@
 pub(crate) mod enemy_loader;
 pub(crate) mod level_loader;
 pub(crate) mod operator_loader;
+#[cfg(test)]
+mod test;
 
 use super::load_json_file;
 use enemy_loader::{OfficialEnemy, OfficialEnemyValue};
@@ -45,14 +47,5 @@ impl Loader {
             skill_table,
             enemy_database,
         })
-    }
-}
-
-mod test {
-    use super::*;
-    #[test]
-    fn test_loader() {
-        let path = "./ArknightsGameData";
-        let loader = Loader::new(path).unwrap();
     }
 }
