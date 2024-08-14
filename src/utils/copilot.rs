@@ -212,7 +212,7 @@ impl Copilot {
         let json = load_json_file(copilot_path)?;
         let copilot_data: CopilotData = serde_json::from_value(json)?;
         let loader = Loader::new(game_data_path)?;
-        let mut calculator = loader.load_level(copilot_data.stage_name.clone())?;
+        let mut calculator = loader.load_level_by_name(copilot_data.stage_name.clone())?;
         for o in copilot_data.operators.iter() {
             let skill_index = o.skill.unwrap_or(0);
             let (level, elite, skill_level) = match &o.requirement {

@@ -180,7 +180,7 @@ impl Into<UnitInfo> for OfficialEnemyAttribute {
 }
 
 impl Loader {
-    pub(crate) fn load_official_enemy(&self, key: &String, level: usize) -> Result<Enemy> {
+    pub(crate) fn load_enemy(&self, key: &String, level: usize) -> Result<Enemy> {
         let data = self.enemy_database.get(key).ok_or("Key not found")?;
         let mut enemy = OfficialEnemyData::default();
         for i in 0..=level {

@@ -288,13 +288,3 @@ impl OfficialRange {
     }
 }
 
-#[cfg(test)]
-mod test {
-    use super::Loader;
-    #[test]
-    fn loader_test() {
-        let l = Loader::new("./ArknightsGameData").unwrap();
-        let oo = l.load_operator("风笛".into(), 2, 30, 2, 8).unwrap();
-        println!("{:?}", oo);
-    }
-}
