@@ -150,6 +150,3 @@ enemy info:",
         write!(f, "")
     }
 }
-
-#[cfg(test)]
-pub mod test {}

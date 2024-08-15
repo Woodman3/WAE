@@ -209,5 +209,3 @@ impl<'a> Render<'a> {
     }
 }
 
-#[cfg(test)]
-mod test {}

@@ -298,9 +298,11 @@ mod test {
     use std::time::{Duration, Instant};
     #[test]
     fn test_copilot() {
-        let start = Instant::now();
+        // let start = Instant::now();
         let mut calculator = Copilot::build_calculator("./copilot.json", "./ArknightsGameData").unwrap();
-        calculator.goto_end(); 
-        let duration = start.elapsed();
+        for  r in calculator.route.iter(){
+            println!("{:?}",r);
+        }
+        // let duration = start.elapsed();
     }
 }

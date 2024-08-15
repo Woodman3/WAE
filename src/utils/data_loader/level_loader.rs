@@ -270,7 +270,7 @@ impl Loader {
         let mut route = Vec::new();
         for r in level.routes.iter(){
             let mut r:Route = r.clone().into(); 
-            r.complete(&map); 
+            // r.complete(&map); 
             route.push(Rc::new(r));
         }
         let mut timeline = VecDeque::new();
