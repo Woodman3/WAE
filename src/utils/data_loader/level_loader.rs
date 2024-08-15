@@ -32,7 +32,7 @@ use crate::utils::math::Point;
 
 #[derive(Deserialize, Default, Debug)]
 #[serde(rename_all = "camelCase")]
-struct OfficialLevelData {
+pub(super) struct OfficialLevelData {
     pub(super) options: Value,
     pub(super) map_data: OfficialMapData,
     pub(super) routes: Vec<OfficialRoute>,

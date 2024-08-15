@@ -1,3 +1,6 @@
+// use std::cell::RefCell;
+// use std::rc::Rc
+
 use super::*;
 
 #[test]
@@ -39,8 +42,8 @@ fn load_enemy_test(){
 }
 
 
-fn find_all_file_in_dir<F>(dir: &Path, f:&mut F)
-where F:FnMut(&PathBuf)
+fn find_all_file_in_dir<F>(dir: &Path,f: &mut F)
+where F:FnMut(PathBuf)
 {
     if dir.is_dir() {
         for entry in std::fs::read_dir(dir).unwrap() {
@@ -48,7 +51,7 @@ where F:FnMut(&PathBuf)
             let path = entry.path();
             if path.is_file() {
                 // get_value_by_key(&path, list);
-                f(&path)
+                f(path);
             } else if path.is_dir() {
                 find_all_file_in_dir(&path,f);
             }
@@ -56,20 +59,20 @@ where F:FnMut(&PathBuf)
     }
 }
 
-fn get_value_by_key(path: &Path, list: &mut Vec<String>) {
-    let json = load_json_file(path).unwrap();
-    if let Ok(data) = from_value::<OfficialLevelData>(json) {
-        for w in data.waves.iter() {
-            for f in w.fragments.iter() {
-                for a in f.actions.iter() {
-                    if !list.contains(&a.action_type){
-                        list.push(a.action_type.clone());
-                    }
-                }
-            }
-        }
-    }
-}
+// fn get_value_by_key(path: &Path, list: &mut Vec<String>) {
+//     let json = load_json_file(path).unwrap();
+//     if let Ok(data) = from_value::<level_loader::OfficialLevelData>(json) {
+//         for w in data.waves.iter() {
+//             for f in w.fragments.iter() {
+//                 for a in f.actions.iter() {
+//                     if !list.contains(&a.action_type){
+//                         list.push(a.action_type.clone());
+//                     }
+//                 }
+//             }
+//         }
+//     }
+// }
 
 // #[test]
 // fn find_all_value() {
@@ -85,12 +88,19 @@ fn load_level_test() {
     let path = "./ArknightsGameData";
     let loader = Loader::new(path).unwrap();
     let mut fail_set = Vec::new();
-    let f = |path|{
-        if let Err(_) = loader.load_level_by_path(path){
-            fail_set.push(path);
+    let mut success_count = 0;
+    let mut f = |path|{
+        if let Err(_) = loader.load_level_by_path(&path){
+            let file_name = path.file_name().unwrap().to_str().unwrap().to_string();
+            fail_set.push(file_name);
+        }else{
+            success_count+=1;
         }
     };
-    let path = Path::new("ArknightsGameData/zh_CN/gamedata/levels");
+    let path = Path::new("ArknightsGameData/zh_CN/gamedata/levels/activities");
     find_all_file_in_dir(path,&mut f);
-    let level = loader.load_level_by_name("main_01-01".to_string()).unwrap();
+    let path = Path::new("ArknightsGameData/zh_CN/gamedata/levels/obt");
+    find_all_file_in_dir(path,&mut f);
+    println!("success count:{success_count},failed count:{}, {:?}",fail_set.len(),fail_set);
+    assert_eq!(fail_set.len(),0);
 }
