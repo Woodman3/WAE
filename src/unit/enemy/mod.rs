@@ -66,15 +66,6 @@ impl Enemy {
                         _ => continue,
                     }
                 }
-                // self.next_point = match self.route.checkpoints.iter().position(|c| matches!(c, CheckPoint::Move(_))) {
-                //     Some(p) => {
-                //         match self.route.checkpoints[p] {
-                //             CheckPoint::Move(p) => p,
-                //             _ => self.route.end,
-                //         }
-                //     }
-                //     None => self.route.end,
-                // };
             } else if(self.route_stage == self.route.checkpoints.len()){
                 self.next_point=self.route.end;
             }else{

@@ -12,15 +12,17 @@ fn test_loader() {
 fn load_operator_test() {
     let l = Loader::new("./ArknightsGameData").unwrap();
     let mut fail_set= Vec::new();
+    let mut success_count = 0;
     for ( key,v ) in l.character_table.as_object().unwrap(){
         let name = v["name"].as_str().unwrap().to_string();
         if let Ok(o) = l.load_operator(name.clone(),0,1,1,1){
-            continue;
+            success_count+=1;
         }else{
             fail_set.push((key.clone(),name));
         }
     }
-    println!("operator load failed: {:?}",fail_set);
+    println!("operator load success count:{}",success_count);
+    println!("load failed count {}: {:?}",fail_set.len(),fail_set);
     assert_eq!(fail_set.len(),0);
 }
 
@@ -28,16 +30,18 @@ fn load_operator_test() {
 fn load_enemy_test(){
     let l = Loader::new("./ArknightsGameData").unwrap();
     let mut fail_set= Vec::new();
+    let mut success_count = 0;
     for ( key,v ) in l.enemy_database.iter(){
         for i in 0..v.len(){
             if let Ok(e) = l.load_enemy(key,i){
-                continue;
+                success_count+=1;
             }else{
                 fail_set.push((key.clone(),i)); 
             }
         }
     }
-    println!("enemy load failed: {:?}",fail_set);
+    println!("enemy load success count:{}",success_count);
+    println!("enemy load failed count {}: {:?}",fail_set.len(),fail_set);
     assert_eq!(fail_set.len(),0);
 }
 
@@ -103,4 +107,6 @@ fn load_level_test() {
     find_all_file_in_dir(path,&mut f);
     println!("success count:{success_count},failed count:{}, {:?}",fail_set.len(),fail_set);
     assert_eq!(fail_set.len(),0);
+
+    // loader.load_level_by_name("main_01-07".into()).unwrap();
 }

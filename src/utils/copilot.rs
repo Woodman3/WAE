@@ -300,8 +300,8 @@ mod test {
     fn test_copilot() {
         // let start = Instant::now();
         let mut calculator = Copilot::build_calculator("./copilot.json", "./ArknightsGameData").unwrap();
-        for  r in calculator.route.iter(){
-            println!("{:?}",r);
+        for  t in calculator.timeline.iter(){
+            println!("{:?}",t);
         }
         // let duration = start.elapsed();
     }

@@ -33,7 +33,7 @@ use crate::utils::math::Point;
 #[derive(Deserialize, Default, Debug)]
 #[serde(rename_all = "camelCase")]
 pub(super) struct OfficialLevelData {
-    pub(super) options: Value,
+    pub(super) options: OfficialLevelOption,
     pub(super) map_data: OfficialMapData,
     pub(super) routes: Vec<OfficialRoute>,
     pub(super) enemy_db_refs: Vec<OfficialEnemyDbRef>,
@@ -43,14 +43,25 @@ pub(super) struct OfficialLevelData {
 
 #[derive(Deserialize, Default, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
-struct OfficialMapData {
+pub(super) struct OfficialLevelOption{
+    pub(super) character_limit:u32,
+    pub(super) max_life_point:u32,
+    pub(super) initial_cost:u32,
+    pub(super) max_cost:u32,
+    pub(super) cost_increase_time:f32,
+    pub(super) max_play_time:f32,
+}
+
+#[derive(Deserialize, Default, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub(super) struct OfficialMapData {
     pub(super) map: Vec<Vec<u64>>,
     pub(super) tiles: Vec<OfficialTile>,
 }
 
 #[derive(Deserialize, Default, Debug, Clone, Copy)]
 #[serde(rename_all = "camelCase")]
-struct OfficialTile {
+pub(super) struct OfficialTile {
     pub(super) tile_key: TileKey,
     pub(super) height_type: TileHeight,
     pub(super) buildable_type: TileBuildable,
@@ -62,7 +73,7 @@ struct OfficialTile {
 
 #[derive(Deserialize, Default, Debug,Clone)]
 #[serde(rename_all = "camelCase")]
-struct OfficialRoute {
+pub(super) struct OfficialRoute {
     pub(super) motion_mode: OfficialRouteType,
     pub(super) start_position: Grid,
     pub(super) end_position: Grid,
@@ -77,7 +88,7 @@ struct OfficialRoute {
 
 #[derive(Deserialize, Default, Debug,Clone)]
 #[serde(rename_all = "camelCase")]
-struct OfficialCheckPoint {
+pub(super) struct OfficialCheckPoint {
     #[serde(alias = "type")]
     pub(super) tag: OfficialCheckPointType,
     pub(super) time: f64,
@@ -88,7 +99,7 @@ struct OfficialCheckPoint {
 
 #[derive(Serialize, Deserialize, Debug, Default, Clone, Copy, PartialEq)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-enum OfficialRouteType {
+pub(super) enum OfficialRouteType {
     // up to 2024/7/29, all of its value are below
     #[default]
     ENum,
@@ -98,7 +109,7 @@ enum OfficialRouteType {
 
 #[derive(Serialize, Deserialize, Debug, Default, Clone, Copy, PartialEq)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-enum OfficialCheckPointType {
+pub(super) enum OfficialCheckPointType {
     // up to 2024/7/29, all of its value are below
     #[default]
     Move,
@@ -111,7 +122,7 @@ enum OfficialCheckPointType {
 }
 #[derive(Deserialize, Default, Debug)]
 #[serde(rename_all = "camelCase")]
-struct OfficialEnemyDbRef {
+pub(super) struct OfficialEnemyDbRef {
     pub(super) use_db: bool,
     pub(super) id: String,
     pub(super) level: i32,
@@ -120,7 +131,7 @@ struct OfficialEnemyDbRef {
 
 #[derive(Deserialize, Default, Debug)]
 #[serde(rename_all = "camelCase")]
-struct OfficialWave {
+pub(super) struct OfficialWave {
     pub(super) pre_delay: f32,
     pub(super) post_delay: f32,
     pub(super) fragments: Vec<OfficialWaveFragment>,
@@ -128,14 +139,14 @@ struct OfficialWave {
 
 #[derive(Deserialize, Default, Debug)]
 #[serde(rename_all = "camelCase")]
-struct OfficialWaveFragment {
+pub(super) struct OfficialWaveFragment {
     pub(super) pre_delay: f32,
     pub(super) actions: Vec<OfficialWaveAction>,
 }
 
 #[derive(Deserialize, Default, Debug)]
 #[serde(rename_all = "camelCase")]
-struct OfficialWaveAction {
+pub(super) struct OfficialWaveAction {
     //up to 2024/8/8 ["SPAWN", "STORY", "DISPLAY_ENEMY_INFO", "PREVIEW_CURSOR", "ACTIVATE_PREDEFINED", "PLAY_OPERA", "PLAY_BGM", "DIALOG", "TRIGGER_PREDEFINED", "BATTLE_EVENTS", "WITHDRAW_PREDEFINED"]
     //it seems only "spawn" related to the enemy behavior
     pub(super) action_type: String,
