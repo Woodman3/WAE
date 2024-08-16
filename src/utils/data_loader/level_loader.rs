@@ -150,9 +150,12 @@ pub(super) struct OfficialWaveAction {
     //up to 2024/8/8 ["SPAWN", "STORY", "DISPLAY_ENEMY_INFO", "PREVIEW_CURSOR", "ACTIVATE_PREDEFINED", "PLAY_OPERA", "PLAY_BGM", "DIALOG", "TRIGGER_PREDEFINED", "BATTLE_EVENTS", "WITHDRAW_PREDEFINED"]
     //it seems only "spawn" related to the enemy behavior
     pub(super) action_type: String,
+    pub(super) managed_by_scheduler:bool,
     pub(super) pre_delay: f32,
     pub(super) route_index: u32,
     pub(super) key:String,
+    pub(super) count:u32,
+    pub(super) interval:u32,
 }
 
 fn find_file_in_dir(dir: &Path, file_name: &str) -> Result<String> {

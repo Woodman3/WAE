@@ -19,6 +19,7 @@ mod route;
 mod timeline;
 mod unit;
 mod utils;
+mod spawner;
 
 fn main() {
     use eframe::egui::vec2;
