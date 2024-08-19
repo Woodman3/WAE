@@ -136,7 +136,9 @@ pub unsafe extern "C" fn action(args: *const c_char) -> u8 {
         if let Ok(json) = serde_json::from_str::<Value>(js) {
             if let Ok(e) = action_to_event(&json) {
                 if let Some(Ca) = INSTANCE.get_mut() {
-                    Ca.insert_event(e);
+                    
+                    // Ca.insert_event(e);
+                    todo!("insert_event");
                     return 0;
                 }
                 println!("can't get instance");

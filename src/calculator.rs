@@ -30,6 +30,7 @@ pub struct Calculator {
     /// first element refer to time
     /// second element refer to event vector
     pub(super) timeline: VecDeque<EventWithTime>,
+    pub(super) event_buffer:Vec<Event>,
     pub(super) route: Vec<Rc<Route>>,
     pub(super) time_remain: i64,
     /// enemy in initial statement,if we place enemy to map,we will get enemy in it
@@ -59,10 +60,13 @@ impl Calculator {
     fn process_frame(&mut self, f: &mut Frame) {
         if let Some(copilot) = &self.copilot {
             let ev = copilot.query(f);
-            for e in ev{
-                self.insert_event(Rc::new(e));
-            }
+            self.event_buffer.extend(ev);
+            // for e in ev{
+            //     self.insert_event(Rc::new(e));
+            // }
         }
+        let ev = self.spawner.step(f);
+        self.event_buffer.extend(ev);
         self.event(f);
         f.step(self);
     }
@@ -120,21 +124,26 @@ impl Calculator {
     /// mostly is happen in an specify time but sometime it happen after something has happen
     /// it can't be skip
     fn event(&mut self, f: &mut Frame) {
-        while self.timeline.len() != 0 {
-            if let Some(et) = self.timeline.front() {
-                if et.time_stamp != f.timestamp {
-                    if et.time_stamp < f.timestamp {
-                        warn!("Some event not happened before,this event has drop");
-                        self.timeline.pop_front();
-                        continue;
-                    } else {
-                        break;
-                    }
-                } else {
-                    et.event.happen(f, self);
-                    self.timeline.pop_front();
-                }
-            }
+        // while self.timeline.len() != 0 {
+        //     if let Some(et) = self.timeline.front() {
+        //         if et.time_stamp != f.timestamp {
+        //             if et.time_stamp < f.timestamp {
+        //                 warn!("Some event not happened before,this event has drop");
+        //                 self.timeline.pop_front();
+        //                 continue;
+        //             } else {
+        //                 break;
+        //             }
+        //         } else {
+        //             et.event.happen(f, self);
+        //             self.timeline.pop_front();
+        //         }
+        //     }
+        // }
+
+        let ev = std::mem::take(&mut self.event_buffer);
+        for e in ev{
+            e.happen(f,&self);
         }
     }
     pub(super) fn has_end(&self)->bool{
@@ -161,6 +170,7 @@ impl Calculator {
         self.frame_vec.last()
     }
 
+    
     pub(super) fn insert_event(&mut self,e:Rc<Event>)->bool{
         if let Some(f) = self.frame_vec.last(){
             let time = f.timestamp+1;
@@ -169,6 +179,7 @@ impl Calculator {
             return true
         }         
         false
+        // self.event_buffer.push((*e).clone());
     }
 }
 

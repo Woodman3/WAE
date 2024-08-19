@@ -30,7 +30,7 @@ pub(super) struct SubSubWave{
 }
 
 impl Spawner{
-    fn step(&mut self,f: &Frame)->Vec<Event>{
+    pub(super) fn step(&mut self,f: &Frame)->Vec<Event>{
         let mut ret = Vec::new();
         if let Some(mut w) =self.wave.pop(){
             ret.extend(w.step(f));            

@@ -111,3 +111,10 @@ fn load_level_test() {
 
     // loader.debug_level("act10d5_01".into()).unwrap();
 }
+
+#[test]
+fn single_test(){
+    let path = "./ArknightsGameData";
+    let loader = Loader::new(path).unwrap();
+    loader.load_operator("芙蓉".into(), 0, 1, 1, 1).unwrap();
+}
