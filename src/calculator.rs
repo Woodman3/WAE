@@ -2,6 +2,7 @@ use std::cell::RefCell;
 
 
 use crate::frame::{Frame, OperatorRef};
+use crate::spawner::Spawner;
 use crate::timeline::{Event, EventWithTime, read_timeline};
 use crate::route::Route;
 use crate::unit;
@@ -36,6 +37,7 @@ pub struct Calculator {
     /// time that lase enemy may push,it isn't certainly because some enemy place by time
     pub(super) last_enemy_time:u64,
     pub(super) copilot: Option<Copilot>,
+    pub(super) spawner: Spawner,
 }
 
 impl Calculator {

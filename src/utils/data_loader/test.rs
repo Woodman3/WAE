@@ -101,6 +101,7 @@ fn load_level_test() {
             success_count+=1;
         }
     };
+    // still has 800+ levels failed , fuck 
     let path = Path::new("ArknightsGameData/zh_CN/gamedata/levels/activities");
     find_all_file_in_dir(path,&mut f);
     let path = Path::new("ArknightsGameData/zh_CN/gamedata/levels/obt");
@@ -108,5 +109,5 @@ fn load_level_test() {
     println!("success count:{success_count},failed count:{}, {:?}",fail_set.len(),fail_set);
     assert_eq!(fail_set.len(),0);
 
-    // loader.load_level_by_name("main_01-07".into()).unwrap();
+    // loader.debug_level("act10d5_01".into()).unwrap();
 }

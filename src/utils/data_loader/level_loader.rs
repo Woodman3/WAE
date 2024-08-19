@@ -8,6 +8,7 @@ use std::cell::RefCell;
 
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use serde_path_to_error;
 
 use super::Loader;
 use super::Result;
@@ -22,6 +23,8 @@ use crate::map::tile::{LayoutCode, TileBuildable, TileHeight, TileKey, TilePassa
 use crate::map::Map;
 use crate::route::CheckPoint;
 use crate::route::Route;
+use crate::spawner;
+use crate::spawner::Spawner;
 use crate::timeline;
 use crate::timeline::hostile::EnemyPlaceEvent;
 use crate::timeline::EventWithTime;
@@ -29,6 +32,7 @@ use crate::unit::enemy::Enemy;
 use crate::utils::load_json_file;
 use crate::utils::math::Grid;
 use crate::utils::math::Point;
+use crate::spawner::{SubSubWave,SubWave,Wave};
 
 #[derive(Deserialize, Default, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -38,7 +42,7 @@ pub(super) struct OfficialLevelData {
     pub(super) routes: Vec<OfficialRoute>,
     pub(super) enemy_db_refs: Vec<OfficialEnemyDbRef>,
     pub(super) waves: Vec<OfficialWave>,
-    pub(super) random_seed: u32,
+    pub(super) random_seed: i32,
 }
 
 #[derive(Deserialize, Default, Debug, Clone)]
@@ -129,7 +133,7 @@ pub(super) struct OfficialEnemyDbRef {
     pub(super) overwritten_data: Option<Value>,
 }
 
-#[derive(Deserialize, Default, Debug)]
+#[derive(Deserialize, Default, Debug,Clone)]
 #[serde(rename_all = "camelCase")]
 pub(super) struct OfficialWave {
     pub(super) pre_delay: f32,
@@ -137,14 +141,14 @@ pub(super) struct OfficialWave {
     pub(super) fragments: Vec<OfficialWaveFragment>,
 }
 
-#[derive(Deserialize, Default, Debug)]
+#[derive(Deserialize, Default, Debug,Clone)]
 #[serde(rename_all = "camelCase")]
 pub(super) struct OfficialWaveFragment {
     pub(super) pre_delay: f32,
     pub(super) actions: Vec<OfficialWaveAction>,
 }
 
-#[derive(Deserialize, Default, Debug)]
+#[derive(Deserialize, Default, Debug,Clone)]
 #[serde(rename_all = "camelCase")]
 pub(super) struct OfficialWaveAction {
     //up to 2024/8/8 ["SPAWN", "STORY", "DISPLAY_ENEMY_INFO", "PREVIEW_CURSOR", "ACTIVATE_PREDEFINED", "PLAY_OPERA", "PLAY_BGM", "DIALOG", "TRIGGER_PREDEFINED", "BATTLE_EVENTS", "WITHDRAW_PREDEFINED"]
@@ -155,7 +159,7 @@ pub(super) struct OfficialWaveAction {
     pub(super) route_index: u32,
     pub(super) key:String,
     pub(super) count:u32,
-    pub(super) interval:u32,
+    pub(super) interval:f32,
 }
 
 fn find_file_in_dir(dir: &Path, file_name: &str) -> Result<String> {
@@ -223,8 +227,6 @@ impl Into<LayoutCode> for OfficialTile {
     }
 }
 
-
-
 //todo:there stil have some problem
 impl Into<Map> for OfficialMapData {
     fn into(self) -> Map {
@@ -248,6 +250,58 @@ impl Into<Map> for OfficialMapData {
         }
     }
 }
+
+impl Into<SubSubWave> for OfficialWaveAction {
+    fn into(self) -> SubSubWave {
+        SubSubWave {
+            count: self.count as i32,
+            interval: self.interval as f32,
+            enemy: self.key.clone(),
+            route: self.route_index as u32,
+            pre_delay: self.pre_delay,
+            cur_delay: self.pre_delay,
+            cur_count: 0,
+            cur_interval: self.interval as f32,
+        }
+    }
+}
+
+impl Into<SubWave> for OfficialWaveFragment {
+    fn into(self) -> SubWave {
+        let mut wave = Vec::new();
+        for a in self.actions.into_iter().rev() {
+            wave.push(a.into());
+        }
+        SubWave {
+            pre_delay: self.pre_delay,
+            wave,
+        }
+    }
+}
+
+impl Into<Wave> for OfficialWave {
+    fn into(self) -> Wave {
+        let mut wave = Vec::new();
+        for f in self.fragments {
+            wave.push(f.into());
+        }
+        Wave {
+            pre_delay: self.pre_delay,
+            wave,
+        }
+    }
+}
+
+impl Into<Spawner> for Vec<OfficialWave> {
+    fn into(self) -> Spawner {
+        let mut wave = Vec::new();
+        for w in self.into_iter().rev() {
+            wave.push(w.into());
+        }
+        Spawner { wave }
+    }
+}   
+
 impl Loader {
     fn find_level(&self, level_name: String) -> Result<OfficialLevelData> {
         let path = self.path.join("levels");
@@ -255,8 +309,26 @@ impl Loader {
         let file_path = find_file_in_dir(&path, &level_file)?;
         let level_json = load_json_file(file_path)?;
         let level = serde_json::from_value::<OfficialLevelData>(level_json)?;
+
+        // use from debug
+        // let binding = level_json.to_string();
+        // let jd = &mut serde_json::Deserializer::from_str(binding.as_str());
+        // let level = serde_path_to_error::deserialize(jd)?;
+
         Ok(level)
     }
+
+    pub(super) fn debug_level(&self, level_name: String) -> Result<OfficialLevelData> {
+        let path = self.path.join("levels");
+        let level_file = format!("level_{}.json", level_name);
+        let file_path = find_file_in_dir(&path, &level_file)?;
+        let file = std::fs::File::open(file_path)?;
+        let reader = std::io::BufReader::new(file);
+        let jd = &mut serde_json::Deserializer::from_reader(reader);
+        let level = serde_path_to_error::deserialize(jd)?;
+        Ok(level)
+    }
+
     fn load_map(&self, level: &OfficialLevelData) -> Result<Map> {
         let map: Map = level.map_data.clone().into();
         Ok(map)
@@ -309,6 +381,7 @@ impl Loader {
                 }
             }
         };
+        let spawner:Spawner = level.waves.clone().into();
         let f = Frame {
             map,
             ..Default::default()
@@ -320,6 +393,7 @@ impl Loader {
             timeline,
             route,
             enemy_initial,
+            spawner,
             ..Default::default()
         };
         return Ok(c);

@@ -82,6 +82,7 @@ pub(crate) enum TileKey {
     TileInfection,
     TileVolcano,
     TileFenceBound,
+    TileCorrosion
 }
 
 impl From<TileInfo> for LayoutCode {
