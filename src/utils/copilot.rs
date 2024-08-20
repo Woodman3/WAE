@@ -181,7 +181,12 @@ impl TryInto<Event> for CopilotAction{
 impl CopilotAction{
     fn check(&self, f: &Frame) -> bool {
         match self {
-            CopilotAction::Deploy(d) => d.condition.as_ref().map_or(true, |c| c.check(f)),
+            CopilotAction::Deploy(d) => {
+                if !f.operator_undeploy.contains_key(&d.name) {
+                    return false;
+                }
+                d.condition.as_ref().map_or(true, |c| c.check(f))
+            },
             CopilotAction::Skill(s) => true,
             CopilotAction::Retreat(r) => true,
             CopilotAction::SkillDaemon => true,
@@ -263,27 +268,14 @@ impl Copilot {
         });
         Ok(calculator)
     }
-    // pub(crate) fn run(&mut self){
-    //     let c = &mut self.calculator;
-    //     while c.step() {
-    //         if let Some(f) = c.frame_vec.pop() {
-    //             for a in self.copilot_data.actions.iter(){
-    //                 if a.check(&f){
-    //                     if let Ok(e) = a.clone().try_into(){
-    //                         c.insert_event(Rc::new(e));
-    //                     }
-    //                 }
-    //             }
-    //             c.frame_vec.push(f);
-    //         }
-    //     }
-    // }
     pub(crate) fn query(&self,f:&Frame) -> Vec<Event> {
         let mut v = Vec::new();
         for a in self.copilot_data.actions.iter(){
             if a.check(f){
                 if let Ok(e) = a.clone().try_into(){
                     v.push(e);
+                    // we force only one action can be execute in one frame
+                    break;
                 }
             }
         }

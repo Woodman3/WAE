@@ -117,6 +117,7 @@ impl Into<UnitInfo> for OfficialData {
             attack_time: self.base_attack_time,
             block_num: self.block_cnt,
             //damage_type and attack_type should init by other way
+            cost: self.cost as i32,
             ..Default::default()
         }
     }

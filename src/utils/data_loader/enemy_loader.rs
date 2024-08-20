@@ -175,6 +175,7 @@ impl Into<UnitInfo> for OfficialEnemyAttribute {
             attack_time,
             block_num,
             attack_type,
+            ..Default::default()
         }
     }
 }

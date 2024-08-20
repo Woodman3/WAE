@@ -11,6 +11,7 @@ use log::{Record, Level, Metadata, LevelFilter};
 pub(crate) struct Debugger {
     pub(crate) c: Calculator,
     pub(crate) run: bool,
+    pub(crate) paint:bool,
     pub(crate) log_receiver: Arc<Mutex<Receiver<String>>>,
     pub(crate) log_messages: Arc<Mutex<Vec<String>>>,
 
@@ -43,7 +44,7 @@ impl Debugger {
         // let text=RichText("a text".into());
         let mut info = egui::text::LayoutJob::default();
         let text_format = TextFormat::default();
-        let text = format!("time_stamp:{}\n", f.timestamp);
+        let text = format!("{}\n", f);
         info.append(text.as_str(), 0.0, text_format.clone());
         for e in f.enemy_set.iter() {
             let e = e.borrow();
@@ -102,6 +103,7 @@ impl eframe::App for Debugger {
             .resizable(true)
             .show(ctx, |ui| {
                 ui.checkbox(&mut self.run, "run");
+                ui.checkbox(&mut self.paint, "paint");
                 if ui.button("next").clicked() || self.run {
                     self.c.step();
                 };
@@ -117,9 +119,9 @@ impl eframe::App for Debugger {
             });
         egui::CentralPanel::default()
             .show(ctx, |ui| {
-            // if(self.c.frame_vec[0].timestamp%100==0){
+            if self.paint {
                 self.paint_frame(ctx, ui);
-            // }
+            }
             // self.paint_frame(ctx, ui);
         });
     }

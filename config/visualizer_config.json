@@ -1,6 +1,6 @@
 {
     "enemy_radius": 25.0,
-    "operator_radius": 2.0,
+    "operator_radius": 20.0,
     "bullet_radius": 1.0,
     "block_size": 50.0,
     "padding": 10.0,

@@ -32,6 +32,7 @@ pub struct UnitInfo {
     pub(super) attack_time: f64,
     pub(super) block_num: i64,
     pub(super) attack_type: AttackType,
+    pub(super) cost:i32,
 }
 
 // pub trait UnitTrait:Debug{

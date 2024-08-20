@@ -384,6 +384,7 @@ impl Loader {
         let spawner:Spawner = level.waves.clone().into();
         let f = Frame {
             map,
+            cost: level.options.initial_cost,
             ..Default::default()
         };
         let c = Calculator {

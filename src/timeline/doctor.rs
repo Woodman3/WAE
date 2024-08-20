@@ -4,6 +4,7 @@ use crate::frame::{Frame, OperatorRef};
 use crate::unit::scope::Toward;
 use crate::utils::error::ConfigParseError;
 use crate::utils::math::Grid;
+use log::error;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::rc::Rc;
@@ -80,6 +81,11 @@ impl OperatorDeployEvent {
             .insert(self.operator_key.clone(), Rc::clone(&or));
         f.map.operator[self.location.row as usize][self.location.col as usize] =
             Some(self.operator_key.clone());
+        if f.cost>=o.stage.cost as f32{
+            f.cost-=o.stage.cost as f32;
+        }else{
+            error!("cost not enough");
+        }
     }
 }
 

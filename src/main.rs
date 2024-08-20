@@ -41,6 +41,7 @@ fn main() {
         Box::new(|cc| Ok(Box::new(Debugger{
             c: ca,
             run: false,
+            paint:false,
             log_receiver: Arc::new(Mutex::new(receiver)),
             log_messages: Arc::new(Mutex::new(Vec::new())),
         }))),
