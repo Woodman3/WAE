@@ -359,7 +359,6 @@ impl Loader {
             // r.complete(&map); 
             route.push(Rc::new(r));
         }
-        let mut timeline = VecDeque::new();
         // for w in level.waves.iter(){
         //     for f in w.fragments.iter(){
         //         for a in f.actions.iter(){
@@ -391,7 +390,6 @@ impl Loader {
             frame_vec: vec![f],
             time_remain: i64::MAX,
             star: -1,
-            timeline,
             route,
             enemy_initial,
             spawner,

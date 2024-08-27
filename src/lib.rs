@@ -133,21 +133,17 @@ pub unsafe extern "C" fn action(args: *const c_char) -> u8 {
     }
     let cstr = CStr::from_ptr(args);
     if let Ok(js) = cstr.to_str() {
-        // if let Ok(json) = serde_json::from_str::<Value>(js) {
-            // if let Ok(e) = action_to_event(&json) {
-            if let Ok(e) = serde_json::from_str::<timeline::Event>(js) {
-                if let Some(Ca) = INSTANCE.get_mut() {
-                    
-                    // Ca.insert_event(e);
-                    Ca.event_buffer.extend(std::iter::once(e));
-                    todo!("insert_event");
-                    return 0;
-                }
-                println!("can't get instance");
+        if let Ok(e) = serde_json::from_str::<timeline::Event>(js) {
+            if let Some(Ca) = INSTANCE.get_mut() {
+                
+                // Ca.insert_event(e);
+                Ca.event_buffer.extend(std::iter::once(e));
+                todo!("insert_event");
+                return 0;
             }
-            // println!("can't convert json to action");
-        // }
-        println!("can't convert str to json");
+            println!("can't get instance");
+        }
+        println!("can't convert json to action");
     }
     println!("can't convert cstring to ruststr");
     1

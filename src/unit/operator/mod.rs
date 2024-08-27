@@ -51,7 +51,7 @@ impl Operator {
             self.mission_vec[i](self, f);
         }
     }
-    pub(super) fn arrange_mission(&mut self) {
+    pub(crate) fn arrange_mission(&mut self) {
         self.mission_vec.push(Self::block);
         // self.mission_vec.push(Self::get_target);
         // self.mission_vec.push(Self::attack_mission);

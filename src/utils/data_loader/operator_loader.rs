@@ -172,6 +172,7 @@ impl Loader {
         )?;
         o.info.damage_type = sp;
         o.stage.damage_type = sp;
+        o.arrange_mission();
         return Ok(o);
     }
     // fn load_copilot_operator(&self,copilot:Copilot)->Result<Vec<Operator>>{

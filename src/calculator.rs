@@ -27,16 +27,11 @@ pub struct Calculator {
     /// star in the battle we will get
     /// -1 mean battle haven't end
     pub(super) star: i8,
-    /// first element refer to time
-    /// second element refer to event vector
-    pub(super) timeline: VecDeque<EventWithTime>,
     pub(super) event_buffer:Vec<Event>,
     pub(super) route: Vec<Rc<Route>>,
     pub(super) time_remain: i64,
     /// enemy in initial statement,if we place enemy to map,we will get enemy in it
     pub(super) enemy_initial: HashMap<String, Enemy>,
-    /// time that lase enemy may push,it isn't certainly because some enemy place by time
-    pub(super) last_enemy_time:u64,
     pub(super) copilot: Option<Copilot>,
     pub(super) spawner: Spawner,
 }
@@ -61,9 +56,6 @@ impl Calculator {
         if let Some(copilot) = &self.copilot {
             let ev = copilot.query(f);
             self.event_buffer.extend(ev);
-            // for e in ev{
-            //     self.insert_event(Rc::new(e));
-            // }
         }
         let ev = self.spawner.step(f);
         self.event_buffer.extend(ev);
@@ -72,20 +64,9 @@ impl Calculator {
     }
     pub(super) fn new(c: &Config) -> Result<Calculator> {
         use serde_json::from_value;
-        let (mut time_line,last_enemy_time)= read_timeline(c)?;
-        time_line.make_contiguous().sort_by(|a,b|{
-            a.time_stamp.cmp(&b.time_stamp)
-        });
         let time_remain: i64 = from_value(c.hostile["time_remain"].clone())?;
         let mut route = Vec::<Rc<Route>>::new();
         let temp: Vec<Vec<Vec<f64>>> = from_value(c.hostile["route"].clone())?;
-        // for v in temp {
-        //     let mut r = Vec::<Point>::new();
-        //     for c in v {
-        //         r.push((c[0], c[1]).into());
-        //     }
-        //     route.push(Rc::new(r));
-        // }
         let mut frame_vec = Vec::<Frame>::new();
         let mut operator_undeploy = HashMap::<String, OperatorRef>::new();
         for (key, v) in c.operator.as_object().unwrap() {
@@ -105,11 +86,9 @@ impl Calculator {
         Ok(Calculator {
             frame_vec,
             star: -1,
-            timeline: time_line,
             route,
             time_remain,
             enemy_initial,
-            last_enemy_time,
             ..Default::default()
         })
     }
@@ -169,19 +148,7 @@ impl Calculator {
     pub(super) fn get_frame(&self)->Option<&Frame>{
         self.frame_vec.last()
     }
-
     
-    #[deprecated]
-    pub(super) fn insert_event(&mut self,e:Rc<Event>)->bool{
-        if let Some(f) = self.frame_vec.last(){
-            let time = f.timestamp+1;
-            let et =EventWithTime{time_stamp:time,event:e};
-            self.timeline.push_front(et);
-            return true
-        }         
-        false
-        // self.event_buffer.push((*e).clone());
-    }
 }
 
 #[cfg(test)]
