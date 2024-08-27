@@ -171,6 +171,7 @@ impl Calculator {
     }
 
     
+    #[deprecated]
     pub(super) fn insert_event(&mut self,e:Rc<Event>)->bool{
         if let Some(f) = self.frame_vec.last(){
             let time = f.timestamp+1;
