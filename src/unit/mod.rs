@@ -17,7 +17,7 @@ use crate::unit::skill::skill_type::AttackType;
 use crate::utils::math::Point;
 use enemy::Enemy;
 use operator::Operator;
-use skill::effect::FixedDamage;
+use skill::effect::{Effect, FixedDamage};
 
 #[derive(Debug, Clone, Default, Deserialize, Serialize)]
 pub struct UnitInfo {
@@ -48,7 +48,7 @@ pub(super) enum Unit {
 }
 
 impl UnitInfo {
-    pub fn be_buff(&mut self, b: Buff) {
+    pub fn be_buff(&mut self, b: &Buff) {
         use ChangeClass::*;
         use ChangeType::*;
         let f = match b.change_type {
@@ -92,6 +92,12 @@ impl Unit {
         match &self {
             Unit::Enemy(e) => e.borrow_mut().be_damage(d),
             Unit::Operator(o) => o.borrow_mut().be_damage(d),
+        }
+    }
+    pub(super) fn be_effect(&mut self,e: &Effect){
+        match &self {
+            Unit::Enemy(enemy) => enemy.borrow_mut().be_effect(e),
+            Unit::Operator(o) => o.borrow_mut().be_effect(e),
         }
     }
 }

@@ -1,4 +1,6 @@
 use super::scope::{Scope, Toward};
+use super::skill::effect::Effect;
+use super::skill::skill_schedule::SkillSchedule;
 use crate::frame::Frame;
 use crate::unit::bullet::Bullet;
 use crate::unit::enemy::{EnemyShared, EnemyWithPriority};
@@ -21,26 +23,25 @@ type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 pub(crate) type OperatorShared = Weak<RefCell<Operator>>;
 #[derive(Debug, Clone, Default, Deserialize, Serialize)]
 #[serde(default)]
-pub struct Operator {
-    pub name: String,
-    pub info: super::UnitInfo,
-    pub stage: super::UnitInfo,
-    pub location: Grid,
-    pub attack_scope: Scope,
-    pub search_scope: Scope,
-    pub re_deploy: f32,
-    pub(super) toward: Toward,
-    pub enemy_find: Vec<EnemyWithPriority>,
+pub(crate) struct Operator {
+    pub(crate) name: String,
+    pub(crate) info: super::UnitInfo,
+    pub(crate) stage: super::UnitInfo,
+    pub(crate) location: Grid,
+    pub(crate) attack_scope: Scope,
+    pub(crate) search_scope: Scope,
+    pub(crate) re_deploy: f32,
+    pub(crate) toward: Toward,
+    pub(crate) enemy_find: Vec<EnemyWithPriority>,
     #[serde(
         serialize_with = "super::enemy::serialize_enemy_shared",
         skip_deserializing
     )]
-    pub target: EnemyShared,
+    pub(crate) target: EnemyShared,
     #[serde(skip)]
-    pub block_vec: Vec<EnemyShared>,
-    pub die_code: u32,
-    pub skill_ready: Vec<Skill>,
-    pub skill_block: Vec<Skill>,
+    pub(crate) block_vec: Vec<EnemyShared>,
+    pub(crate) die_code: u32,
+    pub(crate) skills:SkillSchedule,
     #[serde(skip)]
     mission_vec: Vec<fn(&mut Operator, &mut Frame)>,
 }
@@ -51,11 +52,17 @@ impl Operator {
             self.mission_vec[i](self, f);
         }
     }
+
+    pub(crate) fn init(&mut self){
+        self.arrange_mission();
+        self.generate_default_attack_skill();
+    }
+
     pub(crate) fn arrange_mission(&mut self) {
         self.mission_vec.push(Self::block);
         // self.mission_vec.push(Self::get_target);
         // self.mission_vec.push(Self::attack_mission);
-        self.mission_vec.push(Self::skill);
+        // self.mission_vec.push(Self::skill);
     }
     pub(crate) fn new(v: &Value) -> Result<Operator> {
         let mut o: Operator = serde_json::from_value(v.clone())?;
@@ -109,6 +116,18 @@ impl Operator {
             None => {}
         }
     }
+
+    pub(super) fn be_effect(&mut self, e: &Effect) {
+        match e {
+            Effect::Buff(b) => {
+                self.stage.be_buff(b);
+            }
+            Effect::FixedDamage(d) => {
+                self.be_damage(&d);
+            }
+            _ => {}
+        }
+    }
 }
 
 impl Display for Operator {
@@ -118,16 +137,12 @@ impl Display for Operator {
             "\
         block_num:{}\n\
         block_vec_len:{}\n\
+        skills:{}\n\
         ",
             self.stage.block_num,
             self.block_vec.len(),
+            self.skills,
         )?;
-        for i in 0..self.skill_ready.len() {
-            write!(f, "{i} of ready skill : {}", self.skill_ready[i])?;
-        }
-        for i in 0..self.skill_block.len() {
-            write!(f, "{i} of block skill : {}", self.skill_block[i])?;
-        }
         write!(f, "")
     }
 }

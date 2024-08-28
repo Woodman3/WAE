@@ -72,7 +72,7 @@ impl Calculator {
         for (key, v) in c.operator.as_object().unwrap() {
             operator_undeploy.insert(key.clone(), Rc::new(RefCell::new(Operator::new(v)?)));
         }
-        crate::unit::skill::config_skill(c, &operator_undeploy);
+        // crate::unit::skill::config_skill(c, &operator_undeploy);
         frame_vec.push(Frame {
             operator_undeploy,
             map:map::Map::new(&c.map)?,

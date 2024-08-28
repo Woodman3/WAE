@@ -5,7 +5,7 @@ use crate::unit::scope::Scope;
 use crate::unit::skill::effect::DamageType;
 use crate::unit::skill::skill_type::TriggerType;
 use crate::unit::skill::skill_type::{AttackType, ChargeType};
-use crate::unit::skill::Skill;
+use crate::unit::skill::{Skill,SpData};
 use crate::unit::UnitInfo;
 use crate::utils::math::Grid;
 use crate::utils::math::GridRect;
@@ -131,22 +131,31 @@ impl Into<Skill> for OfficialSkill {
             "PASSIVE" => TriggerType::Passive,
             _ => TriggerType::None,
         };
-        let charge_type: ChargeType = match self.sp_data.sp_type.as_str() {
-            "INCREASE_WITH_TIME" => ChargeType::Time,
-            "INCREASE_WITH_ATTACK" => ChargeType::Attack,
-            "INCREASE_WITH_BE_HIT" => ChargeType::BeHit,
-            _ => ChargeType::None,
-        };
         Skill {
             duration: self.duration,
-            sp: self.sp_data.init_sp as f64,
-            sp_cost: self.sp_data.sp_cost as f64,
             trigger_type,
-            charge_type,
+            sp_data: self.sp_data.into(),
             ..Default::default()
         }
     }
 }
+
+impl Into<SpData> for OfficialSpData {
+    fn into(self) -> SpData {
+        SpData {
+            sp_cost: self.sp_cost as f64,
+            sp: self.init_sp as f64,
+            charge_type: match self.sp_type.as_str() {
+                "INCREASE_WITH_TIME" => ChargeType::Time,
+                "INCREASE_WITH_ATTACK" => ChargeType::Attack,
+                "INCREASE_WITH_BE_HIT" => ChargeType::BeHit,
+                _ => ChargeType::None,
+            },
+            overcharge: false,
+        }
+    }
+}
+
 
 impl Loader {
     /// name can be english or chinese, if name is english,first letter should be upper case
@@ -172,7 +181,7 @@ impl Loader {
         )?;
         o.info.damage_type = sp;
         o.stage.damage_type = sp;
-        o.arrange_mission();
+        o.init();
         return Ok(o);
     }
     // fn load_copilot_operator(&self,copilot:Copilot)->Result<Vec<Operator>>{
@@ -224,6 +233,7 @@ impl Loader {
             o.info = ui.clone();
             o.stage = ui;
             o.name = name;
+            // o.skills.skill_block.push(skill);
             return Ok(o);
         } else {
             return Err("Level or skill level out of range,max_level is {max_level},max_skill_level is {max_skill_level}".into());

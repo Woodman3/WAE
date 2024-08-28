@@ -145,15 +145,4 @@ impl Operator {
             self.target = self.enemy_find[0].enemy.clone();
         }
     }
-    fn be_effect(&mut self, e: Effect) {
-        match e {
-            Effect::Buff(b) => {
-                self.stage.be_buff(b);
-            }
-            Effect::FixedDamage(d) => {
-                self.be_damage(&d);
-            }
-            _ => {}
-        }
-    }
 }

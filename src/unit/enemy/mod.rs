@@ -16,6 +16,8 @@ use std::cmp::Ordering;
 use std::fmt;
 use std::rc::{Rc, Weak};
 
+use super::skill::effect::Effect;
+
 #[cfg(test)]
 mod test;
 
@@ -172,6 +174,10 @@ impl Enemy {
             trace!("an enemy has die!");
             return;
         }
+    }
+
+    pub(super) fn be_effect(&mut self, e: &Effect) {
+        todo!()
     }
 }
 
