@@ -226,7 +226,7 @@ impl Loader {
             data.def += ((upper.def - data.def) as f64 * change) as i64;
             let mut ui: UnitInfo = data.into();
             ui.attack_type = at;
-            let s = Scope { 0: r.merge() };
+            let s = Scope::Grids(r.merge());
             o.attack_scope = s.clone();
             o.search_scope = s;
             o.re_deploy = upper.respawn_time as f32;

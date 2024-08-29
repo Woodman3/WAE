@@ -79,35 +79,35 @@ impl Operator {
     }
 
     /// before call it,you should make sure that map haven't contain empty pointer
-    pub fn search(&mut self, m: &Map, time_stamp: u64) {
-        self.enemy_find.clear();
-        let mut ve = Vec::<Weak<RefCell<Enemy>>>::new();
-        for r in self.search_scope.0.iter() {
-            for i in r.ul.row..=r.dr.row {
-                for j in r.ul.col..=r.ul.col {
-                    for e in m.enemy[i as usize][j as usize].iter() {
-                        if let Some(e) = e.upgrade() {
-                            if !ve.iter().any(|e2| {
-                                if let Some(e2) = e2.upgrade() {
-                                    e2 == e
-                                } else {
-                                    false
-                                }
-                            }) {
-                                ve.push(Rc::downgrade(&e));
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        for e in ve {
-            self.enemy_find.push(EnemyWithPriority {
-                enemy: e,
-                time_stamp,
-            });
-        }
-    }
+    // pub fn search(&mut self, m: &Map, time_stamp: u64) {
+    //     self.enemy_find.clear();
+    //     let mut ve = Vec::<Weak<RefCell<Enemy>>>::new();
+    //     for r in self.search_scope.0.iter() {
+    //         for i in r.ul.row..=r.dr.row {
+    //             for j in r.ul.col..=r.ul.col {
+    //                 for e in m.enemy[i as usize][j as usize].iter() {
+    //                     if let Some(e) = e.upgrade() {
+    //                         if !ve.iter().any(|e2| {
+    //                             if let Some(e2) = e2.upgrade() {
+    //                                 e2 == e
+    //                             } else {
+    //                                 false
+    //                             }
+    //                         }) {
+    //                             ve.push(Rc::downgrade(&e));
+    //                         }
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     for e in ve {
+    //         self.enemy_find.push(EnemyWithPriority {
+    //             enemy: e,
+    //             time_stamp,
+    //         });
+    //     }
+    // }
     /// try to block enemy
     /// make sure all element in block_vec can be find
     pub(super) fn block(&mut self, f: &mut Frame) {
@@ -138,14 +138,14 @@ impl Operator {
             }
         }
     }
-    pub(super) fn get_target(&mut self, f: &mut Frame) {
-        if self.block_vec.len() != 0 {
-            self.target = self.block_vec[0].clone();
-            return;
-        }
-        self.search(&mut f.map, f.timestamp);
-        if self.enemy_find.len() != 0 {
-            self.target = self.enemy_find[0].enemy.clone();
-        }
-    }
+    // pub(super) fn get_target(&mut self, f: &mut Frame) {
+    //     if self.block_vec.len() != 0 {
+    //         self.target = self.block_vec[0].clone();
+    //         return;
+    //     }
+    //     self.search(&mut f.map, f.timestamp);
+    //     if self.enemy_find.len() != 0 {
+    //         self.target = self.enemy_find[0].enemy.clone();
+    //     }
+    // }
 }

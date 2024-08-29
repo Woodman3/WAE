@@ -29,6 +29,7 @@ use crate::timeline;
 use crate::timeline::hostile::EnemyPlaceEvent;
 use crate::timeline::EventWithTime;
 use crate::unit::enemy::Enemy;
+use crate::unit::operator::OperatorShared;
 use crate::utils::load_json_file;
 use crate::utils::math::Grid;
 use crate::utils::math::Point;
@@ -240,7 +241,7 @@ impl Into<Map> for OfficialMapData {
         }
         let enemy =
             vec![vec![Vec::<Weak<RefCell<Enemy>>>::new(); width as usize]; height as usize];
-        let operator = vec![vec![None; width as usize]; height as usize];
+        let operator = vec![vec![OperatorShared::new(); width as usize]; height as usize];
         Map {
             width: width as u32,
             height: height as u32,

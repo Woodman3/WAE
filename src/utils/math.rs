@@ -125,6 +125,14 @@ impl From<Grid> for Point {
         }
     }
 }
+impl From<(usize,usize)> for Point{
+    fn from(value:(usize,usize))->Self{
+        Point{
+            x:value.0 as f64,
+            y:value.1 as f64
+        }
+    }
+}
 impl Add for Point {
     type Output = Self;
     fn add(self, rhs: Self) -> Self::Output {
@@ -175,7 +183,7 @@ macro_rules! mul2d {
     };
 }
 ///we define A is start_point,B is end_point,P is target_point in short
-pub fn distance_from_segment_to_point(a: Point, b: Point, p: Point) -> f64 {
+pub(crate) fn distance_from_segment_to_point(a: Point, b: Point, p: Point) -> f64 {
     // let AB = sub2d!(B, A);
     // let AP = sub2d!(P, A);
     // let r = mul2d!(AB, AP) / mul2d!(AB, AB);
@@ -205,16 +213,21 @@ pub fn distance_from_segment_to_point(a: Point, b: Point, p: Point) -> f64 {
     }
 }
 
-pub fn distance_p2p<T, T2>(a: &(T, T), b: &(T2, T2)) -> f64
-where
-    T: Into<f64> + Copy,
-    T2: Into<f64> + Copy,
-{
-    let a = (a.0.into(), a.1.into());
-    let b = (b.0.into(), b.1.into());
-    let ab = sub2d!(b, a);
-    let d = mul2d!(ab, ab);
-    d.sqrt()
+// pub fn distance_p2p<T, T2>(a: &(T, T), b: &(T2, T2)) -> f64
+// where
+//     T: Into<f64> + Copy,
+//     T2: Into<f64> + Copy,
+// {
+//     let a = (a.0.into(), a.1.into());
+//     let b = (b.0.into(), b.1.into());
+//     let ab = sub2d!(b, a);
+//     let d = mul2d!(ab, ab);
+//     d.sqrt()
+// }
+
+pub(crate) fn distance_p2p(a: &Point, b: &Point) -> f64 {
+    let ab = *b - *a;
+    (ab * ab).sqrt()
 }
 
 pub fn to_target(location: Point, target: Point, move_speed: f64) -> (Point, Point) {

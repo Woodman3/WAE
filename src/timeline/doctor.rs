@@ -1,6 +1,7 @@
 use super::Event;
 use crate::calculator::Calculator;
 use crate::frame::{Frame, OperatorRef};
+use crate::unit::operator::OperatorShared;
 use crate::unit::scope::Toward;
 use crate::utils::error::ConfigParseError;
 use crate::utils::math::Grid;
@@ -77,10 +78,9 @@ impl OperatorDeployEvent {
         o.search_scope.apply_toward(&self.toward);
         o.search_scope.apply_loc(loc, f.map.width, f.map.height);
         o.generate_default_attack_skill();
+        f.map.operator[self.location.row as usize][self.location.col as usize] = Rc::downgrade(&or);
         f.operator_deploy
             .insert(self.operator_key.clone(), Rc::clone(&or));
-        f.map.operator[self.location.row as usize][self.location.col as usize] =
-            Some(self.operator_key.clone());
         if f.cost>=o.stage.cost as f32{
             f.cost-=o.stage.cost as f32;
         }else{
@@ -93,7 +93,7 @@ impl OperatorRetreatEvent {
     pub(super) fn happen(&self, f: &mut Frame, _c: &Calculator) {
         let or: OperatorRef = f.operator_deploy.remove(&self.operator_key).unwrap();
         let o = or.borrow_mut();
-        f.map.operator[o.location.row.clone() as usize][o.location.col.clone() as usize] = None;
+        f.map.operator[o.location.row.clone() as usize][o.location.col.clone() as usize] = OperatorShared::new();
         f.operator_undeploy
             .insert(self.operator_key.clone(), Rc::clone(&or));
     }
@@ -109,12 +109,13 @@ impl OperatorSkillEvent {
 
 impl UnitRetreatEvent {
     pub(super) fn happen(&self, f: &mut Frame, _c: &Calculator) {
-        let remove_key =
+        let remove_o =
             f.map.operator[self.location.row as usize][self.location.col as usize].clone();
-        if let Some(key) = remove_key {
-            let or: OperatorRef = f.operator_deploy.remove(&key).unwrap();
-            f.operator_undeploy.insert(key.clone(), Rc::clone(&or));
-            f.map.operator[self.location.row as usize][self.location.col as usize] = None;
+        if let Some(o) = remove_o.upgrade() {
+            let name = o.borrow().name.clone();
+            let or: OperatorRef = f.operator_deploy.remove(&name).unwrap();
+            f.operator_undeploy.insert(name, Rc::clone(&or));
+            f.map.operator[self.location.row as usize][self.location.col as usize] = Rc::downgrade(&o);
         }
     }
 }
