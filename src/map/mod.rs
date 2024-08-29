@@ -1,6 +1,7 @@
 pub(super) mod tile;
 
 use crate::unit::enemy::Enemy;
+use crate::unit::operator::OperatorShared;
 use crate::unit::scope::Scope;
 use crate::utils::math::{distance_p2p, Grid, Point};
 use serde::{Deserialize, Serialize};
@@ -108,7 +109,7 @@ impl Map {
             operator: self.operator.clone(),
         }
     }
-    pub(crate) fn search(&self, search_scope: &Scope) -> Vec<Weak<RefCell<Enemy>>> {
+    pub(crate) fn search_enemy(&self, search_scope: &Scope) -> Vec<Weak<RefCell<Enemy>>> {
         let mut ve = Vec::<Weak<RefCell<Enemy>>>::new();
         for r in search_scope.0.iter() {
             for i in r.ul.row..=r.dr.row {
@@ -130,6 +131,11 @@ impl Map {
             }
         }
         ve
+    }
+    pub(crate) fn search_operator(&self, search_scope: &Scope) -> Vec<OperatorShared> {
+        let mut vo = Vec::new();
+        todo!();
+        vo
     }
     pub(super) fn update_layout(&mut self) {
         unimplemented!("update layout")

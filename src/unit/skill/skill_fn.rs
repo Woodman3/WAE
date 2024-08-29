@@ -10,14 +10,30 @@ use crate::utils::math::Point;
 use std::fmt::{Display, Formatter};
 use std::rc::Rc;
 
+use super::ToOperatorSkill;
+
 impl ToEnemySkill {
     pub(crate) fn search(&mut self, m: &Map) -> bool {
         if let Some(s) = &self.search_scope {
-            let mut ve = m.search(s);
+            let mut ve = m.search_enemy(s);
             if ve.len() >= self.target_num {
                 self.target = ve.drain(0..self.target_num).collect();
             } else {
                 self.target = ve.drain(..).collect();
+            }
+        }
+        self.target.len() != 0
+    }
+}
+
+impl ToOperatorSkill{
+    pub(crate) fn search(&mut self, m: &Map) -> bool {
+        if let Some(s) = &self.search_scope {
+            let mut vo = m.search_operator(s);
+            if vo.len() >= self.target_num {
+                self.target = vo.drain(0..self.target_num).collect();
+            } else {
+                self.target = vo.drain(..).collect();
             }
         }
         self.target.len() != 0
@@ -50,7 +66,7 @@ impl Display for Skill {
             SkillEntity::ToEnemySkill(se) => {
                 write!(f, "{}\n", se)
             }
-            SkillEntity::None => {
+            _ => {
                 write!(f, "")
             }
         }
@@ -118,6 +134,9 @@ impl Skill{
                         error!("target not found!");
                     }
                 }
+            }
+            SkillEntity::ToOperatorSkill(s) => {
+                todo!()
             }
             SkillEntity::None => {}
         }

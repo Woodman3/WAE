@@ -1,6 +1,9 @@
+use super::enemy::Enemy;
 use super::scope::{Scope, Toward};
-use super::skill::effect::Effect;
+use super::skill::effect::{self, Effect};
 use super::skill::skill_schedule::SkillSchedule;
+use super::skill::{SkillEntity, ToEnemySkill};
+use super::Unit;
 use crate::frame::Frame;
 use crate::unit::bullet::Bullet;
 use crate::unit::enemy::{EnemyShared, EnemyWithPriority};
@@ -12,6 +15,7 @@ use serde::ser::Serializer;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::cell::RefCell;
+use std::f32::consts::E;
 use std::fmt;
 use std::fmt::{Display, Formatter};
 use std::rc::Weak;
@@ -62,7 +66,7 @@ impl Operator {
         self.mission_vec.push(Self::block);
         // self.mission_vec.push(Self::get_target);
         // self.mission_vec.push(Self::attack_mission);
-        // self.mission_vec.push(Self::skill);
+        self.mission_vec.push(Self::skill_mission);
     }
     pub(crate) fn new(v: &Value) -> Result<Operator> {
         let mut o: Operator = serde_json::from_value(v.clone())?;
@@ -80,9 +84,6 @@ impl Operator {
             ..self.clone()
         }
     }
-}
-
-impl Operator {
     pub(super) fn get_loc(&self) -> Point {
         Point::from(self.location)
     }
@@ -127,6 +128,23 @@ impl Operator {
             }
             _ => {}
         }
+    }
+    pub(crate) fn generate_default_attack_skill(&mut self) {
+        let mut s = Skill::default();
+        s.duration = self.stage.attack_time;
+        let d = effect::Damage {
+            value: self.stage.atk,
+            change: Option::None,
+        };
+        let se = ToEnemySkill {
+            target: Vec::new(),
+            target_num: 1,
+            effect: effect::Effect::Damage(d),
+            attack_type: self.stage.attack_type,
+            search_scope: Option::from(self.search_scope.clone()),
+        };
+        s.skill_entity = SkillEntity::ToEnemySkill(se);
+        self.skills.skill_block.push(s);
     }
 }
 

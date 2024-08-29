@@ -2,7 +2,7 @@ pub mod effect;
 mod skill_fn;
 pub mod skill_schedule;
 pub mod skill_type;
-use crate::frame::OperatorRef;
+use crate::frame::{EnemyRef, OperatorRef};
 use crate::unit::enemy::Enemy;
 use crate::unit::scope::Scope;
 use crate::unit::skill::effect::Effect;
@@ -13,6 +13,10 @@ use skill_type::*;
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Weak;
+
+use super::enemy::EnemyShared;
+use super::operator::OperatorShared;
+use super::Unit;
 
 
 #[derive(Clone, Deserialize, Debug, Default, Serialize)]
@@ -40,19 +44,28 @@ pub(crate) struct SpData{
 #[derive(Deserialize, Debug, Default, Clone, Serialize)]
 pub(crate) struct ToEnemySkill {
     #[serde(skip)]
-    pub(crate) target: Vec<Weak<RefCell<Enemy>>>,
-    pub(self) target_num: usize,
+    pub(crate) target: Vec<EnemyShared>,
+    pub(crate) target_num: usize,
     pub(crate) effect: Effect,
-    pub(self) attack_type: AttackType,
-    pub(self) search_scope: Option<Scope>,
+    pub(crate) attack_type: AttackType,
+    pub(crate) search_scope: Option<Scope>,
 }
 
-pub(crate) struct NotDirectSkill {}
+#[derive(Deserialize, Debug, Default, Clone, Serialize)]
+pub(crate) struct ToOperatorSkill {
+    #[serde(skip)]
+    pub(crate) target: Vec<OperatorShared>,
+    pub(crate) target_num: usize,
+    pub(crate) effect: Effect,
+    pub(crate) attack_type: AttackType,
+    pub(crate) search_scope: Option<Scope>,
+}
 
 #[derive(Default, Deserialize, Debug, Clone, Serialize)]
 #[serde(tag = "type")]
 pub(crate) enum SkillEntity {
     ToEnemySkill(ToEnemySkill),
+    ToOperatorSkill(ToOperatorSkill),
     #[default]
     None,
 }

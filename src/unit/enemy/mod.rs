@@ -17,15 +17,17 @@ use std::fmt;
 use std::rc::{Rc, Weak};
 
 use super::skill::effect::Effect;
+use super::skill::skill_schedule::SkillSchedule;
 
 #[cfg(test)]
 mod test;
+mod enemy_mission;
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 pub(crate) type EnemyShared = Weak<RefCell<Enemy>>;
 #[derive(Debug, Clone, Default, Deserialize, Serialize)]
 #[serde(default)]
-pub struct Enemy {
+pub(crate) struct Enemy {
     pub(crate) name: String,
     pub(crate) move_speed: f64,
     pub(crate) info: super::UnitInfo,
@@ -44,6 +46,7 @@ pub struct Enemy {
     )]
     pub(crate) be_block: OperatorShared,
     pub(crate) id: usize,
+    pub(crate) skills:SkillSchedule,
 }
 #[derive(Debug, Clone, Default, Deserialize, Serialize)]
 pub struct EnemyWithPriority {
