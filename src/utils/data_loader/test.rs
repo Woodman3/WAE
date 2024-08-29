@@ -31,10 +31,14 @@ fn load_enemy_test(){
     let l = Loader::new("./ArknightsGameData").unwrap();
     let mut fail_set= Vec::new();
     let mut success_count = 0;
+    // let mut tv = Vec::new();
     for ( key,v ) in l.enemy_database.iter(){
         for i in 0..v.len(){
             if let Ok(e) = l.load_enemy(key,i){
                 success_count+=1;
+                // if v[i].enemy_data.range_radius.m_defined{
+                //     tv.push((v[i].enemy_data.view_radius.m_value.unwrap(),v[i].enemy_data.name.clone()));
+                // }
             }else{
                 fail_set.push((key.clone(),i)); 
             }
@@ -42,6 +46,7 @@ fn load_enemy_test(){
     }
     println!("enemy load success count:{}",success_count);
     println!("enemy load failed count {}: {:?}",fail_set.len(),fail_set);
+    // dbg!("{:?}",tv);
     assert_eq!(fail_set.len(),0);
 }
 

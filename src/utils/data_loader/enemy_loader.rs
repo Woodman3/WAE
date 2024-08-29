@@ -28,6 +28,8 @@ pub(super) struct OfficialEnemyData {
     pub(super) motion: OfficialEnemyDataTemplate<String>,
     pub(super) life_point_reduce: OfficialEnemyDataTemplate<u64>,
     pub(super) attributes: OfficialEnemyAttribute,
+    /// attack range radius if enemy is melee the m_define will set to false
+    pub(super) range_radius: OfficialEnemyDataTemplate<f64>,
 }
 
 #[derive(Deserialize, Default, Debug, Clone)]
@@ -76,6 +78,7 @@ impl Add for OfficialEnemyData {
             motion: self.motion + other.motion,
             life_point_reduce: self.life_point_reduce + other.life_point_reduce,
             attributes: self.attributes + other.attributes,
+            range_radius: self.range_radius + other.range_radius,
         }
     }
 }

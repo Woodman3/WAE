@@ -1,6 +1,6 @@
 use std::{cell::RefCell, rc::Weak};
 
-use crate::{frame::Frame, unit::skill::{effect, Skill}};
+use crate::{frame::Frame, unit::skill::{effect, Skill, ToOperatorSkill}};
 
 use super::Enemy;
 
@@ -15,7 +15,7 @@ impl Enemy{
     //         value: self.stage.atk,
     //         change: Option::None,
     //     };
-    //     let se = ToEnemySkill {
+    //     let se = ToOperatorSkill {
     //         target: Vec::<Weak<RefCell<Enemy>>>::new(),
     //         target_num: 1,
     //         effect: effect::Effect::Damage(d),
