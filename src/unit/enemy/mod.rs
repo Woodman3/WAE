@@ -16,8 +16,9 @@ use std::cmp::Ordering;
 use std::fmt;
 use std::rc::{Rc, Weak};
 
-use super::skill::effect::Effect;
+use super::skill::effect::{self, Effect};
 use super::skill::skill_schedule::SkillSchedule;
+use super::skill::{Skill, SkillEntity, ToOperatorSkill};
 
 #[cfg(test)]
 mod test;
@@ -48,7 +49,9 @@ pub(crate) struct Enemy {
     pub(crate) id: usize,
     pub(crate) skills:SkillSchedule,
     #[serde(skip)]
-    pub(crate) self_weak:EnemyShared
+    pub(crate) self_weak:EnemyShared,
+    #[serde(skip)]
+    pub(crate) mission_vec: Vec<fn(&mut Enemy, &mut Frame)>,
 }
 #[derive(Debug, Clone, Default, Deserialize, Serialize)]
 pub struct EnemyWithPriority {
@@ -58,29 +61,27 @@ pub struct EnemyWithPriority {
 }
 
 impl Enemy {
-    /// t is 1/fps it mean time interval
-    pub fn step(&mut self) {
-        let (direction, new) = to_target(self.location, self.next_point, self.move_speed);
-        let distance = math::distance_from_segment_to_point(self.location, new, self.next_point);
-        if distance <= super::code::MIN_DISTANCE {
-            self.route_stage += 1;
-            if(self.route_stage<self.route.checkpoints.len()){
-                use crate::route::CheckPoint;
-                self.next_point = self.route.end;
-                for i in self.route_stage..self.route.checkpoints.len(){
-                    match self.route.checkpoints[i] {
-                        CheckPoint::Move(p) => {self.next_point = p;break},
-                        _ => continue,
-                    }
-                }
-            } else if(self.route_stage == self.route.checkpoints.len()){
-                self.next_point=self.route.end;
-            }else{
-                self.die_code = super::code::INTO_END;
-            }
-        }
-        self.direction = direction;
-        self.location = new;
+    pub(crate) fn init(&mut self){
+        self.arrange_mission();
+        self.generate_default_attack_skill();
+    }
+    pub(crate) fn generate_default_attack_skill(&mut self) {
+        let mut s = Skill::default();
+        s.duration = self.stage.attack_time;
+        let d = effect::FixedDamage {
+            value: self.stage.atk,
+            damage_type: self.stage.damage_type.clone(),
+        };
+        let se = ToOperatorSkill {
+            host : self.self_weak.clone(),
+            target: Vec::new(),
+            target_num: 1,
+            effect: effect::Effect::FixedDamage(d),
+            attack_type: self.stage.attack_type,
+            search_scope: Option::from(self.stage.scope.clone()),
+        };
+        s.skill_entity = SkillEntity::ToOperatorSkill(se);
+        self.skills.skill_block.push(s);
     }
     pub(super) fn attack(&mut self, _bv: &mut Vec<Bullet>, o: OperatorRef) {
         if self.stage.attack_time > 0.0 {
@@ -115,10 +116,13 @@ impl Enemy {
         }
     }
     pub(crate) fn next(&mut self, f: &mut Frame) {
-        if let Some(o) = self.be_block.upgrade() {
-            self.attack(&mut f.bullet_set, o);
-        } else {
-            self.step();
+        // if let Some(o) = self.be_block.upgrade() {
+        //     self.attack(&mut f.bullet_set, o);
+        // } else {
+        //     self.step();
+        // }
+        for i in 0..self.mission_vec.len() {
+            self.mission_vec[i](self, f);
         }
         if self.stage.hp <= 0 {
             self.die_code = DIE;
