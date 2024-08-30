@@ -1,5 +1,4 @@
 #![allow(non_snake_case)]
-#![allow(unused)]
 #![allow(dead_code)]
 use crate::calculator::Calculator;
 use serde_json::Value;
