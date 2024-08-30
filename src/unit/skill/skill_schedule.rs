@@ -17,43 +17,43 @@ use std::rc::{Rc, Weak};
 
 #[derive(Clone, Deserialize, Debug, Default, Serialize)]
 #[serde(default)]
-pub(crate) struct SkillSchedule{
-    pub(crate) skill_block:Vec<Skill>,
-    pub(crate) skill_ready:Vec<Skill>,
-    pub(crate) skill_running:Vec<Skill>,
+pub(crate) struct SkillSchedule {
+    pub(crate) skill_block: Vec<Skill>,
+    pub(crate) skill_ready: Vec<Skill>,
+    pub(crate) skill_running: Vec<Skill>,
 }
 
-impl SkillSchedule{
-    pub(crate) fn step(&mut self,f:&mut Frame){
-        self.skill_block.retain_mut(|s|{
+impl SkillSchedule {
+    pub(crate) fn step(&mut self, f: &mut Frame) {
+        self.skill_block.retain_mut(|s| {
             s.charge(PERIOD);
-            if s.ready(){
+            if s.ready() {
                 self.skill_ready.push(std::mem::take(s));
                 false
-            }else{
+            } else {
                 true
             }
         });
-        self.skill_ready.retain_mut(|s|{
-            if s.can_run(f){
+        self.skill_ready.retain_mut(|s| {
+            if s.can_run(f) {
                 self.skill_running.push(std::mem::take(s));
                 false
-            }else{
+            } else {
                 true
             }
         });
-        self.skill_running.retain_mut(|s|{
-            if s.step(f){
+        self.skill_running.retain_mut(|s| {
+            if s.step(f) {
                 self.skill_block.push(std::mem::take(s));
                 false
-            }else{
+            } else {
                 true
             }
         });
     }
 }
 
-impl Display for SkillSchedule{
+impl Display for SkillSchedule {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(
             f,

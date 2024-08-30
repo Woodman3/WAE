@@ -8,7 +8,7 @@ pub(crate) enum Scope {
     Circle(Point, f64),
     #[default]
     None,
-} 
+}
 #[derive(Debug, Clone, Copy, Default, Deserialize, Serialize)]
 pub(crate) enum Toward {
     #[serde(alias = "Up")]
@@ -25,7 +25,8 @@ impl Scope {
     pub(crate) fn apply_toward(&mut self, to: &Toward) {
         match self {
             Scope::Grids(rect) => {
-                use std::mem::swap; match to {
+                use std::mem::swap;
+                match to {
                     Toward::North => {
                         // reflect by y=x and then change two point
                         for r in rect.iter_mut() {
@@ -61,7 +62,7 @@ impl Scope {
                         }
                     }
                 }
-            },
+            }
             _ => {}
         }
     }
@@ -72,7 +73,7 @@ impl Scope {
     where
         T: Into<i64>,
     {
-        match self{
+        match self {
             Scope::Grids(rect) => {
                 let (row, col): (i64, i64) = (loc.0.into(), loc.1.into());
                 for r in rect.iter_mut() {
@@ -95,6 +96,6 @@ impl Scope {
                 }
             }
             _ => {}
-        } 
+        }
     }
 }

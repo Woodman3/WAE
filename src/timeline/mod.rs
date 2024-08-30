@@ -5,7 +5,7 @@ use crate::timeline::hostile::EnemyPlaceEvent;
 use crate::utils::config::Config;
 use crate::utils::error::ConfigParseError;
 use doctor::{UnitRetreatEvent, UnitSkillEvent};
-use serde::{Deserialize,Serialize};
+use serde::{Deserialize, Serialize};
 use serde_json::{from_value, Value};
 use std::collections::VecDeque;
 use std::fmt::Debug;
@@ -20,8 +20,8 @@ pub(crate) mod hostile;
 //     fn happen(&self, f: &mut Frame, c: &Calculator);
 // }
 
-#[derive(Debug,Deserialize,Serialize,Clone)]
-pub(crate) enum Event{
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub(crate) enum Event {
     EnemyPlaceEvent(EnemyPlaceEvent),
     OperatorDeployEvent(OperatorDeployEvent),
     OperatorRetreatEvent(OperatorRetreatEvent),
@@ -91,7 +91,9 @@ pub(crate) fn action_to_event(v: &Value) -> Result<Rc<Event>> {
                 ))?
                 .into(),
         })),
-        "Skill" => Rc::new(Event::OperatorSkillEvent(serde_json::from_value::<OperatorSkillEvent>(v[2].clone())?)),
+        "Skill" => Rc::new(Event::OperatorSkillEvent(serde_json::from_value::<
+            OperatorSkillEvent,
+        >(v[2].clone())?)),
         _ => return Err(ConfigParseError("unknown op in timeline".into()).into()),
     };
     Ok(e)

@@ -36,7 +36,7 @@ impl Frame {
         self.enemy_step();
         self.bullet_step();
         self.enemy_set.retain(|e| e.borrow().die_code != code::DIE);
-        self.cost+=PERIOD as f32; 
+        self.cost += PERIOD as f32;
     }
     fn operator_step(&mut self) {
         let ov = self.operator_deploy.clone();
@@ -140,7 +140,7 @@ num of enemy:{enemy_len}
 cost:{cost}
 enemy info:",
             timestamp = self.timestamp,
-            time = self.timestamp as f64 *PERIOD,
+            time = self.timestamp as f64 * PERIOD,
             enemy_len = self.enemy_set.len(),
             cost = self.cost
         )?;

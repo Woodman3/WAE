@@ -18,7 +18,7 @@ use crate::timeline::Event;
 use crate::unit::scope::Toward;
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
-#[derive(Debug,Default)]
+#[derive(Debug, Default)]
 pub(crate) struct Copilot {
     copilot_data: CopilotData,
 }
@@ -57,7 +57,7 @@ pub(super) struct CopilotGroup {
     pub(super) operators: Vec<CopilotOperator>,
 }
 
-#[derive(Debug, Serialize, Deserialize,Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(tag = "type")]
 pub(super) enum CopilotAction {
     Deploy(CopilotActionDeploy),
@@ -69,7 +69,7 @@ pub(super) enum CopilotAction {
 }
 
 //todo: may be all condition can warp into a single struct?
-#[derive(Debug, Serialize, Deserialize, Default,Clone)]
+#[derive(Debug, Serialize, Deserialize, Default, Clone)]
 #[serde(default)]
 pub(super) struct CopilotActionDeploy {
     pub(super) name: String,
@@ -81,7 +81,7 @@ pub(super) struct CopilotActionDeploy {
     pub(super) post_delay: Option<u8>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Default,Clone)]
+#[derive(Debug, Serialize, Deserialize, Default, Clone)]
 #[serde(default)]
 pub(super) struct CopilotActionCondition {
     pub(super) kills: Option<u8>,
@@ -90,7 +90,7 @@ pub(super) struct CopilotActionCondition {
     pub(super) cooling: Option<i8>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Default,Clone)]
+#[derive(Debug, Serialize, Deserialize, Default, Clone)]
 #[serde(default)]
 pub(super) struct CopilotActionSkill {
     pub(super) name: Option<String>,
@@ -99,7 +99,7 @@ pub(super) struct CopilotActionSkill {
     pub(super) location: Option<Grid>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Default,Clone)]
+#[derive(Debug, Serialize, Deserialize, Default, Clone)]
 #[serde(default)]
 pub(super) struct CopilotActionRetreat {
     pub(super) name: Option<String>,
@@ -152,7 +152,7 @@ impl TryInto<UnitRetreatEvent> for CopilotActionRetreat {
     }
 }
 
-impl TryInto<Event> for CopilotAction{
+impl TryInto<Event> for CopilotAction {
     type Error = Box<dyn std::error::Error>;
 
     fn try_into(self) -> Result<Event> {
@@ -178,7 +178,7 @@ impl TryInto<Event> for CopilotAction{
     }
 }
 
-impl CopilotAction{
+impl CopilotAction {
     fn check(&self, f: &Frame) -> bool {
         match self {
             CopilotAction::Deploy(d) => {
@@ -186,7 +186,7 @@ impl CopilotAction{
                     return false;
                 }
                 d.condition.as_ref().map_or(true, |c| c.check(f))
-            },
+            }
             CopilotAction::Skill(s) => true,
             CopilotAction::Retreat(r) => true,
             CopilotAction::SkillDaemon => true,
@@ -195,8 +195,8 @@ impl CopilotAction{
     }
 }
 
-impl CopilotActionCondition{
-    //todo: different condition may conflict 
+impl CopilotActionCondition {
+    //todo: different condition may conflict
     pub(crate) fn check(&self, f: &Frame) -> bool {
         if let Some(k) = self.kills {
             if f.kill_count >= k.into() {
@@ -213,7 +213,10 @@ impl CopilotActionCondition{
 }
 
 impl Copilot {
-    pub(crate) fn build_calculator<P: AsRef<Path>>(copilot_path: P, game_data_path: P) -> Result<Calculator> {
+    pub(crate) fn build_calculator<P: AsRef<Path>>(
+        copilot_path: P,
+        game_data_path: P,
+    ) -> Result<Calculator> {
         let json = load_json_file(copilot_path)?;
         let copilot_data: CopilotData = serde_json::from_value(json)?;
         let loader = Loader::new(game_data_path)?;
@@ -268,11 +271,11 @@ impl Copilot {
         });
         Ok(calculator)
     }
-    pub(crate) fn query(&self,f:&Frame) -> Vec<Event> {
+    pub(crate) fn query(&self, f: &Frame) -> Vec<Event> {
         let mut v = Vec::new();
-        for a in self.copilot_data.actions.iter(){
-            if a.check(f){
-                if let Ok(e) = a.clone().try_into(){
+        for a in self.copilot_data.actions.iter() {
+            if a.check(f) {
+                if let Ok(e) = a.clone().try_into() {
                     v.push(e);
                     // we force only one action can be execute in one frame
                     break;
@@ -291,7 +294,8 @@ mod test {
     #[test]
     fn test_copilot() {
         // let start = Instant::now();
-        let mut calculator = Copilot::build_calculator("./copilot.json", "./ArknightsGameData").unwrap();
+        let mut calculator =
+            Copilot::build_calculator("./copilot.json", "./ArknightsGameData").unwrap();
         // let duration = start.elapsed();
     }
 }

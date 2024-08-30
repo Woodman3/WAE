@@ -1,12 +1,12 @@
 use crate::calculator::PERIOD;
 use crate::frame::{Frame, OperatorRef};
+use crate::route::Route;
 use crate::unit::bullet::Bullet;
 use crate::unit::code::DIE;
 use crate::unit::operator::OperatorShared;
 use crate::unit::skill::effect::FixedDamage;
 use crate::utils::math;
 use crate::utils::math::{to_target, Point};
-use crate::route::Route;
 use log::trace;
 use serde::ser::Serializer;
 use serde::{Deserialize, Serialize};
@@ -20,9 +20,9 @@ use super::skill::effect::{self, Effect};
 use super::skill::skill_schedule::SkillSchedule;
 use super::skill::{Skill, SkillEntity, ToOperatorSkill};
 
+mod enemy_mission;
 #[cfg(test)]
 mod test;
-mod enemy_mission;
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 pub(crate) type EnemyShared = Weak<RefCell<Enemy>>;
@@ -47,9 +47,9 @@ pub(crate) struct Enemy {
     )]
     pub(crate) be_block: OperatorShared,
     pub(crate) id: usize,
-    pub(crate) skills:SkillSchedule,
+    pub(crate) skills: SkillSchedule,
     #[serde(skip)]
-    pub(crate) self_weak:EnemyShared,
+    pub(crate) self_weak: EnemyShared,
     #[serde(skip)]
     pub(crate) mission_vec: Vec<fn(&mut Enemy, &mut Frame)>,
 }
@@ -61,7 +61,7 @@ pub struct EnemyWithPriority {
 }
 
 impl Enemy {
-    pub(crate) fn init(&mut self){
+    pub(crate) fn init(&mut self) {
         self.arrange_mission();
         self.generate_default_attack_skill();
     }
@@ -73,7 +73,7 @@ impl Enemy {
             damage_type: self.stage.damage_type.clone(),
         };
         let se = ToOperatorSkill {
-            host : self.self_weak.clone(),
+            host: self.self_weak.clone(),
             target: Vec::new(),
             target_num: 1,
             effect: effect::Effect::FixedDamage(d),

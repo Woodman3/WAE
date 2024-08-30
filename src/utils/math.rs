@@ -1,11 +1,11 @@
 use serde::{Deserialize, Serialize};
 use std::ops::{Add, Mul, Sub};
-#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize,PartialEq)]
+#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PartialEq)]
 pub struct Point {
     pub x: f64,
     pub y: f64,
 }
-#[derive(Clone, Debug, Copy, Default, Deserialize, Serialize,PartialEq)]
+#[derive(Clone, Debug, Copy, Default, Deserialize, Serialize, PartialEq)]
 pub struct Grid {
     pub row: i64,
     pub col: i64,
@@ -125,11 +125,11 @@ impl From<Grid> for Point {
         }
     }
 }
-impl From<(usize,usize)> for Point{
-    fn from(value:(usize,usize))->Self{
-        Point{
-            x:value.0 as f64,
-            y:value.1 as f64
+impl From<(usize, usize)> for Point {
+    fn from(value: (usize, usize)) -> Self {
+        Point {
+            x: value.0 as f64,
+            y: value.1 as f64,
         }
     }
 }
@@ -155,7 +155,7 @@ impl Mul for Point {
     }
 }
 
-impl Add for Grid{
+impl Add for Grid {
     type Output = Self;
     fn add(self, rhs: Self) -> Self::Output {
         (self.row + rhs.row, self.col + rhs.col).into()

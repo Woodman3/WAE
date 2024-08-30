@@ -146,7 +146,7 @@ impl Into<Enemy> for OfficialEnemyData {
         let mut info: UnitInfo = att.into();
         let stage = info.clone();
         if self.range_radius.m_defined {
-            info.scope = Scope::Circle(Point::default(),self.range_radius.m_value.unwrap()); 
+            info.scope = Scope::Circle(Point::default(), self.range_radius.m_value.unwrap());
         } else {
             info.scope = Scope::None;
         }

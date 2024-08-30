@@ -1,10 +1,10 @@
 pub mod config;
 pub(super) mod copilot;
 pub(super) mod data_loader;
+pub mod debugger;
 pub mod error;
 pub mod math;
 pub(super) mod render;
-pub mod debugger;
 mod render_config;
 
 use serde_json::Value;

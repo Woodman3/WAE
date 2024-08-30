@@ -12,11 +12,11 @@ pub mod calculator;
 mod demo;
 pub mod frame;
 pub mod map;
+pub mod route;
+mod spawner;
 pub mod timeline;
 pub mod unit;
 pub mod utils;
-pub mod route;
-mod spawner;
 
 static mut INSTANCE: OnceCell<Calculator> = OnceCell::new();
 
@@ -135,7 +135,6 @@ pub unsafe extern "C" fn action(args: *const c_char) -> u8 {
     if let Ok(js) = cstr.to_str() {
         if let Ok(e) = serde_json::from_str::<timeline::Event>(js) {
             if let Some(Ca) = INSTANCE.get_mut() {
-                
                 // Ca.insert_event(e);
                 Ca.event_buffer.extend(std::iter::once(e));
                 todo!("insert_event");

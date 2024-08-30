@@ -19,18 +19,19 @@ struct Config {
 
 lazy_static! {
     static ref CONFIG: Mutex<Config> = {
-        let config_str = fs::read_to_string("config/visualizer_config.json").expect("Failed to read config file");
-        let config: Config = serde_json::from_str(&config_str).expect("Failed to parse config file");
+        let config_str = fs::read_to_string("config/visualizer_config.json")
+            .expect("Failed to read config file");
+        let config: Config =
+            serde_json::from_str(&config_str).expect("Failed to parse config file");
         Mutex::new(config)
     };
-
     pub static ref OPERATOR_COLOR: Color = {
         let config = CONFIG.lock().unwrap();
         Color::from_rgba8(
             config.operator_color[0],
             config.operator_color[1],
             config.operator_color[2],
-            config.operator_color[3]
+            config.operator_color[3],
         )
     };
     pub static ref BULLET_COLOR: Color = {
@@ -39,7 +40,7 @@ lazy_static! {
             config.bullet_color[0],
             config.bullet_color[1],
             config.bullet_color[2],
-            config.bullet_color[3]
+            config.bullet_color[3],
         )
     };
     pub static ref ENEMY_COLOR: Color = {
@@ -48,10 +49,9 @@ lazy_static! {
             config.enemy_color[0],
             config.enemy_color[1],
             config.enemy_color[2],
-            config.enemy_color[3]
+            config.enemy_color[3],
         )
     };
-
     pub static ref ENEMY_RADIUS: f32 = CONFIG.lock().unwrap().enemy_radius;
     pub static ref OPERATOR_RADIUS: f32 = CONFIG.lock().unwrap().operator_radius;
     pub static ref BULLET_RADIUS: f32 = CONFIG.lock().unwrap().bullet_radius;
@@ -63,7 +63,7 @@ lazy_static! {
             config.block_color[0],
             config.block_color[1],
             config.block_color[2],
-            config.block_color[3]
+            config.block_color[3],
         )
     };
 }

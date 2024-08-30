@@ -18,7 +18,6 @@ use super::enemy::EnemyShared;
 use super::operator::OperatorShared;
 use super::Unit;
 
-
 #[derive(Clone, Deserialize, Debug, Default, Serialize)]
 #[serde(default)]
 pub(crate) struct Skill {
@@ -34,12 +33,12 @@ pub(crate) struct Skill {
 
 #[derive(Clone, Deserialize, Debug, Default, Serialize)]
 #[serde(default)]
-pub(crate) struct SpData{
-    pub(crate) sp_cost:f64,
+pub(crate) struct SpData {
+    pub(crate) sp_cost: f64,
     /// sp now
-    pub(crate) sp:f64,
-    pub(crate) overcharge:bool,
-    pub(crate) charge_type:ChargeType,
+    pub(crate) sp: f64,
+    pub(crate) overcharge: bool,
+    pub(crate) charge_type: ChargeType,
 }
 #[derive(Deserialize, Debug, Default, Clone, Serialize)]
 pub(crate) struct ToEnemySkill {

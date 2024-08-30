@@ -5,7 +5,7 @@ use crate::unit::scope::Scope;
 use crate::unit::skill::effect::DamageType;
 use crate::unit::skill::skill_type::TriggerType;
 use crate::unit::skill::skill_type::{AttackType, ChargeType};
-use crate::unit::skill::{Skill,SpData};
+use crate::unit::skill::{Skill, SpData};
 use crate::unit::UnitInfo;
 use crate::utils::math::Grid;
 use crate::utils::math::GridRect;
@@ -156,7 +156,6 @@ impl Into<SpData> for OfficialSpData {
     }
 }
 
-
 impl Loader {
     /// name can be english or chinese, if name is english,first letter should be upper case
     /// elite: 0 is the lowest phase, 2 is the highest phase
@@ -299,4 +298,3 @@ impl OfficialRange {
         merged
     }
 }
-

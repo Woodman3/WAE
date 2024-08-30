@@ -1,7 +1,7 @@
+use serde::{Deserialize, Serialize};
 use std::cell::RefCell;
 use std::f32::consts::E;
 use std::rc::Rc;
-use serde::{Deserialize, Serialize};
 // use std::collections::HashMap;
 use serde_json::Value;
 // use serde_json::Value;
@@ -11,7 +11,7 @@ use crate::frame::Frame;
 use crate::route::CheckPoint;
 use crate::utils::error::ConfigParseError;
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
-#[derive(Debug,Deserialize,Serialize,Clone,Default)]
+#[derive(Debug, Deserialize, Serialize, Clone, Default)]
 pub(crate) struct EnemyPlaceEvent {
     pub(crate) enemy_key: String,
     pub(crate) enemy_route: usize,
@@ -25,17 +25,20 @@ impl EnemyPlaceEvent {
             .unwrap();
         e.route = Rc::clone(&c.route[self.enemy_route]);
         e.location = e.route.start;
-        e.next_point = match e.route.checkpoints.iter().position(|c| matches!(c, CheckPoint::Move(_))) {
-            Some(p) => {
-                match e.route.checkpoints[p] {
-                    CheckPoint::Move(p) => p,
-                    _ => e.route.end,
-                }
-            }
+        e.next_point = match e
+            .route
+            .checkpoints
+            .iter()
+            .position(|c| matches!(c, CheckPoint::Move(_)))
+        {
+            Some(p) => match e.route.checkpoints[p] {
+                CheckPoint::Move(p) => p,
+                _ => e.route.end,
+            },
             None => e.route.end,
         };
         e.id = f.next_id;
-        let e = Rc::new(RefCell::new(e)); 
+        let e = Rc::new(RefCell::new(e));
         e.borrow_mut().self_weak = Rc::downgrade(&e);
         f.next_id += 1;
         f.enemy_set.push(e);

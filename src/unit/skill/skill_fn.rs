@@ -26,7 +26,7 @@ impl ToEnemySkill {
     }
 }
 
-impl ToOperatorSkill{
+impl ToOperatorSkill {
     pub(crate) fn search(&mut self, m: &Map) -> bool {
         if let Some(s) = &self.search_scope {
             let mut vo = m.search_operator(s);
@@ -73,7 +73,7 @@ impl Display for Skill {
     }
 }
 
-impl Skill{
+impl Skill {
     pub(super) fn ready(&self) -> bool {
         self.last != 0.0 && self.sp_data.sp >= self.sp_data.sp_cost
     }
@@ -85,28 +85,28 @@ impl Skill{
             self.sp_data.sp += value
         }
     }
-    pub(super) fn can_run(&mut self,f:&Frame) -> bool {
+    pub(super) fn can_run(&mut self, f: &Frame) -> bool {
         match &mut self.skill_entity {
             SkillEntity::ToEnemySkill(s) => {
                 if s.search(&f.map) {
-                    return true
+                    return true;
                 } else {
-                    return false
+                    return false;
                 }
             }
             _ => return false,
         }
     }
-    pub(super) fn step(&mut self,f:&mut Frame)->bool {
+    pub(super) fn step(&mut self, f: &mut Frame) -> bool {
         self.last -= PERIOD;
         if self.last <= 0.0 {
             self.shoot(f);
             self.last = self.duration;
-            return true
+            return true;
         }
         false
     }
-    pub(super) fn shoot(&self,f:&mut Frame) {
+    pub(super) fn shoot(&self, f: &mut Frame) {
         match &self.skill_entity {
             SkillEntity::ToEnemySkill(s) => {
                 for t in s.target.iter() {

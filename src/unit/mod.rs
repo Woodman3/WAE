@@ -33,8 +33,8 @@ pub struct UnitInfo {
     pub(super) attack_time: f64,
     pub(super) block_num: i64,
     pub(super) attack_type: AttackType,
-    pub(super) cost:i32,
-    pub(super) scope:Scope,
+    pub(super) cost: i32,
+    pub(super) scope: Scope,
 }
 
 // pub trait UnitTrait:Debug{
@@ -96,7 +96,7 @@ impl Unit {
             Unit::Operator(o) => o.borrow_mut().be_damage(d),
         }
     }
-    pub(super) fn be_effect(&mut self,e: &Effect){
+    pub(super) fn be_effect(&mut self, e: &Effect) {
         match &self {
             Unit::Enemy(enemy) => enemy.borrow_mut().be_effect(e),
             Unit::Operator(o) => o.borrow_mut().be_effect(e),

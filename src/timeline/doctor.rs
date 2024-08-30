@@ -11,28 +11,28 @@ use serde_json::Value;
 use std::rc::Rc;
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
-#[derive(Debug,Deserialize,Serialize,Clone,Default)]
+#[derive(Debug, Deserialize, Serialize, Clone, Default)]
 pub(crate) struct OperatorDeployEvent {
     pub(crate) operator_key: String,
     pub(crate) location: Grid,
     pub(crate) toward: Toward,
 }
-#[derive(Debug,Deserialize,Serialize,Clone,Default)]
+#[derive(Debug, Deserialize, Serialize, Clone, Default)]
 pub(crate) struct OperatorRetreatEvent {
     pub(crate) operator_key: String,
 }
 
-#[derive(Debug,Deserialize,Serialize,Clone,Default)]
+#[derive(Debug, Deserialize, Serialize, Clone, Default)]
 pub(crate) struct OperatorSkillEvent {
     pub(crate) operator_key: String,
 }
 
-#[derive(Debug,Deserialize,Serialize,Clone,Default)]
+#[derive(Debug, Deserialize, Serialize, Clone, Default)]
 pub(crate) struct UnitRetreatEvent {
     pub(crate) location: Grid,
 }
 
-#[derive(Debug,Deserialize,Serialize,Clone,Default)]
+#[derive(Debug, Deserialize, Serialize, Clone, Default)]
 pub(crate) struct UnitSkillEvent {
     pub(crate) location: Grid,
 }
@@ -80,9 +80,9 @@ impl OperatorDeployEvent {
         f.map.operator[self.location.row as usize][self.location.col as usize] = Rc::downgrade(&or);
         f.operator_deploy
             .insert(self.operator_key.clone(), Rc::clone(&or));
-        if f.cost>=o.stage.cost as f32{
-            f.cost-=o.stage.cost as f32;
-        }else{
+        if f.cost >= o.stage.cost as f32 {
+            f.cost -= o.stage.cost as f32;
+        } else {
             error!("cost not enough");
         }
     }
@@ -92,7 +92,8 @@ impl OperatorRetreatEvent {
     pub(super) fn happen(&self, f: &mut Frame, _c: &Calculator) {
         let or: OperatorRef = f.operator_deploy.remove(&self.operator_key).unwrap();
         let o = or.borrow_mut();
-        f.map.operator[o.location.row.clone() as usize][o.location.col.clone() as usize] = OperatorShared::new();
+        f.map.operator[o.location.row.clone() as usize][o.location.col.clone() as usize] =
+            OperatorShared::new();
         f.operator_undeploy
             .insert(self.operator_key.clone(), Rc::clone(&or));
     }
@@ -114,7 +115,8 @@ impl UnitRetreatEvent {
             let name = o.borrow().name.clone();
             let or: OperatorRef = f.operator_deploy.remove(&name).unwrap();
             f.operator_undeploy.insert(name, Rc::clone(&or));
-            f.map.operator[self.location.row as usize][self.location.col as usize] = Rc::downgrade(&o);
+            f.map.operator[self.location.row as usize][self.location.col as usize] =
+                Rc::downgrade(&o);
         }
     }
 }

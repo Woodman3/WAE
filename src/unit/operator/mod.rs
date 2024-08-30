@@ -43,7 +43,7 @@ pub(crate) struct Operator {
     #[serde(skip)]
     pub(crate) block_vec: Vec<EnemyShared>,
     pub(crate) die_code: u32,
-    pub(crate) skills:SkillSchedule,
+    pub(crate) skills: SkillSchedule,
     #[serde(skip)]
     mission_vec: Vec<fn(&mut Operator, &mut Frame)>,
 }
@@ -55,7 +55,7 @@ impl Operator {
         }
     }
 
-    pub(crate) fn init(&mut self){
+    pub(crate) fn init(&mut self) {
         self.arrange_mission();
         self.generate_default_attack_skill();
     }

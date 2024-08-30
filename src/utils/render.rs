@@ -71,17 +71,17 @@ impl<'a> Render<'a> {
                 let x = *PADDING + j as f32 * *BLOCK_SIZE;
                 let y = *PADDING + i as f32 * *BLOCK_SIZE;
                 block_paint.set_color(Color::from_rgba8(r, g, b, a));
-                if let Some(pb) =p.get_mut(&(r,g,b)){
+                if let Some(pb) = p.get_mut(&(r, g, b)) {
                     pb.push_rect(Rect::from_xywh(x, y, *BLOCK_SIZE, *BLOCK_SIZE).unwrap());
-                }else{
+                } else {
                     let mut pb = PathBuilder::new();
                     pb.push_rect(Rect::from_xywh(x, y, *BLOCK_SIZE, *BLOCK_SIZE).unwrap());
-                    p.insert((r,g,b),pb);
+                    p.insert((r, g, b), pb);
                 }
             }
         }
-        for ((r,g,b),path) in p{
-            if let Some(path) = path.finish(){
+        for ((r, g, b), path) in p {
+            if let Some(path) = path.finish() {
                 let mut block_paint = Paint::default();
                 block_paint.set_color(Color::from_rgba8(r, g, b, 255));
                 self.pixmap.fill_path(
@@ -208,4 +208,3 @@ impl<'a> Render<'a> {
         self.pixmap.encode_png().unwrap()
     }
 }
-

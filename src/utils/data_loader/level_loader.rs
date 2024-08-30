@@ -1,10 +1,10 @@
+use std::cell::RefCell;
 use std::collections::HashMap;
 use std::collections::VecDeque;
 use std::i64;
 use std::path::Path;
 use std::path::PathBuf;
-use std::rc::{Rc,Weak};
-use std::cell::RefCell;
+use std::rc::{Rc, Weak};
 
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -25,6 +25,7 @@ use crate::route::CheckPoint;
 use crate::route::Route;
 use crate::spawner;
 use crate::spawner::Spawner;
+use crate::spawner::{SubSubWave, SubWave, Wave};
 use crate::timeline;
 use crate::timeline::hostile::EnemyPlaceEvent;
 use crate::timeline::EventWithTime;
@@ -33,7 +34,6 @@ use crate::unit::operator::OperatorShared;
 use crate::utils::load_json_file;
 use crate::utils::math::Grid;
 use crate::utils::math::Point;
-use crate::spawner::{SubSubWave,SubWave,Wave};
 
 #[derive(Deserialize, Default, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -48,13 +48,13 @@ pub(super) struct OfficialLevelData {
 
 #[derive(Deserialize, Default, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
-pub(super) struct OfficialLevelOption{
-    pub(super) character_limit:u32,
-    pub(super) max_life_point:u32,
-    pub(super) initial_cost:u32,
-    pub(super) max_cost:u32,
-    pub(super) cost_increase_time:f32,
-    pub(super) max_play_time:f32,
+pub(super) struct OfficialLevelOption {
+    pub(super) character_limit: u32,
+    pub(super) max_life_point: u32,
+    pub(super) initial_cost: u32,
+    pub(super) max_cost: u32,
+    pub(super) cost_increase_time: f32,
+    pub(super) max_play_time: f32,
 }
 
 #[derive(Deserialize, Default, Debug, Clone)]
@@ -76,7 +76,7 @@ pub(super) struct OfficialTile {
     // it also has a palyerSideMask,but up to 2024/7/29, all its value is "ALL",so i ignore it
 }
 
-#[derive(Deserialize, Default, Debug,Clone)]
+#[derive(Deserialize, Default, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub(super) struct OfficialRoute {
     pub(super) motion_mode: OfficialRouteType,
@@ -91,7 +91,7 @@ pub(super) struct OfficialRoute {
     pub(super) visit_every_check_point: bool,
 }
 
-#[derive(Deserialize, Default, Debug,Clone)]
+#[derive(Deserialize, Default, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub(super) struct OfficialCheckPoint {
     #[serde(alias = "type")]
@@ -134,7 +134,7 @@ pub(super) struct OfficialEnemyDbRef {
     pub(super) overwritten_data: Option<Value>,
 }
 
-#[derive(Deserialize, Default, Debug,Clone)]
+#[derive(Deserialize, Default, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub(super) struct OfficialWave {
     pub(super) pre_delay: f32,
@@ -142,25 +142,25 @@ pub(super) struct OfficialWave {
     pub(super) fragments: Vec<OfficialWaveFragment>,
 }
 
-#[derive(Deserialize, Default, Debug,Clone)]
+#[derive(Deserialize, Default, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub(super) struct OfficialWaveFragment {
     pub(super) pre_delay: f32,
     pub(super) actions: Vec<OfficialWaveAction>,
 }
 
-#[derive(Deserialize, Default, Debug,Clone)]
+#[derive(Deserialize, Default, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub(super) struct OfficialWaveAction {
     //up to 2024/8/8 ["SPAWN", "STORY", "DISPLAY_ENEMY_INFO", "PREVIEW_CURSOR", "ACTIVATE_PREDEFINED", "PLAY_OPERA", "PLAY_BGM", "DIALOG", "TRIGGER_PREDEFINED", "BATTLE_EVENTS", "WITHDRAW_PREDEFINED"]
     //it seems only "spawn" related to the enemy behavior
     pub(super) action_type: String,
-    pub(super) managed_by_scheduler:bool,
+    pub(super) managed_by_scheduler: bool,
     pub(super) pre_delay: f32,
     pub(super) route_index: u32,
-    pub(super) key:String,
-    pub(super) count:u32,
-    pub(super) interval:f32,
+    pub(super) key: String,
+    pub(super) count: u32,
+    pub(super) interval: f32,
 }
 
 fn find_file_in_dir(dir: &Path, file_name: &str) -> Result<String> {
@@ -180,7 +180,7 @@ fn find_file_in_dir(dir: &Path, file_name: &str) -> Result<String> {
     Err("File not found".into())
 }
 
-impl Into<CheckPoint> for OfficialCheckPoint{
+impl Into<CheckPoint> for OfficialCheckPoint {
     fn into(self) -> CheckPoint {
         match self.tag {
             OfficialCheckPointType::Move => CheckPoint::Move(self.position.into()),
@@ -189,7 +189,7 @@ impl Into<CheckPoint> for OfficialCheckPoint{
     }
 }
 
-impl Into<Route> for OfficialRoute{
+impl Into<Route> for OfficialRoute {
     fn into(self) -> Route {
         let mut checkpoints = Vec::new();
         if let Some(c) = self.checkpoints {
@@ -204,7 +204,6 @@ impl Into<Route> for OfficialRoute{
         }
     }
 }
-
 
 impl Into<LayoutCode> for OfficialTile {
     fn into(self) -> LayoutCode {
@@ -239,8 +238,7 @@ impl Into<Map> for OfficialMapData {
                 layout[i][j] = self.tiles[self.map[i][j] as usize].into();
             }
         }
-        let enemy =
-            vec![vec![Vec::<Weak<RefCell<Enemy>>>::new(); width as usize]; height as usize];
+        let enemy = vec![vec![Vec::<Weak<RefCell<Enemy>>>::new(); width as usize]; height as usize];
         let operator = vec![vec![OperatorShared::new(); width as usize]; height as usize];
         Map {
             width: width as u32,
@@ -301,7 +299,7 @@ impl Into<Spawner> for Vec<OfficialWave> {
         }
         Spawner { wave }
     }
-}   
+}
 
 impl Loader {
     fn find_level(&self, level_name: String) -> Result<OfficialLevelData> {
@@ -334,7 +332,7 @@ impl Loader {
         let map: Map = level.map_data.clone().into();
         Ok(map)
     }
-    
+
     pub(super) fn load_level_by_path(&self, path: &PathBuf) -> Result<Calculator> {
         let level_json = load_json_file(path)?;
         let level = serde_json::from_value::<OfficialLevelData>(level_json)?;
@@ -347,17 +345,17 @@ impl Loader {
         self.load_level(level)
     }
 
-    fn load_level(&self,level:OfficialLevelData)-> Result<Calculator>{
+    fn load_level(&self, level: OfficialLevelData) -> Result<Calculator> {
         let map = self.load_map(&level)?;
         let mut enemy_initial = HashMap::new();
         for e in level.enemy_db_refs.iter() {
             let enemy = self.load_enemy(&e.id, e.level as usize)?;
             enemy_initial.insert(e.id.clone(), enemy);
-        };
+        }
         let mut route = Vec::new();
-        for r in level.routes.iter(){
-            let mut r:Route = r.clone().into(); 
-            // r.complete(&map); 
+        for r in level.routes.iter() {
+            let mut r: Route = r.clone().into();
+            // r.complete(&map);
             route.push(Rc::new(r));
         }
         // for w in level.waves.iter(){
@@ -381,7 +379,7 @@ impl Loader {
         //         }
         //     }
         // };
-        let spawner:Spawner = level.waves.clone().into();
+        let spawner: Spawner = level.waves.clone().into();
         let f = Frame {
             map,
             cost: level.options.initial_cost as f32,

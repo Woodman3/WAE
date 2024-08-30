@@ -5,20 +5,19 @@ use eframe::egui;
 use eframe::egui::{Context, Painter, TextFormat, Ui};
 use egui_extras::install_image_loaders;
 
-use std::sync::{Arc, Mutex};
+use log::{Level, LevelFilter, Metadata, Record};
 use std::sync::mpsc::{self, Receiver, Sender};
-use log::{Record, Level, Metadata, LevelFilter};
+use std::sync::{Arc, Mutex};
 pub(crate) struct Debugger {
     pub(crate) c: Calculator,
     pub(crate) run: bool,
-    pub(crate) paint:bool,
+    pub(crate) paint: bool,
     pub(crate) log_receiver: Arc<Mutex<Receiver<String>>>,
     pub(crate) log_messages: Arc<Mutex<Vec<String>>>,
-
 }
 
-pub(crate) struct DebugLogger{
-    pub(crate) sender:Sender<String>
+pub(crate) struct DebugLogger {
+    pub(crate) sender: Sender<String>,
 }
 
 impl log::Log for DebugLogger {
@@ -28,19 +27,20 @@ impl log::Log for DebugLogger {
 
     fn log(&self, record: &Record) {
         if self.enabled(record.metadata()) {
-            let _ = self.sender.send(format!("{} - {}", record.level(), record.args()));
+            let _ = self
+                .sender
+                .send(format!("{} - {}", record.level(), record.args()));
         }
     }
 
     fn flush(&self) {}
 }
 
-
 impl Debugger {
     // pub(crate) fn new(_cc: &eframe::CreationContext<'_>, c: Calculator) -> Self {
     //     Self { c, run: false }
     // }
-    fn paint_info(&self,f: &Frame, ui: &mut Ui) {
+    fn paint_info(&self, f: &Frame, ui: &mut Ui) {
         // let text=RichText("a text".into());
         let mut info = egui::text::LayoutJob::default();
         let text_format = TextFormat::default();
@@ -62,16 +62,16 @@ impl Debugger {
         }
         ui.label(info);
     }
-    fn paint_log(&self,ui: &mut Ui){
+    fn paint_log(&self, ui: &mut Ui) {
         let receiver = self.log_receiver.lock().unwrap();
         while let Ok(message) = receiver.try_recv() {
             self.log_messages.lock().unwrap().push(message);
         }
         for message in self.log_messages.lock().unwrap().iter() {
             ui.label(message);
-        };
+        }
     }
-    fn paint_frame(&self,ctx:&Context, ui: &mut Ui) {
+    fn paint_frame(&self, ctx: &Context, ui: &mut Ui) {
         let mut r = Render::new(&self.c.frame_vec[0]);
         r.render();
         let image_bytes = r.encode();
@@ -117,8 +117,7 @@ impl eframe::App for Debugger {
                     self.paint_info(&self.c.frame_vec[0], ui);
                 });
             });
-        egui::CentralPanel::default()
-            .show(ctx, |ui| {
+        egui::CentralPanel::default().show(ctx, |ui| {
             if self.paint {
                 self.paint_frame(ctx, ui);
             }
