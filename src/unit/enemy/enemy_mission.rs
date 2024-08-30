@@ -1,10 +1,8 @@
-use std::{cell::RefCell, rc::Weak};
 
 use crate::{
     frame::Frame,
     unit::{
         code,
-        skill::{effect, Skill, SkillEntity, ToOperatorSkill},
     },
     utils::math::{self, to_target},
 };
@@ -28,7 +26,7 @@ impl Enemy {
         let distance = math::distance_from_segment_to_point(self.location, new, self.next_point);
         if distance <= code::MIN_DISTANCE {
             self.route_stage += 1;
-            if (self.route_stage < self.route.checkpoints.len()) {
+            if self.route_stage < self.route.checkpoints.len() {
                 use crate::route::CheckPoint;
                 self.next_point = self.route.end;
                 for i in self.route_stage..self.route.checkpoints.len() {
@@ -40,7 +38,7 @@ impl Enemy {
                         _ => continue,
                     }
                 }
-            } else if (self.route_stage == self.route.checkpoints.len()) {
+            } else if self.route_stage == self.route.checkpoints.len() {
                 self.next_point = self.route.end;
             } else {
                 self.die_code = code::INTO_END;

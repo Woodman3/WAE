@@ -3,12 +3,8 @@ use log::error;
 use crate::calculator::PERIOD;
 use crate::frame::Frame;
 use crate::map::Map;
-use crate::unit::bullet::Bullet;
 use crate::unit::skill::{Skill, SkillEntity, ToEnemySkill};
-use crate::unit::Unit;
-use crate::utils::math::Point;
 use std::fmt::{Display, Formatter};
-use std::rc::Rc;
 
 use super::ToOperatorSkill;
 
@@ -106,7 +102,7 @@ impl Skill {
         }
         false
     }
-    pub(super) fn shoot(&self, f: &mut Frame) {
+    pub(super) fn shoot(&self, _f: &mut Frame) {
         match &self.skill_entity {
             SkillEntity::ToEnemySkill(s) => {
                 for t in s.target.iter() {
@@ -135,7 +131,7 @@ impl Skill {
                     }
                 }
             }
-            SkillEntity::ToOperatorSkill(s) => {
+            SkillEntity::ToOperatorSkill(_s) => {
                 todo!()
             }
             SkillEntity::None => {}

@@ -2,8 +2,8 @@ pub(super) mod tile;
 
 use crate::unit::enemy::{Enemy, EnemyShared};
 use crate::unit::operator::OperatorShared;
-use crate::unit::scope::{self, Scope};
-use crate::utils::math::{distance_p2p, Grid, Point};
+use crate::unit::scope::{Scope};
+use crate::utils::math::{distance_p2p, Grid};
 use serde::{Deserialize, Serialize};
 use serde_json::{from_value, Value};
 use std::cell::RefCell;
@@ -142,7 +142,7 @@ impl Map {
     pub(crate) fn search_operator(&self, search_scope: &Scope) -> Vec<OperatorShared> {
         let mut vo = Vec::new();
         match search_scope {
-            Scope::Grids(rect) => {
+            Scope::Grids(_rect) => {
                 todo!();
             }
             Scope::Circle(center, r) => {
@@ -156,7 +156,7 @@ impl Map {
                     for j in start_col..=end_col {
                         let distance_squared = distance_p2p(&(i, j).into(), &center);
                         if distance_squared <= r_squared {
-                            if let Some(o) = self.operator[i][j].upgrade() {
+                            if let Some(_o) = self.operator[i][j].upgrade() {
                                 vo.push(self.operator[i][j].clone());
                             }
                         }
@@ -211,7 +211,7 @@ impl Map {
         }
         let mut route = Vec::new();
         let mut p = end;
-        while (p != start) {
+        while p != start {
             route.push(p);
             p = path[p.row as usize][p.col as usize];
         }

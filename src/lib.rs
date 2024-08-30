@@ -1,10 +1,9 @@
 #![allow(non_snake_case)]
 #![allow(dead_code)]
+#![allow(unreachable_code)]
 use crate::calculator::Calculator;
-use serde_json::Value;
 use std::ffi::{CStr, CString};
 use std::{cell::OnceCell, os::raw::c_char, ptr::null_mut};
-use timeline::action_to_event;
 
 //mod block;
 pub mod calculator;

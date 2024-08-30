@@ -50,7 +50,7 @@ pub(super) enum Unit {
 }
 
 impl UnitInfo {
-    pub fn be_buff(&mut self, b: &Buff) {
+    pub(crate) fn be_buff(&mut self, b: &Buff) {
         use ChangeClass::*;
         use ChangeType::*;
         let f = match b.change_type {

@@ -2,21 +2,13 @@ pub mod effect;
 mod skill_fn;
 pub mod skill_schedule;
 pub mod skill_type;
-use crate::frame::{EnemyRef, OperatorRef};
-use crate::unit::enemy::Enemy;
 use crate::unit::scope::Scope;
 use crate::unit::skill::effect::Effect;
-use crate::utils::config::Config;
-use log::warn;
 use serde::{Deserialize, Serialize};
 use skill_type::*;
-use std::cell::RefCell;
-use std::collections::HashMap;
-use std::rc::Weak;
 
 use super::enemy::EnemyShared;
 use super::operator::OperatorShared;
-use super::Unit;
 
 #[derive(Clone, Deserialize, Debug, Default, Serialize)]
 #[serde(default)]

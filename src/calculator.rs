@@ -4,17 +4,15 @@ use crate::frame::{Frame, OperatorRef};
 use crate::map;
 use crate::route::Route;
 use crate::spawner::Spawner;
-use crate::timeline::{read_timeline, Event, EventWithTime};
+use crate::timeline::{Event};
 use crate::unit;
-use crate::unit::bullet::Bullet;
 use crate::unit::enemy::Enemy;
 use crate::unit::operator::Operator;
 use crate::utils::config::Config;
-use crate::utils::copilot::{self, Copilot};
-use crate::utils::math::Point;
-use log::{debug, trace, warn};
+use crate::utils::copilot::{Copilot};
+use log::{debug};
 use serde_json::Value;
-use std::collections::{HashMap, VecDeque};
+use std::collections::{HashMap};
 use std::rc::Rc;
 
 pub(crate) static PERIOD: f64 = 0.0166;
@@ -64,8 +62,7 @@ impl Calculator {
     pub(super) fn new(c: &Config) -> Result<Calculator> {
         use serde_json::from_value;
         let time_remain: i64 = from_value(c.hostile["time_remain"].clone())?;
-        let mut route = Vec::<Rc<Route>>::new();
-        let temp: Vec<Vec<Vec<f64>>> = from_value(c.hostile["route"].clone())?;
+        let route = Vec::<Rc<Route>>::new();
         let mut frame_vec = Vec::<Frame>::new();
         let mut operator_undeploy = HashMap::<String, OperatorRef>::new();
         for (key, v) in c.operator.as_object().unwrap() {

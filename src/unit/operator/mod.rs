@@ -1,9 +1,7 @@
-use super::enemy::Enemy;
-use super::scope::{Scope, Toward};
+use super::scope::{Toward};
 use super::skill::effect::{self, Effect};
 use super::skill::skill_schedule::SkillSchedule;
 use super::skill::{SkillEntity, ToEnemySkill};
-use super::Unit;
 use crate::frame::Frame;
 use crate::unit::bullet::Bullet;
 use crate::unit::enemy::{EnemyShared, EnemyWithPriority};
@@ -15,7 +13,6 @@ use serde::ser::Serializer;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::cell::RefCell;
-use std::f32::consts::E;
 use std::fmt;
 use std::fmt::{Display, Formatter};
 use std::rc::Weak;

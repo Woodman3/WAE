@@ -2,18 +2,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::calculator::PERIOD;
 use crate::frame::Frame;
-use crate::unit::bullet::Bullet;
-use crate::unit::enemy::Enemy;
-use crate::unit::operator::Operator;
-use crate::unit::skill::effect::Effect::Damage;
-use crate::unit::skill::effect::FixedDamage;
-use crate::unit::skill::skill_type::ChargeType;
-use crate::unit::skill::{Skill, SkillEntity, ToEnemySkill};
-use crate::unit::Unit;
-use crate::utils::math::Point;
-use std::cell::RefCell;
+use crate::unit::skill::{Skill};
 use std::fmt::{self, Display, Formatter};
-use std::rc::{Rc, Weak};
 
 #[derive(Clone, Deserialize, Debug, Default, Serialize)]
 #[serde(default)]

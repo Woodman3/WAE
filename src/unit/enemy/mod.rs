@@ -5,8 +5,7 @@ use crate::unit::bullet::Bullet;
 use crate::unit::code::DIE;
 use crate::unit::operator::OperatorShared;
 use crate::unit::skill::effect::FixedDamage;
-use crate::utils::math;
-use crate::utils::math::{to_target, Point};
+use crate::utils::math::{Point};
 use log::trace;
 use serde::ser::Serializer;
 use serde::{Deserialize, Serialize};
@@ -185,7 +184,7 @@ impl Enemy {
         }
     }
 
-    pub(super) fn be_effect(&mut self, e: &Effect) {
+    pub(super) fn be_effect(&mut self, _e: &Effect) {
         todo!()
     }
 }

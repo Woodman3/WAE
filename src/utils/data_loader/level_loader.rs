@@ -1,6 +1,5 @@
 use std::cell::RefCell;
 use std::collections::HashMap;
-use std::collections::VecDeque;
 use std::i64;
 use std::path::Path;
 use std::path::PathBuf;
@@ -23,12 +22,8 @@ use crate::map::tile::{LayoutCode, TileBuildable, TileHeight, TileKey, TilePassa
 use crate::map::Map;
 use crate::route::CheckPoint;
 use crate::route::Route;
-use crate::spawner;
 use crate::spawner::Spawner;
 use crate::spawner::{SubSubWave, SubWave, Wave};
-use crate::timeline;
-use crate::timeline::hostile::EnemyPlaceEvent;
-use crate::timeline::EventWithTime;
 use crate::unit::enemy::Enemy;
 use crate::unit::operator::OperatorShared;
 use crate::utils::load_json_file;
@@ -354,7 +349,7 @@ impl Loader {
         }
         let mut route = Vec::new();
         for r in level.routes.iter() {
-            let mut r: Route = r.clone().into();
+            let r: Route = r.clone().into();
             // r.complete(&map);
             route.push(Rc::new(r));
         }
@@ -395,6 +390,5 @@ impl Loader {
             ..Default::default()
         };
         return Ok(c);
-        todo!("load route")
     }
 }

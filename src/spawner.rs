@@ -86,7 +86,7 @@ impl SubWave {
 
 impl SubSubWave {
     fn step(&mut self, f: &Frame) -> Vec<Event> {
-        let mut ret = Vec::new();
+        let ret = Vec::new();
         if self.cur_count == 0 {
             if self.cur_delay > 0.0 {
                 self.cur_delay -= PERIOD as f32;
@@ -106,7 +106,7 @@ impl SubSubWave {
             }
         }
     }
-    fn spawn(&mut self, f: &Frame) -> Vec<Event> {
+    fn spawn(&mut self, _f: &Frame) -> Vec<Event> {
         let e = EnemyPlaceEvent {
             enemy_key: self.enemy.clone(),
             enemy_route: self.route as usize,

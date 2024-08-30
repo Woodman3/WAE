@@ -1,11 +1,9 @@
 use serde::{Deserialize, Serialize};
 use std::cell::RefCell;
-use std::f32::consts::E;
 use std::rc::Rc;
 // use std::collections::HashMap;
 use serde_json::Value;
 // use serde_json::Value;
-use super::Event;
 use crate::calculator::Calculator;
 use crate::frame::Frame;
 use crate::route::CheckPoint;

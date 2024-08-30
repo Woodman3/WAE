@@ -187,8 +187,8 @@ impl CopilotAction {
                 }
                 d.condition.as_ref().map_or(true, |c| c.check(f))
             }
-            CopilotAction::Skill(s) => true,
-            CopilotAction::Retreat(r) => true,
+            CopilotAction::Skill(_s) => true,
+            CopilotAction::Retreat(_r) => true,
             CopilotAction::SkillDaemon => true,
             CopilotAction::UseLess => false,
         }
@@ -287,15 +287,15 @@ impl Copilot {
 }
 
 mod test {
-    use crate::calculator;
+    
 
-    use super::*;
-    use std::time::{Duration, Instant};
+    
+    
     #[test]
     fn test_copilot() {
         // let start = Instant::now();
-        let mut calculator =
-            Copilot::build_calculator("./copilot.json", "./ArknightsGameData").unwrap();
+        // let calculator =
+        //     Copilot::build_calculator("./copilot.json", "./ArknightsGameData").unwrap();
         // let duration = start.elapsed();
     }
 }

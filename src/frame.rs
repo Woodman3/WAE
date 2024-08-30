@@ -87,18 +87,18 @@ impl Frame {
         for (key, o) in self.operator_undeploy.iter() {
             operator_undeploy.insert(key.clone(), Rc::new(RefCell::new(o.borrow().deep_clone())));
         }
-        let bullet_set = self.bullet_set.clone();
+        let _bullet_set = self.bullet_set.clone();
         todo!();
-        Frame {
-            timestamp: self.timestamp,
-            enemy_set,
-            operator_deploy,
-            operator_undeploy,
-            map: self.map.deep_clone(),
-            bullet_set,
-            next_id: self.next_id,
-            ..Default::default()
-        }
+        // Frame {
+        //     timestamp: self.timestamp,
+        //     enemy_set,
+        //     operator_deploy,
+        //     operator_undeploy,
+        //     map: self.map.deep_clone(),
+        //     bullet_set,
+        //     next_id: self.next_id,
+        //     ..Default::default()
+        // }
     }
 
     pub(super) fn no_enemy(&self) -> bool {

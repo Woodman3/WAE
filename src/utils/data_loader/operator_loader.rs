@@ -208,7 +208,7 @@ impl Loader {
         if level >= 1 && level <= max_level && skill_level >= 1 && skill_level <= max_skill_level {
             let mut r = from_value::<OfficialRange>(self.range_table[op.range_id.clone()].clone())?;
             let at = from_value::<AttackType>(Value::String(oo.position.clone()))?;
-            let skill = if skill_index == 0 {
+            let _skill = if skill_index == 0 {
                 Skill::default()
             } else {
                 let sd = oo.skills.get(skill_index - 1).ok_or(format!(

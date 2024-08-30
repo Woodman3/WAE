@@ -2,11 +2,11 @@ use super::render::Render;
 use crate::calculator::Calculator;
 use crate::frame::Frame;
 use eframe::egui;
-use eframe::egui::{Context, Painter, TextFormat, Ui};
+use eframe::egui::{Context, TextFormat, Ui};
 use egui_extras::install_image_loaders;
 
-use log::{Level, LevelFilter, Metadata, Record};
-use std::sync::mpsc::{self, Receiver, Sender};
+use log::{Level, Metadata, Record};
+use std::sync::mpsc::{Receiver, Sender};
 use std::sync::{Arc, Mutex};
 pub(crate) struct Debugger {
     pub(crate) c: Calculator,

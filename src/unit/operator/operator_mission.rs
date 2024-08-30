@@ -1,13 +1,10 @@
 use crate::calculator::PERIOD;
 use crate::frame::Frame;
-use crate::map::Map;
 use crate::unit::bullet::Bullet;
-use crate::unit::enemy::{Enemy, EnemyWithPriority};
 use crate::unit::operator::Operator;
-use crate::unit::skill::effect::{Effect, FixedDamage};
+use crate::unit::skill::effect::{FixedDamage};
 use crate::unit::Unit;
 use crate::utils::math::Point;
-use std::cell::RefCell;
 use std::rc::{Rc, Weak};
 
 impl Operator {

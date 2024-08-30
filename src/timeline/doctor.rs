@@ -1,4 +1,3 @@
-use super::Event;
 use crate::calculator::Calculator;
 use crate::frame::{Frame, OperatorRef};
 use crate::unit::operator::OperatorShared;
@@ -122,7 +121,7 @@ impl UnitRetreatEvent {
 }
 
 impl UnitSkillEvent {
-    pub(super) fn happen(&self, f: &mut Frame, c: &Calculator) {
-        todo!()
+    pub(super) fn happen(&self, _f: &mut Frame, _c: &Calculator) {
+        unimplemented!()
     }
 }
