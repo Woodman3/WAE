@@ -32,8 +32,6 @@ pub(crate) struct Operator {
     pub(crate) info: super::UnitInfo,
     pub(crate) stage: super::UnitInfo,
     pub(crate) location: Grid,
-    pub(crate) attack_scope: Scope,
-    pub(crate) search_scope: Scope,
     pub(crate) re_deploy: f32,
     pub(crate) toward: Toward,
     pub(crate) enemy_find: Vec<EnemyWithPriority>,
@@ -71,7 +69,6 @@ impl Operator {
     pub(crate) fn new(v: &Value) -> Result<Operator> {
         let mut o: Operator = serde_json::from_value(v.clone())?;
         o.stage = o.info.clone();
-        o.search_scope = o.attack_scope.clone();
         o.arrange_mission();
         Ok(o)
     }
@@ -141,7 +138,7 @@ impl Operator {
             target_num: 1,
             effect: effect::Effect::Damage(d),
             attack_type: self.stage.attack_type,
-            search_scope: Option::from(self.search_scope.clone()),
+            search_scope: Option::from(self.stage.scope.clone()),
         };
         s.skill_entity = SkillEntity::ToEnemySkill(se);
         self.skills.skill_block.push(s);

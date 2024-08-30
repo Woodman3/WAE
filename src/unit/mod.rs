@@ -5,6 +5,7 @@ pub(super) mod operator;
 pub mod scope;
 pub mod skill;
 
+use scope::Scope;
 use serde::{Deserialize, Serialize};
 use std::cell::RefCell;
 use std::fmt::Debug;
@@ -33,6 +34,7 @@ pub struct UnitInfo {
     pub(super) block_num: i64,
     pub(super) attack_type: AttackType,
     pub(super) cost:i32,
+    pub(super) scope:Scope,
 }
 
 // pub trait UnitTrait:Debug{

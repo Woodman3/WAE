@@ -4,7 +4,9 @@ use serde::Deserialize;
 
 use super::Loader;
 use super::Result;
+use crate::unit::scope::Scope;
 use crate::unit::{enemy::Enemy, UnitInfo};
+use crate::utils::math::Point;
 
 #[derive(Deserialize, Default, Debug, Clone)]
 #[serde(rename_all = "PascalCase")]
@@ -141,8 +143,13 @@ impl Into<Enemy> for OfficialEnemyData {
         let name = self.name.m_value.unwrap();
         let att = self.attributes;
         let move_speed = att.move_speed.m_value.unwrap();
-        let info: UnitInfo = att.into();
+        let mut info: UnitInfo = att.into();
         let stage = info.clone();
+        if self.range_radius.m_defined {
+            info.scope = Scope::Circle(Point::default(),self.range_radius.m_value.unwrap()); 
+        } else {
+            info.scope = Scope::None;
+        }
         Enemy {
             name,
             move_speed,

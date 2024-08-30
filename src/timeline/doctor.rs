@@ -74,9 +74,8 @@ impl OperatorDeployEvent {
             self.location.row.try_into().unwrap(),
             self.location.col.try_into().unwrap(),
         );
-        o.search_scope = o.attack_scope.clone();
-        o.search_scope.apply_toward(&self.toward);
-        o.search_scope.apply_loc(loc, f.map.width, f.map.height);
+        o.stage.scope.apply_toward(&self.toward);
+        o.stage.scope.apply_loc(loc, f.map.width, f.map.height);
         o.generate_default_attack_skill();
         f.map.operator[self.location.row as usize][self.location.col as usize] = Rc::downgrade(&or);
         f.operator_deploy

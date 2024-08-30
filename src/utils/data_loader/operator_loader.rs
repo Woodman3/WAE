@@ -227,8 +227,8 @@ impl Loader {
             let mut ui: UnitInfo = data.into();
             ui.attack_type = at;
             let s = Scope::Grids(r.merge());
-            o.attack_scope = s.clone();
-            o.search_scope = s;
+            o.info.scope = s.clone();
+            o.stage.scope = s;
             o.re_deploy = upper.respawn_time as f32;
             o.info = ui.clone();
             o.stage = ui;
