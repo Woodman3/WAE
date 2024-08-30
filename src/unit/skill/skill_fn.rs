@@ -57,7 +57,7 @@ impl Display for Skill {
         last:{}\n\
         ",
             self.duration, self.last
-        );
+        )?;
         match &self.skill_entity {
             SkillEntity::ToEnemySkill(se) => {
                 write!(f, "{}\n", se)
