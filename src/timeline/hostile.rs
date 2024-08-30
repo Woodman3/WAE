@@ -1,4 +1,5 @@
 use std::cell::RefCell;
+use std::f32::consts::E;
 use std::rc::Rc;
 use serde::{Deserialize, Serialize};
 // use std::collections::HashMap;
@@ -34,8 +35,10 @@ impl EnemyPlaceEvent {
             None => e.route.end,
         };
         e.id = f.next_id;
+        let e = Rc::new(RefCell::new(e)); 
+        e.borrow_mut().self_weak = Rc::downgrade(&e);
         f.next_id += 1;
-        f.enemy_set.push(Rc::new(RefCell::new(e)));
+        f.enemy_set.push(e);
     }
     pub(super) fn new(v: &Value) -> Result<EnemyPlaceEvent> {
         let enemy_key = String::from(v[2].as_str().ok_or(ConfigParseError(

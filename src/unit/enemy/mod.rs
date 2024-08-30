@@ -47,6 +47,8 @@ pub(crate) struct Enemy {
     pub(crate) be_block: OperatorShared,
     pub(crate) id: usize,
     pub(crate) skills:SkillSchedule,
+    #[serde(skip)]
+    pub(crate) self_weak:EnemyShared
 }
 #[derive(Debug, Clone, Default, Deserialize, Serialize)]
 pub struct EnemyWithPriority {

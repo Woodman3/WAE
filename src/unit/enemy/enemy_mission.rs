@@ -16,6 +16,7 @@ impl Enemy{
             damage_type: self.stage.damage_type.clone(),
         };
         let se = ToOperatorSkill {
+            host : self.self_weak.clone(),
             target: Vec::new(),
             target_num: 1,
             effect: effect::Effect::FixedDamage(d),
