@@ -36,6 +36,7 @@ impl EnemyPlaceEvent {
             None => e.route.end,
         };
         e.id = f.next_id;
+        e.init();
         let e = Rc::new(RefCell::new(e));
         e.borrow_mut().self_weak = Rc::downgrade(&e);
         f.next_id += 1;

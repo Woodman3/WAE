@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use std::ops::{Add, Mul, Sub};
+use std::{fmt::{self, Display}, ops::{Add, Mul, Sub}};
 #[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PartialEq)]
 pub struct Point {
     pub x: f64,
@@ -161,6 +161,13 @@ impl Add for Grid {
         (self.row + rhs.row, self.col + rhs.col).into()
     }
 }
+
+impl Display for Grid {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "({}, {})", self.row, self.col)
+    }
+}
+
 #[macro_export]
 macro_rules! add2d {
     () => {};

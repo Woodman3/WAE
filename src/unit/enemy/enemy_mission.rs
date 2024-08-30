@@ -19,7 +19,7 @@ impl Enemy {
     }
     /// t is 1/fps it mean time interval
     fn step_mission(&mut self, _f: &mut Frame) {
-        if matches!(self.be_block.upgrade(), None) {
+        if !matches!(self.be_block.upgrade(), None) {
             return;
         }
         let (direction, new) = to_target(self.location, self.next_point, self.move_speed);

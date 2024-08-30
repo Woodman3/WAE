@@ -131,9 +131,9 @@ pub unsafe extern "C" fn action(args: *const c_char) -> u8 {
     let cstr = CStr::from_ptr(args);
     if let Ok(js) = cstr.to_str() {
         if let Ok(e) = serde_json::from_str::<timeline::Event>(js) {
-            if let Some(Ca) = INSTANCE.get_mut() {
+            if let Some(ca) = INSTANCE.get_mut() {
                 // Ca.insert_event(e);
-                Ca.event_buffer.extend(std::iter::once(e));
+                ca.event_buffer.extend(std::iter::once(e));
                 todo!("insert_event");
                 return 0;
             }

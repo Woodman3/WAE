@@ -1,7 +1,8 @@
 use super::scope::{Toward};
 use super::skill::effect::{self, Effect};
 use super::skill::skill_schedule::SkillSchedule;
-use super::skill::{SkillEntity, ToEnemySkill};
+use super::skill::skill_type::{ChargeType, ScheduleType, TriggerType};
+use super::skill::{SkillEntity, SpData, ToEnemySkill};
 use crate::frame::Frame;
 use crate::unit::bullet::Bullet;
 use crate::unit::enemy::{EnemyShared, EnemyWithPriority};
@@ -10,7 +11,7 @@ use crate::unit::skill::Skill;
 use crate::utils::math::{Grid, Point};
 use log::trace;
 use serde::ser::Serializer;
-use serde::{Deserialize, Serialize};
+use serde::{de, Deserialize, Serialize};
 use serde_json::Value;
 use std::cell::RefCell;
 use std::fmt;
@@ -124,38 +125,47 @@ impl Operator {
         }
     }
     pub(crate) fn generate_default_attack_skill(&mut self) {
-        let mut s = Skill::default();
-        s.duration = self.stage.attack_time;
         let d = effect::Damage {
             value: self.stage.atk,
             change: Option::None,
         };
-        let se = ToEnemySkill {
+        let skill_entity = SkillEntity::ToEnemySkill(ToEnemySkill {
             target: Vec::new(),
             target_num: 1,
             effect: effect::Effect::Damage(d),
             attack_type: self.stage.attack_type,
             search_scope: Option::from(self.stage.scope.clone()),
+        });
+        let s = Skill{
+            trigger_type: TriggerType::Auto,
+            schedule_type: ScheduleType::Immediately,
+            duration: self.stage.attack_time,
+            last: self.stage.attack_time,
+            skill_entity,
+            ..Default::default()
         };
-        s.skill_entity = SkillEntity::ToEnemySkill(se);
         self.skills.skill_block.push(s);
     }
 }
 
 impl Display for Operator {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(
+        writeln!(
             f,
             "\
+        name:{}\n\
+        loc:{}\n\
         block_num:{}\n\
         block_vec_len:{}\n\
         skills:{}\n\
         ",
+            self.name,
+            self.location,
             self.stage.block_num,
             self.block_vec.len(),
             self.skills,
         )?;
-        write!(f, "")
+        Ok(())
     }
 }
 

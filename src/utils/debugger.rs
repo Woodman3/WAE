@@ -46,20 +46,20 @@ impl Debugger {
         let text_format = TextFormat::default();
         let text = format!("{}\n", f);
         info.append(text.as_str(), 0.0, text_format.clone());
-        for e in f.enemy_set.iter() {
-            let e = e.borrow();
-            let text = format!("{e}\n");
-            info.append(text.as_str(), 0.0, text_format.clone());
-        }
-        for (name, o) in f.operator_deploy.iter() {
-            let o = o.borrow();
-            let text = format!("{name},{o}\n");
-            info.append(text.as_str(), 0.0, text_format.clone());
-        }
-        for b in f.bullet_set.iter() {
-            let text = format!("{b}");
-            info.append(text.as_str(), 0.0, text_format.clone());
-        }
+        // for e in f.enemy_set.iter() {
+        //     let e = e.borrow();
+        //     let text = format!("{e}\n");
+        //     info.append(text.as_str(), 0.0, text_format.clone());
+        // }
+        // for (name, o) in f.operator_deploy.iter() {
+        //     let o = o.borrow();
+        //     let text = format!("{name},{o}\n");
+        //     info.append(text.as_str(), 0.0, text_format.clone());
+        // }
+        // for b in f.bullet_set.iter() {
+        //     let text = format!("{b}");
+        //     info.append(text.as_str(), 0.0, text_format.clone());
+        // }
         ui.label(info);
     }
     fn paint_log(&self, ui: &mut Ui) {

@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::cell::RefCell;
 use std::collections::HashMap;
-use std::fmt;
+use std::fmt::{self, write};
 use std::rc::Rc;
 
 pub(super) type OperatorRef = Rc<RefCell<Operator>>;
@@ -147,6 +147,10 @@ enemy info:",
         for e in self.enemy_set.iter() {
             writeln!(f, "{}", e.borrow())?;
         }
-        write!(f, "")
+        writeln!(f, "operators info:")?;
+        for o in self.operator_deploy.values() {
+            writeln!(f, "{}", o.borrow())?;
+        }
+        Ok(())
     }
 }
