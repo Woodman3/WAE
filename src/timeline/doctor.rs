@@ -4,7 +4,7 @@ use crate::unit::operator::OperatorShared;
 use crate::unit::scope::Toward;
 use crate::utils::error::ConfigParseError;
 use crate::utils::math::Grid;
-use log::error;
+use log::{error, info};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::rc::Rc;
@@ -75,7 +75,7 @@ impl OperatorDeployEvent {
         );
         o.stage.scope.apply_toward(&self.toward);
         o.stage.scope.apply_loc(loc, f.map.width, f.map.height);
-        o.generate_default_attack_skill();
+        o.init();
         f.map.operator[self.location.row as usize][self.location.col as usize] = Rc::downgrade(&or);
         f.operator_deploy
             .insert(self.operator_key.clone(), Rc::clone(&or));

@@ -180,7 +180,6 @@ impl Loader {
         )?;
         o.info.damage_type = sp;
         o.stage.damage_type = sp;
-        o.init();
         return Ok(o);
     }
     // fn load_copilot_operator(&self,copilot:Copilot)->Result<Vec<Operator>>{
@@ -226,8 +225,7 @@ impl Loader {
             let mut ui: UnitInfo = data.into();
             ui.attack_type = at;
             let s = Scope::Grids(r.merge());
-            o.info.scope = s.clone();
-            o.stage.scope = s;
+            ui.scope = s;
             o.re_deploy = upper.respawn_time as f32;
             o.info = ui.clone();
             o.stage = ui;
