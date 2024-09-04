@@ -20,13 +20,13 @@ impl Operator {
                     e.borrow_mut().be_damage(&d);
                 }
                 Ranged => {
-                    f.bullet_set.push(Bullet::new(
-                        Unit::Enemy(Rc::clone(&e)),
-                        Point::from(self.location),
-                        2f64,
-                        self.stage.damage_type,
-                        self.stage.atk,
-                    ));
+                    // f.bullet_set.push(Bullet::new(
+                    //     Unit::Enemy(Rc::clone(&e)),
+                    //     Point::from(self.location),
+                    //     2f64,
+                    //     self.stage.damage_type,
+                    // ));
+                    unimplemented!()
                 }
                 _ => {
                     todo!("unknown attack_type!")

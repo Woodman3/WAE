@@ -2,7 +2,7 @@ use rand::seq::SliceRandom;
 use rand::thread_rng;
 use serde::{Deserialize, Serialize};
 
-use std::cell::RefCell;
+use std::cell::{Ref, RefCell};
 use std::path::Path;
 use std::rc::Rc;
 
@@ -15,6 +15,7 @@ use crate::timeline::doctor::{
     OperatorDeployEvent, OperatorRetreatEvent, OperatorSkillEvent, UnitRetreatEvent, UnitSkillEvent,
 };
 use crate::timeline::Event;
+use crate::unit::operator::OperatorShared;
 use crate::unit::scope::Toward;
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
@@ -231,16 +232,18 @@ impl Copilot {
                 ),
                 None => (1, 0, 1),
             };
-            let op = loader.load_operator(
+            let op = Rc::new(RefCell::new(loader.load_operator(
                 o.name.clone(),
                 elite as usize,
                 level as u32,
                 skill_index as usize,
                 skill_level as usize,
-            )?;
+            )?));
+            op.borrow_mut().self_weak = Rc::downgrade(&op); 
+            let name = op.borrow().name.clone();
             calculator.frame_vec[0]
                 .operator_undeploy
-                .insert(op.name.clone(), Rc::new(RefCell::new(op)));
+                .insert(name, op);
         }
         for g in copilot_data.groups.iter() {
             if let Some(o) = g.operators.choose(&mut thread_rng()) {
@@ -267,7 +270,6 @@ impl Copilot {
         }
         calculator.copilot = Some(Copilot {
             copilot_data,
-            // game_data: loader,
         });
         Ok(calculator)
     }

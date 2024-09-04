@@ -3,8 +3,12 @@ use log::error;
 use crate::calculator::PERIOD;
 use crate::frame::Frame;
 use crate::map::Map;
+use crate::unit::bullet::Bullet;
 use crate::unit::skill::{Skill, SkillEntity, ToEnemySkill};
+use crate::unit::Unit;
+use crate::utils::math::Point;
 use std::fmt::{Display, Formatter};
+use std::rc::Rc;
 
 use super::ToOperatorSkill;
 
@@ -102,7 +106,7 @@ impl Skill {
         }
         false
     }
-    pub(super) fn shoot(&self, _f: &mut Frame) {
+    pub(super) fn shoot(&self, f: &mut Frame) {
         match &self.skill_entity {
             SkillEntity::ToEnemySkill(s) => {
                 for t in s.target.iter() {
@@ -113,14 +117,15 @@ impl Skill {
                                 u.borrow_mut().be_effect(&s.effect);
                             }
                             Ranged => {
-                                // f.bullet_set.push(Bullet::new(
-                                //     Unit::Enemy(Rc::clone(&u)),
-                                //     Point::from(self.location),
-                                //     2f64,
-                                //     self.stage.damage_type,
-                                //     self.stage.atk,
-                                // ));
-                                todo!("ranged skill");
+                                let location = s.host.upgrade().unwrap().borrow().location.into();
+                                f.bullet_set.push(Bullet{
+                                    target: Unit::Enemy(t.upgrade().unwrap()),
+                                    direction: Point::default(),
+                                    location,
+                                    move_speed: 2.0,
+                                    effect: s.effect.clone(),
+                                    distance: 0.0,
+                                });
                             }
                             _ => {
                                 todo!("unknown attack type of enemy");

@@ -7,14 +7,16 @@ use std::fmt::{Display, Formatter};
 
 use crate::unit::skill::effect::{DamageType, FixedDamage};
 
+use super::skill::effect::Effect;
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub(crate) struct Bullet {
     pub(crate) target: Unit,
-    direction: Point,
+    pub(crate) direction: Point,
     pub(crate) location: Point,
-    move_speed: f64,
+    pub(crate) move_speed: f64,
     pub(crate) distance: f64,
-    pub(crate) damage: FixedDamage,
+    pub(crate) effect: Effect,
 }
 
 impl Bullet {
@@ -25,25 +27,21 @@ impl Bullet {
         self.location = new;
     }
 
-    pub(super) fn new(
-        target: Unit,
-        location: Point,
-        move_speed: f64,
-        damage_type: DamageType,
-        damage: i64,
-    ) -> Self {
-        Bullet {
-            target,
-            direction: (0.0, 0.0).into(),
-            location,
-            move_speed,
-            distance: f64::MAX,
-            damage: FixedDamage {
-                value: damage,
-                damage_type,
-            },
-        }
-    }
+    // pub(super) fn new(
+    //     target: Unit,
+    //     location: Point,
+    //     move_speed: f64,
+    //     effect: Effect,
+    // ) -> Self {
+    //     Bullet {
+    //         target,
+    //         direction: (0.0, 0.0).into(),
+    //         location,
+    //         move_speed,
+    //         distance: f64::MAX,
+    //         effect,
+    //     }
+    // }
 }
 
 impl Display for Bullet {

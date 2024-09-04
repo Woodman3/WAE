@@ -44,6 +44,8 @@ pub(crate) struct Operator {
     pub(crate) skills: SkillSchedule,
     #[serde(skip)]
     mission_vec: Vec<fn(&mut Operator, &mut Frame)>,
+    #[serde(skip)]
+    pub(crate) self_weak: OperatorShared,
 }
 
 impl Operator {
@@ -84,7 +86,7 @@ impl Operator {
     }
 
     pub(super) fn be_hit(&mut self, b: &Bullet, _f: &mut Frame) {
-        self.be_damage(&b.damage);
+        self.be_effect(&b.effect);
         if self.stage.hp <= 0 {
             self.die_code = super::code::DIE;
             trace!("an enemy has die!");
@@ -135,6 +137,7 @@ impl Operator {
             effect: effect::Effect::Damage(d),
             attack_type: self.stage.attack_type,
             search_scope: Option::from(self.stage.scope.clone()),
+            host: self.self_weak.clone(),
         });
         let s = Skill{
             trigger_type: TriggerType::Auto,

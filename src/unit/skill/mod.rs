@@ -35,6 +35,8 @@ pub(crate) struct SpData {
 #[derive(Deserialize, Debug, Default, Clone, Serialize)]
 pub(crate) struct ToEnemySkill {
     #[serde(skip)]
+    pub(crate) host: OperatorShared,
+    #[serde(skip)]
     pub(crate) target: Vec<EnemyShared>,
     pub(crate) target_num: usize,
     pub(crate) effect: Effect,

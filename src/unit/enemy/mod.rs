@@ -153,7 +153,7 @@ impl Enemy {
         self.location
     }
     pub(super) fn be_hit(&mut self, b: &Bullet, _f: &mut Frame) {
-        self.be_damage(&b.damage);
+        self.be_effect(&b.effect);
     }
     pub(super) fn be_damage(&mut self, d: &FixedDamage) {
         use super::DamageType::*;
@@ -184,8 +184,16 @@ impl Enemy {
         }
     }
 
-    pub(super) fn be_effect(&mut self, _e: &Effect) {
-        todo!()
+    pub(super) fn be_effect(&mut self, e: &Effect) {
+        match e {
+            Effect::Buff(b) => {
+                self.stage.be_buff(b);
+            }
+            Effect::FixedDamage(d) => {
+                self.be_damage(&d);
+            }
+            _ => {}
+        }
     }
 }
 
