@@ -46,9 +46,6 @@ pub(crate) struct Enemy {
     )]
     pub(crate) be_block: OperatorShared,
     pub(crate) id: usize,
-    pub(crate) skills: SkillSchedule,
-    #[serde(skip)]
-    pub(crate) self_weak: EnemyShared,
     #[serde(skip)]
     pub(crate) mission_vec: Vec<fn(&mut Enemy, &mut Frame)>,
 }
@@ -64,7 +61,7 @@ impl Enemy {
         self.arrange_mission();
         self.generate_default_attack_skill();
     }
-    pub(crate) fn generate_default_attack_skill(&mut self) {
+    pub(crate) fn generate_default_attack_skill(&mut self)->Skill {
         let mut s = Skill::default();
         s.duration = self.stage.attack_time;
         let d = effect::FixedDamage {
@@ -72,7 +69,6 @@ impl Enemy {
             damage_type: self.stage.damage_type.clone(),
         };
         let se = ToOperatorSkill {
-            host: self.self_weak.clone(),
             target: Vec::new(),
             target_num: 1,
             effect: effect::Effect::FixedDamage(d),
@@ -80,7 +76,7 @@ impl Enemy {
             search_scope: Option::from(self.stage.scope.clone()),
         };
         s.skill_entity = SkillEntity::ToOperatorSkill(se);
-        self.skills.skill_block.push(s);
+        s
     }
     pub(super) fn attack(&mut self, _bv: &mut Vec<Bullet>, o: OperatorRef) {
         if self.stage.attack_time > 0.0 {

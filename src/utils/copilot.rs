@@ -239,7 +239,6 @@ impl Copilot {
                 skill_index as usize,
                 skill_level as usize,
             )?));
-            op.borrow_mut().self_weak = Rc::downgrade(&op); 
             let name = op.borrow().name.clone();
             calculator.frame_vec[0]
                 .operator_undeploy

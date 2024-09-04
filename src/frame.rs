@@ -4,6 +4,7 @@ use crate::unit::bullet::Bullet;
 use crate::unit::code;
 use crate::unit::enemy::Enemy;
 use crate::unit::operator::Operator;
+use crate::unit::skill::skill_schedule::SkillSchedule;
 use log::info;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
@@ -23,6 +24,9 @@ pub(super) struct Frame {
     pub(super) operator_undeploy: HashMap<String, OperatorRef>,
     pub(super) map: map::Map,
     pub(super) bullet_set: Vec<Bullet>,
+    // todo: serde
+    #[serde(skip)]
+    pub(super) skill_set: Vec<SkillSchedule>,
     /// start for 1
     pub(super) next_id: usize,
     pub(super) kill_count: u32,

@@ -97,16 +97,16 @@ impl Skill {
             _ => return false,
         }
     }
-    pub(super) fn step(&mut self, f: &mut Frame) -> bool {
+    pub(super) fn step(&mut self, f: &mut Frame,unit:&Unit) -> bool {
         self.last -= PERIOD;
         if self.last <= 0.0 {
-            self.shoot(f);
+            self.shoot(f,unit);
             self.last = self.duration;
             return true;
         }
         false
     }
-    pub(super) fn shoot(&self, f: &mut Frame) {
+    pub(super) fn shoot(&self, f: &mut Frame,unit:&Unit) {
         match &self.skill_entity {
             SkillEntity::ToEnemySkill(s) => {
                 for t in s.target.iter() {
@@ -117,7 +117,7 @@ impl Skill {
                                 u.borrow_mut().be_effect(&s.effect);
                             }
                             Ranged => {
-                                let location = s.host.upgrade().unwrap().borrow().location.into();
+                                let location = unit.get_loc();
                                 f.bullet_set.push(Bullet{
                                     target: Unit::Enemy(t.upgrade().unwrap()),
                                     direction: Point::default(),

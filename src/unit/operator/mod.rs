@@ -41,11 +41,8 @@ pub(crate) struct Operator {
     #[serde(skip)]
     pub(crate) block_vec: Vec<EnemyShared>,
     pub(crate) die_code: u32,
-    pub(crate) skills: SkillSchedule,
     #[serde(skip)]
     mission_vec: Vec<fn(&mut Operator, &mut Frame)>,
-    #[serde(skip)]
-    pub(crate) self_weak: OperatorShared,
 }
 
 impl Operator {
@@ -64,7 +61,7 @@ impl Operator {
         self.mission_vec.push(Self::block);
         // self.mission_vec.push(Self::get_target);
         // self.mission_vec.push(Self::attack_mission);
-        self.mission_vec.push(Self::skill_mission);
+        // self.mission_vec.push(Self::skill_mission);
     }
     pub(crate) fn new(v: &Value) -> Result<Operator> {
         let mut o: Operator = serde_json::from_value(v.clone())?;
@@ -126,7 +123,7 @@ impl Operator {
             _ => {}
         }
     }
-    pub(crate) fn generate_default_attack_skill(&mut self) {
+    pub(crate) fn generate_default_attack_skill(&mut self)->Skill {
         let d = effect::Damage {
             value: self.stage.atk,
             change: Option::None,
@@ -137,17 +134,15 @@ impl Operator {
             effect: effect::Effect::Damage(d),
             attack_type: self.stage.attack_type,
             search_scope: Option::from(self.stage.scope.clone()),
-            host: self.self_weak.clone(),
         });
-        let s = Skill{
+        Skill{
             trigger_type: TriggerType::Auto,
             schedule_type: ScheduleType::Immediately,
             duration: self.stage.attack_time,
             last: self.stage.attack_time,
             skill_entity,
             ..Default::default()
-        };
-        self.skills.skill_block.push(s);
+        }
     }
 }
 
@@ -160,13 +155,11 @@ impl Display for Operator {
         loc:{}\n\
         block_num:{}\n\
         block_vec_len:{}\n\
-        skills:{}\n\
         ",
             self.name,
             self.location,
             self.stage.block_num,
             self.block_vec.len(),
-            self.skills,
         )?;
         Ok(())
     }

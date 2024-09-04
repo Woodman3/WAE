@@ -3,14 +3,17 @@ use serde::{Deserialize, Serialize};
 use crate::calculator::PERIOD;
 use crate::frame::Frame;
 use crate::unit::skill::{Skill};
+use crate::unit::Unit;
 use std::fmt::{self, Display, Formatter};
+use std::rc::Rc;
 
-#[derive(Clone, Deserialize, Debug, Default, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 #[serde(default)]
 pub(crate) struct SkillSchedule {
     pub(crate) skill_block: Vec<Skill>,
     pub(crate) skill_ready: Vec<Skill>,
     pub(crate) skill_running: Vec<Skill>,
+    pub(crate) host: Unit,
 }
 
 impl SkillSchedule {
@@ -33,7 +36,7 @@ impl SkillSchedule {
             }
         });
         self.skill_running.retain_mut(|s| {
-            if s.step(f) {
+            if s.step(f,&self.host) {
                 self.skill_block.push(std::mem::take(s));
                 false
             } else {

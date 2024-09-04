@@ -79,6 +79,7 @@ impl OperatorDeployEvent {
         f.map.operator[self.location.row as usize][self.location.col as usize] = Rc::downgrade(&or);
         f.operator_deploy
             .insert(self.operator_key.clone(), Rc::clone(&or));
+        
         if f.cost >= o.stage.cost as f32 {
             f.cost -= o.stage.cost as f32;
         } else {

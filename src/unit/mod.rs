@@ -7,9 +7,10 @@ pub mod skill;
 
 use scope::Scope;
 use serde::{Deserialize, Serialize};
-use std::cell::RefCell;
+use std::cell::{Ref, RefCell};
+use std::default;
 use std::fmt::Debug;
-use std::rc::Rc;
+use std::rc::{Rc, Weak};
 
 use crate::frame::Frame;
 use crate::unit::bullet::Bullet;
@@ -49,6 +50,12 @@ pub(super) enum Unit {
     Operator(Rc<RefCell<Operator>>),
 }
 
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub(super) enum UnitShared{
+    Enemy(Weak<RefCell<Enemy>>),
+    Operator(Weak<RefCell<Operator>>),
+}
+
 impl UnitInfo {
     pub(crate) fn be_buff(&mut self, b: &Buff) {
         use ChangeClass::*;
@@ -78,25 +85,25 @@ impl UnitInfo {
 }
 
 impl Unit {
-    pub(super) fn get_loc(&self) -> Point {
+    pub(crate) fn get_loc(&self) -> Point {
         match &self {
             Unit::Enemy(e) => e.borrow().get_loc(),
             Unit::Operator(o) => o.borrow().get_loc(),
         }
     }
-    pub(super) fn be_hit(&mut self, b: &Bullet, f: &mut Frame) {
+    pub(crate) fn be_hit(&mut self, b: &Bullet, f: &mut Frame) {
         match &self {
             Unit::Enemy(e) => e.borrow_mut().be_hit(b, f),
             Unit::Operator(o) => o.borrow_mut().be_hit(b, f),
         }
     }
-    pub(super) fn be_damage(&mut self, d: &FixedDamage) {
+    pub(crate) fn be_damage(&mut self, d: &FixedDamage) {
         match &self {
             Unit::Enemy(e) => e.borrow_mut().be_damage(d),
             Unit::Operator(o) => o.borrow_mut().be_damage(d),
         }
     }
-    pub(super) fn be_effect(&mut self, e: &Effect) {
+    pub(crate) fn be_effect(&mut self, e: &Effect) {
         match &self {
             Unit::Enemy(enemy) => enemy.borrow_mut().be_effect(e),
             Unit::Operator(o) => o.borrow_mut().be_effect(e),

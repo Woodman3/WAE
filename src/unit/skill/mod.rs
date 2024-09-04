@@ -35,8 +35,6 @@ pub(crate) struct SpData {
 #[derive(Deserialize, Debug, Default, Clone, Serialize)]
 pub(crate) struct ToEnemySkill {
     #[serde(skip)]
-    pub(crate) host: OperatorShared,
-    #[serde(skip)]
     pub(crate) target: Vec<EnemyShared>,
     pub(crate) target_num: usize,
     pub(crate) effect: Effect,
@@ -46,8 +44,6 @@ pub(crate) struct ToEnemySkill {
 
 #[derive(Deserialize, Debug, Default, Clone, Serialize)]
 pub(crate) struct ToOperatorSkill {
-    #[serde(skip)]
-    pub(crate) host: EnemyShared,
     #[serde(skip)]
     pub(crate) target: Vec<OperatorShared>,
     pub(crate) target_num: usize,
@@ -64,19 +60,3 @@ pub(crate) enum SkillEntity {
     #[default]
     None,
 }
-
-// pub fn config_skill(c: &Config, os: &HashMap<String, OperatorRef>) {
-//     for (key, skill) in c.doctor["skill"].as_object().unwrap() {
-//         if let Some(value) = c.skill.get(key).unwrap().get(skill.as_str().unwrap()) {
-//             if let Some(o) = os.get(key) {
-//                 o.borrow_mut()
-//                     .skill_ready
-//                     .push(serde_json::from_value(value.clone()).unwrap());
-//             } else {
-//                 warn!("unknown operator name in skill config!")
-//             }
-//         } else {
-//             warn!("unknown skill name in skill config!,skill name:{}", skill)
-//         }
-//     }
-// }
