@@ -1,7 +1,7 @@
 use crate::calculator::{Calculator, PERIOD};
 use crate::map;
 use crate::unit::bullet::Bullet;
-use crate::unit::code;
+use crate::unit::{code, skill};
 use crate::unit::enemy::Enemy;
 use crate::unit::operator::Operator;
 use crate::unit::skill::skill_schedule::SkillSchedule;
@@ -39,6 +39,7 @@ impl Frame {
         self.operator_step();
         self.enemy_step();
         self.bullet_step();
+        self.skill_step();
         self.enemy_set.retain(|e| e.borrow().die_code != code::DIE);
         self.cost += PERIOD as f32;
     }
@@ -76,6 +77,14 @@ impl Frame {
         }
         self.bullet_set
             .retain(|b| b.distance > code::BULLET_HIT_DISTANCE);
+    }
+
+    fn skill_step(&mut self) {
+        let mut skill_set:Vec<_> = self.skill_set.drain(..).collect();
+        for s in skill_set.iter_mut() {
+            s.step(self);
+        }
+        self.skill_set.extend(skill_set);
     }
 
     pub(super) fn deep_clone(&self) -> Self {
@@ -154,6 +163,10 @@ enemy info:",
         writeln!(f, "operators info:")?;
         for o in self.operator_deploy.values() {
             writeln!(f, "{}", o.borrow())?;
+        }
+        writeln!(f, "skill info: ")?;
+        for s in self.skill_set.iter(){
+            writeln!(f,"{}",s)?;
         }
         Ok(())
     }

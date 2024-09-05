@@ -7,6 +7,8 @@ use serde_json::Value;
 use crate::calculator::Calculator;
 use crate::frame::Frame;
 use crate::route::CheckPoint;
+use crate::unit::skill::skill_schedule::SkillSchedule;
+use crate::unit::Unit;
 use crate::utils::error::ConfigParseError;
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 #[derive(Debug, Deserialize, Serialize, Clone, Default)]
@@ -37,7 +39,15 @@ impl EnemyPlaceEvent {
         };
         e.id = f.next_id;
         e.init();
+        let default_skill = e.generate_default_attack_skill();
         let e = Rc::new(RefCell::new(e));
+        let s = SkillSchedule{
+            skill_block: vec![default_skill],
+            skill_ready: vec![],
+            skill_running: vec![],
+            host: Unit::Enemy(Rc::clone(&e)),
+        };
+        f.skill_set.push(s); 
         f.next_id += 1;
         f.enemy_set.push(e);
     }

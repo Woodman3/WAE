@@ -17,6 +17,7 @@ use std::rc::{Rc, Weak};
 
 use super::skill::effect::{self, Effect};
 use super::skill::skill_schedule::SkillSchedule;
+use super::skill::skill_type::{ScheduleType, TriggerType};
 use super::skill::{Skill, SkillEntity, ToOperatorSkill};
 
 mod enemy_mission;
@@ -62,21 +63,25 @@ impl Enemy {
         self.generate_default_attack_skill();
     }
     pub(crate) fn generate_default_attack_skill(&mut self)->Skill {
-        let mut s = Skill::default();
-        s.duration = self.stage.attack_time;
-        let d = effect::FixedDamage {
+        let d = effect::Damage {
             value: self.stage.atk,
-            damage_type: self.stage.damage_type.clone(),
+            change: Option::None,
         };
-        let se = ToOperatorSkill {
+        let skill_entity = SkillEntity::ToOperatorSkill(ToOperatorSkill {
             target: Vec::new(),
             target_num: 1,
-            effect: effect::Effect::FixedDamage(d),
+            effect: effect::Effect::Damage(d),
             attack_type: self.stage.attack_type,
             search_scope: Option::from(self.stage.scope.clone()),
-        };
-        s.skill_entity = SkillEntity::ToOperatorSkill(se);
-        s
+        });
+        Skill{
+            trigger_type: TriggerType::Auto,
+            schedule_type: ScheduleType::Immediately,
+            duration: self.stage.attack_time,
+            last: self.stage.attack_time,
+            skill_entity,
+            ..Default::default()
+        }
     }
     pub(super) fn attack(&mut self, _bv: &mut Vec<Bullet>, o: OperatorRef) {
         if self.stage.attack_time > 0.0 {

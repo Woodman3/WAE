@@ -53,9 +53,9 @@ impl Operator {
     //         self.stage.attack_time=self.info.attack_time;
     //     }
     // }
-    pub(super) fn skill_mission(&mut self, f: &mut Frame) {
-        self.skills.step(f);
-    }
+    // pub(super) fn skill_mission(&mut self, f: &mut Frame) {
+    //     self.skills.step(f);
+    // }
     pub(super) fn attack_mission(&mut self, f: &mut Frame) {
         // if let Some(skill) = &mut self.skill {
         //     if skill.ready(){
