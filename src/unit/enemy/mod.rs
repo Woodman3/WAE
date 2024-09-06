@@ -49,6 +49,7 @@ pub(crate) struct Enemy {
     pub(crate) id: usize,
     #[serde(skip)]
     pub(crate) mission_vec: Vec<fn(&mut Enemy, &mut Frame)>,
+    pub(crate) skills:SkillSchedule,
 }
 #[derive(Debug, Clone, Default, Deserialize, Serialize)]
 pub struct EnemyWithPriority {
@@ -154,7 +155,7 @@ impl Enemy {
         self.location
     }
     pub(super) fn be_hit(&mut self, b: &Bullet, _f: &mut Frame) {
-        self.be_damage(&b.damage);
+        self.be_effect(&b.effect);
     }
     pub(super) fn be_damage(&mut self, d: &FixedDamage) {
         use super::DamageType::*;

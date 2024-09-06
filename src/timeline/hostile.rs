@@ -45,9 +45,7 @@ impl EnemyPlaceEvent {
             skill_block: vec![default_skill],
             skill_ready: vec![],
             skill_running: vec![],
-            host: Unit::Enemy(Rc::clone(&e)),
         };
-        f.skill_set.push(s); 
         f.next_id += 1;
         f.enemy_set.push(e);
     }

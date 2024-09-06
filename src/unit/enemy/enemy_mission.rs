@@ -15,7 +15,7 @@ impl Enemy {
     // }
     pub(crate) fn arrange_mission(&mut self) {
         self.mission_vec.push(Self::step_mission);
-        // self.mission_vec.push(Self::skill_mission);
+        self.mission_vec.push(Self::skill_mission);
     }
     /// t is 1/fps it mean time interval
     fn step_mission(&mut self, _f: &mut Frame) {
@@ -46,5 +46,13 @@ impl Enemy {
         }
         self.direction = direction;
         self.location = new;
+    }
+
+    fn skill_mission(&mut self, f: &mut Frame) {
+        let sv = self.skills.step(f);
+        for s in sv.iter(){
+            s.shoot(f,self.location.into());
+        }
+        self.skills.skill_block.extend(sv);
     }
 }

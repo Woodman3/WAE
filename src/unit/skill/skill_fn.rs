@@ -3,8 +3,12 @@ use log::error;
 use crate::calculator::PERIOD;
 use crate::frame::Frame;
 use crate::map::Map;
+use crate::unit::bullet::Bullet;
 use crate::unit::skill::{Skill, SkillEntity, ToEnemySkill};
+use crate::unit::{Unit, UnitInfo};
+use crate::utils::math::Point;
 use std::fmt::{Display, Formatter};
+use std::rc::Rc;
 
 use super::ToOperatorSkill;
 
@@ -93,16 +97,15 @@ impl Skill {
             _ => return false,
         }
     }
-    pub(super) fn step(&mut self, f: &mut Frame,unit:&Unit) -> bool {
+    pub(super) fn step(&mut self, f: & Frame) -> bool {
         self.last -= PERIOD;
         if self.last <= 0.0 {
-            self.shoot(f,unit);
             self.last = self.duration;
             return true;
         }
         false
     }
-    pub(super) fn shoot(&self, _f: &mut Frame) {
+    pub(crate) fn shoot(&self, f: &mut Frame,loc:Point) {
         match &self.skill_entity {
             SkillEntity::ToEnemySkill(s) => {
                 for t in s.target.iter() {
@@ -113,14 +116,15 @@ impl Skill {
                                 u.borrow_mut().be_effect(&s.effect);
                             }
                             Ranged => {
-                                // f.bullet_set.push(Bullet::new(
-                                //     Unit::Enemy(Rc::clone(&u)),
-                                //     Point::from(self.location),
-                                //     2f64,
-                                //     self.stage.damage_type,
-                                //     self.stage.atk,
-                                // ));
-                                todo!("ranged skill");
+                                f.bullet_set.push(Bullet{
+                                    target:Unit::Enemy(Rc::clone(&u)),
+                                    location:loc,
+                                    // todo: move_speed
+                                    move_speed:2.0,
+                                    effect:s.effect.clone(),
+                                    direction: Point::default(),
+                                    distance: 0.0,
+                                });
                             }
                             _ => {
                                 todo!("unknown attack type of enemy");

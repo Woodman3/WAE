@@ -43,6 +43,7 @@ pub(crate) struct Operator {
     pub(crate) die_code: u32,
     #[serde(skip)]
     mission_vec: Vec<fn(&mut Operator, &mut Frame)>,
+    pub(crate) skills:SkillSchedule,
 }
 
 impl Operator {
@@ -54,14 +55,15 @@ impl Operator {
 
     pub(crate) fn init(&mut self) {
         self.arrange_mission();
-        self.generate_default_attack_skill();
+        let default_skill = self.generate_default_attack_skill();
+        self.skills.skill_block.push(default_skill);
     }
 
     pub(crate) fn arrange_mission(&mut self) {
         self.mission_vec.push(Self::block);
         // self.mission_vec.push(Self::get_target);
         // self.mission_vec.push(Self::attack_mission);
-        // self.mission_vec.push(Self::skill_mission);
+        self.mission_vec.push(Self::skill_mission);
     }
     pub(crate) fn new(v: &Value) -> Result<Operator> {
         let mut o: Operator = serde_json::from_value(v.clone())?;
@@ -83,7 +85,7 @@ impl Operator {
     }
 
     pub(super) fn be_hit(&mut self, b: &Bullet, _f: &mut Frame) {
-        self.be_damage(&b.damage);
+        self.be_effect(&b.effect);
         if self.stage.hp <= 0 {
             self.die_code = super::code::DIE;
             trace!("an enemy has die!");

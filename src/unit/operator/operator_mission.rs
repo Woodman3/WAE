@@ -8,35 +8,36 @@ use crate::utils::math::Point;
 use std::rc::{Rc, Weak};
 
 impl Operator {
-    pub(super) fn attack(&mut self, f: &mut Frame) {
-        if let Some(e) = self.target.upgrade() {
-            use crate::unit::skill::skill_type::AttackType::*;
-            match self.stage.attack_type {
-                Melee => {
-                    let d = FixedDamage {
-                        value: self.stage.atk,
-                        damage_type: self.stage.damage_type.clone(),
-                    };
-                    e.borrow_mut().be_damage(&d);
-                }
-                Ranged => {
-                    f.bullet_set.push(Bullet::new(
-                        Unit::Enemy(Rc::clone(&e)),
-                        Point::from(self.location),
-                        2f64,
-                        self.stage.damage_type,
-                        self.stage.atk,
-                    ));
-                }
-                _ => {
-                    todo!("unknown attack_type!")
-                }
-            }
-        } else {
-            self.target = Weak::new();
-            self.stage.attack_time = self.info.attack_time;
-        }
-    }
+    // pub(super) fn attack(&mut self, f: &mut Frame) {
+    //     if let Some(e) = self.target.upgrade() {
+    //         use crate::unit::skill::skill_type::AttackType::*;
+    //         match self.stage.attack_type {
+    //             Melee => {
+    //                 let d = FixedDamage {
+    //                     value: self.stage.atk,
+    //                     damage_type: self.stage.damage_type.clone(),
+    //                 };
+    //                 e.borrow_mut().be_damage(&d);
+    //             }
+    //             Ranged => {
+    //                 f.bullet_set.push(Bullet::new(
+    //                     Unit::Enemy(Rc::clone(&e)),
+    //                     Point::from(self.location),
+    //                     2f64,
+    //                     self.stage.damage_type,
+    //                     self.stage.atk,
+    //                 ));
+    //             }
+    //             _ => {
+    //                 todo!("unknown attack_type!")
+    //             }
+    //         }
+    //     } else {
+    //         self.target = Weak::new();
+    //         self.stage.attack_time = self.info.attack_time;
+    //     }
+    // }
+
     // pub fn attack_skill(&mut self, f:&mut Frame){
     //     if let Some(skill) = &mut self.skill{
     //         if self.stage.attack_time>0.0{
@@ -53,27 +54,32 @@ impl Operator {
     //         self.stage.attack_time=self.info.attack_time;
     //     }
     // }
-    // pub(super) fn skill_mission(&mut self, f: &mut Frame) {
-    //     self.skills.step(f);
-    // }
-    pub(super) fn attack_mission(&mut self, f: &mut Frame) {
-        // if let Some(skill) = &mut self.skill {
-        //     if skill.ready(){
-        //         self.skill(f);
-        //         return;
-        //     }else{
-        //         if skill.charge_type==Auto{
-        //             skill.charge(PERIOD);
-        //         }
-        //     }
-        // }
-        if self.stage.attack_time > 0.0 {
-            self.stage.attack_time -= PERIOD;
-        } else {
-            self.stage.attack_time = self.info.attack_time;
-            self.attack(f);
+    pub(super) fn skill_mission(&mut self, f: &mut Frame) {
+        let sv = self.skills.step(f);
+        for s in sv.iter(){
+            s.shoot(f,self.location.into());
         }
+        self.skills.skill_block.extend(sv);
     }
+
+    // pub(super) fn attack_mission(&mut self, f: &mut Frame) {
+    //     // if let Some(skill) = &mut self.skill {
+    //     //     if skill.ready(){
+    //     //         self.skill(f);
+    //     //         return;
+    //     //     }else{
+    //     //         if skill.charge_type==Auto{
+    //     //             skill.charge(PERIOD);
+    //     //         }
+    //     //     }
+    //     // }
+    //     if self.stage.attack_time > 0.0 {
+    //         self.stage.attack_time -= PERIOD;
+    //     } else {
+    //         self.stage.attack_time = self.info.attack_time;
+    //         self.attack(f);
+    //     }
+    // }
 
     /// before call it,you should make sure that map haven't contain empty pointer
     // pub fn search(&mut self, m: &Map, time_stamp: u64) {

@@ -81,13 +81,6 @@ impl OperatorDeployEvent {
         f.map.operator[self.location.row as usize][self.location.col as usize] = Rc::downgrade(&or);
         f.operator_deploy
             .insert(self.operator_key.clone(), Rc::clone(&or));
-        let s =SkillSchedule{
-            skill_block:vec![o.generate_default_attack_skill()],
-            skill_ready:vec![],
-            skill_running:vec![],
-            host:Unit::Operator(Rc::clone(&or)),
-        };
-        f.skill_set.push(s) ;
         if f.cost >= o.stage.cost as f32 {
             f.cost -= o.stage.cost as f32;
         } else {
@@ -104,17 +97,6 @@ impl OperatorRetreatEvent {
             OperatorShared::new();
         f.operator_undeploy
             .insert(self.operator_key.clone(), Rc::clone(&or));
-        f.skill_set.retain(|s| {
-            if let Unit::Operator(o) = &s.host {
-                if o.borrow().name == self.operator_key {
-                    false
-                } else {
-                    true
-                }
-            } else {
-                true
-            }
-        });
     }
 }
 

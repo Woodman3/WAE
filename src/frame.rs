@@ -24,9 +24,6 @@ pub(super) struct Frame {
     pub(super) operator_undeploy: HashMap<String, OperatorRef>,
     pub(super) map: map::Map,
     pub(super) bullet_set: Vec<Bullet>,
-    // todo: serde
-    #[serde(skip)]
-    pub(super) skill_set: Vec<SkillSchedule>,
     /// start for 1
     pub(super) next_id: usize,
     pub(super) kill_count: u32,
@@ -39,7 +36,6 @@ impl Frame {
         self.operator_step();
         self.enemy_step();
         self.bullet_step();
-        self.skill_step();
         self.enemy_set.retain(|e| e.borrow().die_code != code::DIE);
         self.cost += PERIOD as f32;
     }
@@ -77,14 +73,6 @@ impl Frame {
         }
         self.bullet_set
             .retain(|b| b.distance > code::BULLET_HIT_DISTANCE);
-    }
-
-    fn skill_step(&mut self) {
-        let mut skill_set:Vec<_> = self.skill_set.drain(..).collect();
-        for s in skill_set.iter_mut() {
-            s.step(self);
-        }
-        self.skill_set.extend(skill_set);
     }
 
     pub(super) fn deep_clone(&self) -> Self {
@@ -163,10 +151,6 @@ enemy info:",
         writeln!(f, "operators info:")?;
         for o in self.operator_deploy.values() {
             writeln!(f, "{}", o.borrow())?;
-        }
-        writeln!(f, "skill info: ")?;
-        for s in self.skill_set.iter(){
-            writeln!(f,"{}",s)?;
         }
         Ok(())
     }

@@ -7,17 +7,17 @@ use crate::unit::Unit;
 use std::fmt::{self, Display, Formatter};
 use std::rc::Rc;
 
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug,Default,Deserialize, Serialize)]
 #[serde(default)]
 pub(crate) struct SkillSchedule {
     pub(crate) skill_block: Vec<Skill>,
     pub(crate) skill_ready: Vec<Skill>,
     pub(crate) skill_running: Vec<Skill>,
-    pub(crate) host: Unit,
 }
 
 impl SkillSchedule {
-    pub(crate) fn step(&mut self, f: &mut Frame) {
+    pub(crate) fn step(&mut self, f: &mut Frame)->Vec<Skill> {
+        let mut r = vec![];
         self.skill_block.retain_mut(|s| {
             s.charge(PERIOD);
             if s.ready() {
@@ -36,13 +36,14 @@ impl SkillSchedule {
             }
         });
         self.skill_running.retain_mut(|s| {
-            if s.step(f,&self.host) {
-                self.skill_block.push(std::mem::take(s));
+            if s.step(f) {
+                r.push(std::mem::take(s));
                 false
             } else {
                 true
             }
         });
+        r
     }
 }
 
