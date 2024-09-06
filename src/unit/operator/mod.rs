@@ -83,7 +83,7 @@ impl Operator {
     }
 
     pub(super) fn be_hit(&mut self, b: &Bullet, _f: &mut Frame) {
-        self.be_effect(&b.effect);
+        self.be_damage(&b.damage);
         if self.stage.hp <= 0 {
             self.die_code = super::code::DIE;
             trace!("an enemy has die!");
