@@ -42,6 +42,7 @@ pub(super) struct OfficialEnemyAttribute {
     pub(super) def: OfficialEnemyDataTemplate<i64>,
     pub(super) magic_resistance: OfficialEnemyDataTemplate<f64>,
     pub(super) cost: OfficialEnemyDataTemplate<i64>,
+    // 所有的值都是未定义
     pub(super) block_cnt: OfficialEnemyDataTemplate<i64>,
     pub(super) move_speed: OfficialEnemyDataTemplate<f64>,
     pub(super) attack_speed: OfficialEnemyDataTemplate<f64>,
@@ -170,7 +171,9 @@ impl Into<UnitInfo> for OfficialEnemyAttribute {
         let def = self.def.m_value.unwrap();
         let magic_resist = self.magic_resistance.m_value.unwrap();
         let attack_time = self.base_attack_time.m_value.unwrap();
-        let block_num = self.block_cnt.m_value.unwrap();
+        // detail look about think
+        // todo: block_num
+        let block_num = 1;
         let aspd = self.attack_speed.m_value.unwrap();
         let damage_type = DamageType::None;
         let attack_type = AttackType::None;

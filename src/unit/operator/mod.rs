@@ -1,5 +1,5 @@
 use super::scope::{Toward};
-use super::skill::effect::{self, Effect};
+use super::skill::effect::{self, Damage, Effect};
 use super::skill::skill_schedule::SkillSchedule;
 use super::skill::skill_type::{ChargeType, ScheduleType, TriggerType};
 use super::skill::{SkillEntity, SpData, ToEnemySkill};
@@ -93,7 +93,7 @@ impl Operator {
         }
     }
 
-    pub(super) fn be_damage(&mut self, d: &FixedDamage) {
+    pub(super) fn be_damage(&mut self, d: &Damage) {
         use super::DamageType::*;
         match d.damage_type {
             Magical => {
@@ -119,7 +119,7 @@ impl Operator {
             Effect::Buff(b) => {
                 self.stage.be_buff(b);
             }
-            Effect::FixedDamage(d) => {
+            Effect::Damage(d) => {
                 self.be_damage(&d);
             }
             _ => {}
@@ -129,6 +129,7 @@ impl Operator {
         let d = effect::Damage {
             value: self.stage.atk,
             change: Option::None,
+            damage_type:self.stage.damage_type,
         };
         let skill_entity = SkillEntity::ToEnemySkill(ToEnemySkill {
             target: Vec::new(),

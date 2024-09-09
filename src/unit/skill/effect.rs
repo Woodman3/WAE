@@ -50,6 +50,7 @@ pub(crate) enum Effect {
     None,
 }
 
+// i don't know why i make this struct
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub(crate) struct FixedDamage {
     pub(crate) value: i64,
@@ -58,9 +59,10 @@ pub(crate) struct FixedDamage {
 
 #[derive(Clone, Deserialize, Debug, Serialize)]
 pub(crate) struct Damage {
-    #[serde(skip)] //from operator ,don't need to set
+    // #[serde(skip)] //from operator ,don't need to set
     pub(crate) value: i64,
     pub(crate) change: Option<Change>,
+    pub(crate) damage_type: DamageType,
 }
 #[derive(Debug, Clone, Copy, Deserialize, Default, Serialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]

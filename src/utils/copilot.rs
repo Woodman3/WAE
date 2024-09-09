@@ -110,7 +110,8 @@ impl Into<OperatorDeployEvent> for CopilotActionDeploy {
     fn into(self) -> OperatorDeployEvent {
         OperatorDeployEvent {
             operator_key: self.name.clone(),
-            location: self.location,
+            // todo:maa 使用的坐标系有点奇怪,不仅方向不同,而且似乎还做了一些简略处理
+            location: (self.location.col,self.location.row).into(),
             toward: self.direction,
         }
     }

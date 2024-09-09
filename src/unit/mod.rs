@@ -19,7 +19,7 @@ use crate::unit::skill::skill_type::AttackType;
 use crate::utils::math::Point;
 use enemy::Enemy;
 use operator::Operator;
-use skill::effect::{Effect, FixedDamage};
+use skill::effect::{Damage, Effect, FixedDamage};
 
 #[derive(Debug, Clone, Default, Deserialize, Serialize)]
 pub struct UnitInfo {
@@ -97,7 +97,7 @@ impl Unit {
             Unit::Operator(o) => o.borrow_mut().be_hit(b, f),
         }
     }
-    pub(crate) fn be_damage(&mut self, d: &FixedDamage) {
+    pub(crate) fn be_damage(&mut self, d: &Damage) {
         match &self {
             Unit::Enemy(e) => e.borrow_mut().be_damage(d),
             Unit::Operator(o) => o.borrow_mut().be_damage(d),

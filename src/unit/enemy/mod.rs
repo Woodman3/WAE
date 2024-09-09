@@ -15,7 +15,7 @@ use std::cmp::Ordering;
 use std::fmt;
 use std::rc::{Rc, Weak};
 
-use super::skill::effect::{self, Effect};
+use super::skill::effect::{self, Damage, Effect};
 use super::skill::skill_schedule::SkillSchedule;
 use super::skill::skill_type::{ScheduleType, TriggerType};
 use super::skill::{Skill, SkillEntity, ToOperatorSkill};
@@ -67,6 +67,7 @@ impl Enemy {
         let d = effect::Damage {
             value: self.stage.atk,
             change: Option::None,
+            damage_type: self.stage.damage_type,
         };
         let skill_entity = SkillEntity::ToOperatorSkill(ToOperatorSkill {
             target: Vec::new(),
@@ -84,38 +85,38 @@ impl Enemy {
             ..Default::default()
         }
     }
-    pub(super) fn attack(&mut self, _bv: &mut Vec<Bullet>, o: OperatorRef) {
-        if self.stage.attack_time > 0.0 {
-            self.stage.attack_time -= PERIOD;
-        } else {
-            use super::AttackType::*;
-            match self.stage.attack_type {
-                Melee => {
-                    let d = FixedDamage {
-                        value: self.stage.atk,
-                        damage_type: self.stage.damage_type.clone(),
-                    };
-                    o.borrow_mut().be_damage(&d);
-                    // self.target.upgrade().unwrap().borrow_mut().be_damage(&d);
-                }
-                Ranged => {
-                    todo!("ranged enemy");
-                    //todo: ranged enemy
-                    // bv.push(Bullet::new(
-                    //     self.target.upgrade().unwrap(),
-                    //     Point::from(self.location),
-                    //     2f64,
-                    //     self.stage.damage_type.clone(),
-                    //     self.stage.damage,
-                    // ));
-                }
-                _ => {
-                    todo!("unknown attack type of enemy");
-                }
-            }
-            self.stage.attack_time = self.info.attack_time;
-        }
-    }
+    // pub(super) fn attack(&mut self, _bv: &mut Vec<Bullet>, o: OperatorRef) {
+    //     if self.stage.attack_time > 0.0 {
+    //         self.stage.attack_time -= PERIOD;
+    //     } else {
+    //         use super::AttackType::*;
+    //         match self.stage.attack_type {
+    //             Melee => {
+    //                 let d = FixedDamage {
+    //                     value: self.stage.atk,
+    //                     damage_type: self.stage.damage_type.clone(),
+    //                 };
+    //                 o.borrow_mut().be_damage(&d);
+    //                 // self.target.upgrade().unwrap().borrow_mut().be_damage(&d);
+    //             }
+    //             Ranged => {
+    //                 todo!("ranged enemy");
+    //                 //todo: ranged enemy
+    //                 // bv.push(Bullet::new(
+    //                 //     self.target.upgrade().unwrap(),
+    //                 //     Point::from(self.location),
+    //                 //     2f64,
+    //                 //     self.stage.damage_type.clone(),
+    //                 //     self.stage.damage,
+    //                 // ));
+    //             }
+    //             _ => {
+    //                 todo!("unknown attack type of enemy");
+    //             }
+    //         }
+    //         self.stage.attack_time = self.info.attack_time;
+    //     }
+    // }
     pub(crate) fn next(&mut self, f: &mut Frame) {
         // if let Some(o) = self.be_block.upgrade() {
         //     self.attack(&mut f.bullet_set, o);
@@ -157,7 +158,7 @@ impl Enemy {
     pub(super) fn be_hit(&mut self, b: &Bullet, _f: &mut Frame) {
         self.be_effect(&b.effect);
     }
-    pub(super) fn be_damage(&mut self, d: &FixedDamage) {
+    pub(super) fn be_damage(&mut self, d: &Damage) {
         use super::DamageType::*;
         match d.damage_type {
             Magical => {
@@ -186,8 +187,16 @@ impl Enemy {
         }
     }
 
-    pub(super) fn be_effect(&mut self, _e: &Effect) {
-        todo!()
+    pub(super) fn be_effect(&mut self, e: &Effect) {
+        match e {
+            Effect::Buff(b) => {
+                self.stage.be_buff(b);
+            }
+            Effect::Damage(d) => {
+                self.be_damage(&d);
+            }
+            _ => {}
+        }
     }
 }
 
