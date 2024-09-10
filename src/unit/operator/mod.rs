@@ -1,4 +1,4 @@
-use super::scope::{Toward};
+use super::scope::Toward;
 use super::skill::effect::{self, Damage, Effect};
 use super::skill::skill_schedule::SkillSchedule;
 use super::skill::skill_type::{ChargeType, ScheduleType, TriggerType};
@@ -45,7 +45,7 @@ pub(crate) struct Operator {
     pub(crate) die_code: u32,
     #[serde(skip)]
     mission_vec: Vec<fn(&mut Operator, &mut Frame)>,
-    pub(crate) skills:SkillSchedule,
+    pub(crate) skills: SkillSchedule,
 }
 
 impl Operator {
@@ -89,7 +89,8 @@ impl Operator {
     pub(super) fn be_hit(&mut self, b: &Bullet, f: &mut Frame) {
         self.be_effect(&b.effect);
         if self.stage.hp <= 0 {
-            f.events.push(Event::OperatorRetreatEvent(self.name.clone()));
+            f.events
+                .push(Event::OperatorRetreatEvent(self.name.clone()));
             return;
         }
     }
@@ -126,11 +127,11 @@ impl Operator {
             _ => {}
         }
     }
-    pub(crate) fn generate_default_attack_skill(&mut self)->Skill {
+    pub(crate) fn generate_default_attack_skill(&mut self) -> Skill {
         let d = effect::Damage {
             value: self.stage.atk,
             change: Option::None,
-            damage_type:self.stage.damage_type,
+            damage_type: self.stage.damage_type,
         };
         let skill_entity = SkillEntity::ToEnemySkill(ToEnemySkill {
             target: Vec::new(),
@@ -139,7 +140,7 @@ impl Operator {
             attack_type: self.stage.attack_type,
             search_scope: Option::from(self.stage.scope.clone()),
         });
-        Skill{
+        Skill {
             trigger_type: TriggerType::Auto,
             schedule_type: ScheduleType::Immediately,
             duration: self.stage.attack_time,

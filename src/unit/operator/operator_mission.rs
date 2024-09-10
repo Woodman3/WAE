@@ -2,7 +2,7 @@ use crate::calculator::PERIOD;
 use crate::frame::Frame;
 use crate::unit::bullet::Bullet;
 use crate::unit::operator::Operator;
-use crate::unit::skill::effect::{FixedDamage};
+use crate::unit::skill::effect::FixedDamage;
 use crate::unit::Unit;
 use crate::utils::math::Point;
 use std::rc::{Rc, Weak};
@@ -56,8 +56,8 @@ impl Operator {
     // }
     pub(super) fn skill_mission(&mut self, f: &mut Frame) {
         let sv = self.skills.step(f);
-        for s in sv.iter(){
-            s.shoot(f,self.location.into());
+        for s in sv.iter() {
+            s.shoot(f, self.location.into());
         }
         self.skills.skill_block.extend(sv);
     }

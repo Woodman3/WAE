@@ -2,7 +2,7 @@ pub(super) mod tile;
 
 use crate::unit::enemy::{Enemy, EnemyShared};
 use crate::unit::operator::OperatorShared;
-use crate::unit::scope::{Scope};
+use crate::unit::scope::Scope;
 use crate::utils::math::{distance_p2p, Grid};
 use log::info;
 use serde::{Deserialize, Serialize};

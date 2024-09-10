@@ -1,18 +1,18 @@
 use std::cell::RefCell;
 
+use crate::event::Event;
 use crate::frame::{Frame, OperatorRef};
 use crate::map;
 use crate::route::Route;
 use crate::spawner::Spawner;
-use crate::event::{Event};
 use crate::unit;
 use crate::unit::enemy::Enemy;
 use crate::unit::operator::Operator;
 use crate::utils::config::Config;
-use crate::utils::copilot::{Copilot};
-use log::{debug};
+use crate::utils::copilot::Copilot;
+use log::debug;
 use serde_json::Value;
-use std::collections::{HashMap};
+use std::collections::HashMap;
 use std::rc::Rc;
 
 pub(crate) static PERIOD: f64 = 0.0166;

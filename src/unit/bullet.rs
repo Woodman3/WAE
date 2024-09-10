@@ -9,7 +9,7 @@ use crate::unit::skill::effect::{DamageType, FixedDamage};
 
 use super::skill::effect::Effect;
 
-#[derive(Clone, Debug,Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub(crate) struct Bullet {
     pub(crate) target: Unit,
     pub(crate) direction: Point,

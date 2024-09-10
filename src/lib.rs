@@ -7,11 +7,11 @@ use std::{cell::OnceCell, os::raw::c_char, ptr::null_mut};
 //mod block;
 pub mod calculator;
 mod demo;
+pub mod event;
 pub mod frame;
 pub mod map;
 pub mod route;
 mod spawner;
-pub mod event;
 pub mod unit;
 pub mod utils;
 

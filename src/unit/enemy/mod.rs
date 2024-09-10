@@ -6,7 +6,7 @@ use crate::unit::bullet::Bullet;
 use crate::unit::code::DIE;
 use crate::unit::operator::OperatorShared;
 use crate::unit::skill::effect::FixedDamage;
-use crate::utils::math::{Point};
+use crate::utils::math::Point;
 use log::trace;
 use serde::ser::Serializer;
 use serde::{Deserialize, Serialize};
@@ -50,7 +50,7 @@ pub(crate) struct Enemy {
     pub(crate) id: usize,
     #[serde(skip)]
     pub(crate) mission_vec: Vec<fn(&mut Enemy, &mut Frame)>,
-    pub(crate) skills:SkillSchedule,
+    pub(crate) skills: SkillSchedule,
 }
 #[derive(Debug, Clone, Default, Deserialize, Serialize)]
 pub struct EnemyWithPriority {
@@ -65,7 +65,7 @@ impl Enemy {
         let default_skill = self.generate_default_attack_skill();
         self.skills.skill_block.push(default_skill);
     }
-    pub(crate) fn generate_default_attack_skill(&mut self)->Skill {
+    pub(crate) fn generate_default_attack_skill(&mut self) -> Skill {
         let d = effect::Damage {
             value: self.stage.atk,
             change: Option::None,
@@ -78,7 +78,7 @@ impl Enemy {
             attack_type: self.stage.attack_type,
             search_scope: Option::from(self.stage.scope.clone()),
         });
-        Skill{
+        Skill {
             trigger_type: TriggerType::Auto,
             schedule_type: ScheduleType::Immediately,
             duration: self.stage.attack_time,

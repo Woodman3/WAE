@@ -1,4 +1,3 @@
-
 use serde::{Deserialize, Serialize};
 
 use crate::{map::Map, utils::math::Grid};

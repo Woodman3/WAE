@@ -1,9 +1,6 @@
-
 use crate::{
     frame::Frame,
-    unit::{
-        code,
-    },
+    unit::code,
     utils::math::{self, to_target},
 };
 
@@ -47,8 +44,8 @@ impl Enemy {
 
     fn skill_mission(&mut self, f: &mut Frame) {
         let sv = self.skills.step(f);
-        for s in sv.iter(){
-            s.shoot(f,self.location.into());
+        for s in sv.iter() {
+            s.shoot(f, self.location.into());
         }
         self.skills.skill_block.extend(sv);
     }

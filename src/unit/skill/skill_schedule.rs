@@ -2,12 +2,12 @@ use serde::{Deserialize, Serialize};
 
 use crate::calculator::PERIOD;
 use crate::frame::Frame;
-use crate::unit::skill::{Skill};
+use crate::unit::skill::Skill;
 use crate::unit::Unit;
 use std::fmt::{self, Display, Formatter};
 use std::rc::Rc;
 
-#[derive(Clone, Debug,Default,Deserialize, Serialize)]
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[serde(default)]
 pub(crate) struct SkillSchedule {
     pub(crate) skill_block: Vec<Skill>,
@@ -16,7 +16,7 @@ pub(crate) struct SkillSchedule {
 }
 
 impl SkillSchedule {
-    pub(crate) fn step(&mut self, f: &mut Frame)->Vec<Skill> {
+    pub(crate) fn step(&mut self, f: &mut Frame) -> Vec<Skill> {
         let mut r = vec![];
         self.skill_block.retain_mut(|s| {
             s.charge(PERIOD);

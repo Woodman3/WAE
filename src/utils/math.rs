@@ -1,5 +1,8 @@
 use serde::{Deserialize, Serialize};
-use std::{fmt::{self, Display}, ops::{Add, Mul, Sub}};
+use std::{
+    fmt::{self, Display},
+    ops::{Add, Mul, Sub},
+};
 #[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PartialEq)]
 pub struct Point {
     pub x: f64,

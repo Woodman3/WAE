@@ -1,11 +1,11 @@
 use crate::calculator::{Calculator, PERIOD};
-use crate::map;
 use crate::event::Event;
+use crate::map;
 use crate::unit::bullet::Bullet;
-use crate::unit::{code, skill};
 use crate::unit::enemy::Enemy;
 use crate::unit::operator::Operator;
 use crate::unit::skill::skill_schedule::SkillSchedule;
+use crate::unit::{code, skill};
 use log::info;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
@@ -77,7 +77,7 @@ impl Frame {
             .retain(|b| b.distance > code::BULLET_HIT_DISTANCE);
     }
 
-    fn event_step(&mut self,c: &mut Calculator) {
+    fn event_step(&mut self, c: &mut Calculator) {
         let ev = std::mem::take(&mut self.events);
         for e in ev {
             e.happen(self, c);

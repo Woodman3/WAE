@@ -1,7 +1,7 @@
 use crate::calculator::Calculator;
-use crate::frame::{Frame, OperatorRef};
 use crate::event::doctor::{OperatorDeployEvent, OperatorRetreatEvent, OperatorSkillEvent};
 use crate::event::hostile::EnemyPlaceEvent;
+use crate::frame::{Frame, OperatorRef};
 use crate::unit::operator::OperatorShared;
 use crate::utils::config::Config;
 use crate::utils::error::ConfigParseError;
@@ -47,7 +47,7 @@ impl Event {
                 f.operator_undeploy
                     .insert(operator_key.clone(), Rc::clone(&or));
                 info!("an operator retreat");
-            },
+            }
             Event::OperatorSkillEvent(e) => e.happen(f, c),
             Event::UnitRetreatEvent(e) => e.happen(f, c),
             Event::UnitSkillEvent(e) => e.happen(f, c),
@@ -55,11 +55,11 @@ impl Event {
                 f.enemy_set.retain(|e| e.borrow().id != *id);
                 f.kill_count += 1;
                 info!("an enemy die");
-            },
-            Event::EnemyEnterEvent(id) =>{
+            }
+            Event::EnemyEnterEvent(id) => {
                 f.enemy_set.retain(|e| e.borrow().id != *id);
                 info!("an enemy enter end");
-            },
+            }
         }
     }
 }

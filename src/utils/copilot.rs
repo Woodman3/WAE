@@ -10,11 +10,11 @@ use super::data_loader::Loader;
 use super::load_json_file;
 use super::math::Grid;
 use crate::calculator::Calculator;
-use crate::frame::Frame;
 use crate::event::doctor::{
     OperatorDeployEvent, OperatorRetreatEvent, OperatorSkillEvent, UnitRetreatEvent, UnitSkillEvent,
 };
 use crate::event::Event;
+use crate::frame::Frame;
 use crate::unit::scope::Toward;
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
@@ -111,7 +111,7 @@ impl Into<OperatorDeployEvent> for CopilotActionDeploy {
         OperatorDeployEvent {
             operator_key: self.name.clone(),
             // todo:maa 使用的坐标系有点奇怪,不仅方向不同,而且似乎还做了一些简略处理
-            location: (self.location.col,self.location.row).into(),
+            location: (self.location.col, self.location.row).into(),
             toward: self.direction,
         }
     }
@@ -288,10 +288,7 @@ impl Copilot {
 }
 
 mod test {
-    
 
-    
-    
     #[test]
     fn test_copilot() {
         // let start = Instant::now();

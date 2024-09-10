@@ -1,7 +1,7 @@
 use crate::{
     calculator::PERIOD,
-    frame::Frame,
     event::{hostile::EnemyPlaceEvent, Event},
+    frame::Frame,
 };
 
 #[derive(Clone, Debug, Default)]

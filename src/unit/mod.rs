@@ -51,7 +51,7 @@ pub(super) enum Unit {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
-pub(super) enum UnitShared{
+pub(super) enum UnitShared {
     Enemy(Weak<RefCell<Enemy>>),
     Operator(Weak<RefCell<Operator>>),
 }
