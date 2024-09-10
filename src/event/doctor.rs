@@ -66,6 +66,7 @@ impl OperatorDeployEvent {
         })
     }
 }
+
 impl OperatorDeployEvent {
     pub(super) fn happen(&self, f: &mut Frame, _c: &Calculator) {
         let or = f.operator_undeploy.remove(&self.operator_key).unwrap();

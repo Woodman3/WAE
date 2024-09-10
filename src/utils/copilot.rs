@@ -11,10 +11,10 @@ use super::load_json_file;
 use super::math::Grid;
 use crate::calculator::Calculator;
 use crate::frame::Frame;
-use crate::timeline::doctor::{
+use crate::event::doctor::{
     OperatorDeployEvent, OperatorRetreatEvent, OperatorSkillEvent, UnitRetreatEvent, UnitSkillEvent,
 };
-use crate::timeline::Event;
+use crate::event::Event;
 use crate::unit::scope::Toward;
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
@@ -168,7 +168,7 @@ impl TryInto<Event> for CopilotAction {
             }
             CopilotAction::Retreat(r) => {
                 if r.name.is_some() {
-                    Ok(Event::OperatorRetreatEvent(r.try_into()?))
+                    Ok(Event::OperatorRetreatEvent(r.name.unwrap()))
                 } else {
                     Ok(Event::UnitRetreatEvent(r.try_into()?))
                 }

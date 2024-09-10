@@ -4,7 +4,7 @@ use crate::frame::{Frame, OperatorRef};
 use crate::map;
 use crate::route::Route;
 use crate::spawner::Spawner;
-use crate::timeline::{Event};
+use crate::event::{Event};
 use crate::unit;
 use crate::unit::enemy::Enemy;
 use crate::unit::operator::Operator;
@@ -50,13 +50,14 @@ impl Calculator {
         }
     }
     fn process_frame(&mut self, f: &mut Frame) {
+        let mut ev = std::mem::take(&mut self.event_buffer);
         if let Some(copilot) = &self.copilot {
-            let ev = copilot.query(f);
-            self.event_buffer.extend(ev);
+            ev.extend(copilot.query(f));
         }
-        let ev = self.spawner.step(f);
-        self.event_buffer.extend(ev);
-        self.event(f);
+        ev.extend(self.spawner.step(f));
+        f.events.extend(ev);
+        // self.event_buffer.extend(ev);
+        // self.event(f);
         f.step(self);
     }
     pub(super) fn new(c: &Config) -> Result<Calculator> {
@@ -99,26 +100,9 @@ impl Calculator {
     /// mostly is happen in an specify time but sometime it happen after something has happen
     /// it can't be skip
     fn event(&mut self, f: &mut Frame) {
-        // while self.timeline.len() != 0 {
-        //     if let Some(et) = self.timeline.front() {
-        //         if et.time_stamp != f.timestamp {
-        //             if et.time_stamp < f.timestamp {
-        //                 warn!("Some event not happened before,this event has drop");
-        //                 self.timeline.pop_front();
-        //                 continue;
-        //             } else {
-        //                 break;
-        //             }
-        //         } else {
-        //             et.event.happen(f, self);
-        //             self.timeline.pop_front();
-        //         }
-        //     }
-        // }
-
         let ev = std::mem::take(&mut self.event_buffer);
         for e in ev {
-            e.happen(f, &self);
+            e.happen(f, self);
         }
     }
     pub(super) fn has_end(&self) -> bool {

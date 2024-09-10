@@ -1,4 +1,5 @@
 use crate::calculator::PERIOD;
+use crate::event::Event;
 use crate::frame::{Frame, OperatorRef};
 use crate::route::Route;
 use crate::unit::bullet::Bullet;
@@ -61,7 +62,8 @@ pub struct EnemyWithPriority {
 impl Enemy {
     pub(crate) fn init(&mut self) {
         self.arrange_mission();
-        self.generate_default_attack_skill();
+        let default_skill = self.generate_default_attack_skill();
+        self.skills.skill_block.push(default_skill);
     }
     pub(crate) fn generate_default_attack_skill(&mut self)->Skill {
         let d = effect::Damage {
@@ -90,7 +92,7 @@ impl Enemy {
             self.mission_vec[i](self, f);
         }
         if self.stage.hp <= 0 {
-            self.die_code = DIE;
+            f.events.push(Event::EnemyDieEvent(self.id));
         }
     }
     pub fn new(v: &Value) -> Result<Enemy> {
@@ -143,11 +145,11 @@ impl Enemy {
                        //     return
                        // }
         }
-        if self.stage.hp <= 0 {
-            self.die_code = super::code::DIE;
-            trace!("an enemy has die!");
-            return;
-        }
+        // maybe it should be check in next turn?
+        // if self.stage.hp <= 0 {
+        //     f.events.push(Event::EnemyDieEvent(self.id));
+        //     return;
+        // }
     }
 
     pub(super) fn be_effect(&mut self, e: &Effect) {

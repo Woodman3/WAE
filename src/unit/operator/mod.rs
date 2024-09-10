@@ -3,6 +3,8 @@ use super::skill::effect::{self, Damage, Effect};
 use super::skill::skill_schedule::SkillSchedule;
 use super::skill::skill_type::{ChargeType, ScheduleType, TriggerType};
 use super::skill::{SkillEntity, SpData, ToEnemySkill};
+use crate::event::doctor::OperatorRetreatEvent;
+use crate::event::Event;
 use crate::frame::Frame;
 use crate::unit::bullet::Bullet;
 use crate::unit::enemy::{EnemyShared, EnemyWithPriority};
@@ -84,11 +86,10 @@ impl Operator {
         Point::from(self.location)
     }
 
-    pub(super) fn be_hit(&mut self, b: &Bullet, _f: &mut Frame) {
+    pub(super) fn be_hit(&mut self, b: &Bullet, f: &mut Frame) {
         self.be_effect(&b.effect);
         if self.stage.hp <= 0 {
-            self.die_code = super::code::DIE;
-            trace!("an enemy has die!");
+            f.events.push(Event::OperatorRetreatEvent(self.name.clone()));
             return;
         }
     }

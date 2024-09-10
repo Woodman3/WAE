@@ -1,5 +1,6 @@
 use crate::calculator::{Calculator, PERIOD};
 use crate::map;
+use crate::event::Event;
 use crate::unit::bullet::Bullet;
 use crate::unit::{code, skill};
 use crate::unit::enemy::Enemy;
@@ -28,15 +29,16 @@ pub(super) struct Frame {
     pub(super) next_id: usize,
     pub(super) kill_count: u32,
     pub(super) cost: f32,
+    pub(super) events: Vec<Event>,
 }
 
 impl Frame {
-    pub(super) fn step(&mut self, _c: &mut Calculator) {
+    pub(super) fn step(&mut self, c: &mut Calculator) {
+        self.event_step(c);
         self.map.update_enemy_map(self.enemy_set.clone());
         self.operator_step();
         self.enemy_step();
         self.bullet_step();
-        self.enemy_set.retain(|e| e.borrow().die_code != code::DIE);
         self.cost += PERIOD as f32;
     }
     fn operator_step(&mut self) {
@@ -73,6 +75,13 @@ impl Frame {
         }
         self.bullet_set
             .retain(|b| b.distance > code::BULLET_HIT_DISTANCE);
+    }
+
+    fn event_step(&mut self,c: &mut Calculator) {
+        let ev = std::mem::take(&mut self.events);
+        for e in ev {
+            e.happen(self, c);
+        }
     }
 
     pub(super) fn deep_clone(&self) -> Self {

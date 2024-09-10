@@ -39,13 +39,7 @@ impl EnemyPlaceEvent {
         };
         e.id = f.next_id;
         e.init();
-        let default_skill = e.generate_default_attack_skill();
         let e = Rc::new(RefCell::new(e));
-        let s = SkillSchedule{
-            skill_block: vec![default_skill],
-            skill_ready: vec![],
-            skill_running: vec![],
-        };
         f.next_id += 1;
         f.enemy_set.push(e);
     }

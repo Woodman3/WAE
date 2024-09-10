@@ -10,9 +10,6 @@ use crate::{
 use super::Enemy;
 
 impl Enemy {
-    // fn skill_mission(&mut self, f: &mut Frame) {
-    //     self.skills.step(f);
-    // }
     pub(crate) fn arrange_mission(&mut self) {
         self.mission_vec.push(Self::step_mission);
         self.mission_vec.push(Self::skill_mission);
