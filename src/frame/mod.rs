@@ -29,6 +29,7 @@ pub(super) struct Frame {
     pub(super) next_id: usize,
     pub(super) kill_count: u32,
     pub(super) cost: f32,
+    pub(super) life_point:u32,
     pub(super) events: Vec<Event>,
 }
 

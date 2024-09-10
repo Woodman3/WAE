@@ -58,6 +58,10 @@ impl Event {
             }
             Event::EnemyEnterEvent(id) => {
                 f.enemy_set.retain(|e| e.borrow().id != *id);
+                f.life_point-=1;
+                if(f.life_point<=0){
+                    c.star=0;
+                }
                 info!("an enemy enter end");
             }
         }

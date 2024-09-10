@@ -353,31 +353,11 @@ impl Loader {
             // r.complete(&map);
             route.push(Rc::new(r));
         }
-        // for w in level.waves.iter(){
-        //     for f in w.fragments.iter(){
-        //         for a in f.actions.iter(){
-        //             if a.route_index>=level.routes.len() as u32{
-        //                 return Err("route index out of range".into());
-        //             }
-        //             if !matches!(a.action_type.as_str(),"SPAWN"){
-        //                 continue;
-        //             }
-        //             let e = EnemyPlaceEvent{
-        //                 enemy_key:a.key.clone(),
-        //                 enemy_route:a.route_index as usize,
-        //             };
-        //             let e = EventWithTime{
-        //                 time_stamp:(f.pre_delay+a.pre_delay) as u64,
-        //                 event:Rc::new(timeline::Event::EnemyPlaceEvent(e)),
-        //             };
-        //             timeline.push_back(e);
-        //         }
-        //     }
-        // };
         let spawner: Spawner = level.waves.clone().into();
         let f = Frame {
             map,
             cost: level.options.initial_cost as f32,
+            life_point:level.options.max_life_point,
             ..Default::default()
         };
         let c = Calculator {

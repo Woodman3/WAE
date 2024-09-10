@@ -106,7 +106,7 @@ impl Calculator {
         }
     }
     pub(super) fn has_end(&self) -> bool {
-        self.star != -1 || self.time_remain == 0
+        self.star != -1 || self.time_remain == 0 
     }
 
     pub(super) fn get_obs(&self) -> Option<Value> {
