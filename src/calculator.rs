@@ -25,7 +25,7 @@ pub struct Calculator {
     /// -1 mean battle haven't end
     pub(super) star: i8,
     pub(super) event_buffer: Vec<Event>,
-    pub(super) route: Vec<Rc<Route>>,
+    pub(super) route: Vec<Route>,
     pub(super) time_remain: i64,
     /// enemy in initial statement,if we place enemy to map,we will get enemy in it
     pub(super) enemy_initial: HashMap<String, Enemy>,
@@ -63,7 +63,7 @@ impl Calculator {
     pub(super) fn new(c: &Config) -> Result<Calculator> {
         use serde_json::from_value;
         let time_remain: i64 = from_value(c.hostile["time_remain"].clone())?;
-        let route = Vec::<Rc<Route>>::new();
+        let route = Vec::<Route>::new();
         let mut frame_vec = Vec::<Frame>::new();
         let mut operator_undeploy = HashMap::<String, OperatorRef>::new();
         for (key, v) in c.operator.as_object().unwrap() {

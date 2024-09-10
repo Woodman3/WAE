@@ -14,7 +14,7 @@ pub(super) struct Route {
 #[derive(Debug, Serialize, Deserialize, Default, Clone, PartialEq)]
 pub(super) enum CheckPoint {
     Move(Point),
-    // WaitForSeconds(f64),
+    WaitForSeconds(f64),
     // Disappear,
     // AppearAtPos(Point),
     // WaitCurrentFragmentTime(f64),

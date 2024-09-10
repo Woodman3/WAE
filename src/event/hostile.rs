@@ -23,7 +23,7 @@ impl EnemyPlaceEvent {
             .get(self.enemy_key.as_str())
             .cloned()
             .unwrap();
-        e.route = Rc::clone(&c.route[self.enemy_route]);
+        e.route = c.route[self.enemy_route].clone();
         e.location = e.route.start;
         e.next_point = match e
             .route

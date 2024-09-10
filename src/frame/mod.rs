@@ -29,7 +29,7 @@ pub(super) struct Frame {
     pub(super) next_id: usize,
     pub(super) kill_count: u32,
     pub(super) cost: f32,
-    pub(super) life_point:u32,
+    pub(super) life_point:i8,
     pub(super) events: Vec<Event>,
 }
 
@@ -50,16 +50,10 @@ impl Frame {
         }
     }
     fn enemy_step(&mut self) {
-        self.enemy_set
-            .retain(|e| e.borrow().die_code != code::INTO_END);
         let ve = self.enemy_set.clone();
         for e in ve {
             let mut eb = e.borrow_mut();
             eb.next(self);
-            if eb.die_code == code::INTO_END {
-                self.kill_count += 1;
-                info!("An enemy has enter to blue point");
-            }
         }
     }
     fn bullet_step(&mut self) {

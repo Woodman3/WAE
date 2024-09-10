@@ -351,13 +351,13 @@ impl Loader {
         for r in level.routes.iter() {
             let r: Route = r.clone().into();
             // r.complete(&map);
-            route.push(Rc::new(r));
+            route.push(r);
         }
         let spawner: Spawner = level.waves.clone().into();
         let f = Frame {
             map,
             cost: level.options.initial_cost as f32,
-            life_point:level.options.max_life_point,
+            life_point:level.options.max_life_point as i8,
             ..Default::default()
         };
         let c = Calculator {

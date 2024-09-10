@@ -3,7 +3,6 @@ use crate::event::Event;
 use crate::frame::{Frame, OperatorRef};
 use crate::route::Route;
 use crate::unit::bullet::Bullet;
-use crate::unit::code::DIE;
 use crate::unit::operator::OperatorShared;
 use crate::unit::skill::effect::FixedDamage;
 use crate::utils::math::Point;
@@ -41,7 +40,7 @@ pub(crate) struct Enemy {
     pub(crate) route_stage: usize,
     pub(crate) die_code: u32,
     /// 0 mean haven't die
-    pub(crate) route: Rc<Route>,
+    pub(crate) route: Route,
     #[serde(
         serialize_with = "super::operator::serialize_operator_shared",
         skip_deserializing

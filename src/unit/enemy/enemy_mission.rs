@@ -1,7 +1,5 @@
 use crate::{
-    frame::Frame,
-    unit::code,
-    utils::math::{self, to_target},
+    event::Event, frame::Frame, route, unit::code, utils::math::{self, to_target}
 };
 
 use super::Enemy;
@@ -12,7 +10,7 @@ impl Enemy {
         self.mission_vec.push(Self::skill_mission);
     }
     /// t is 1/fps it mean time interval
-    fn step_mission(&mut self, _f: &mut Frame) {
+    fn step_mission(&mut self, f: &mut Frame) {
         if !matches!(self.be_block.upgrade(), None) {
             return;
         }
@@ -35,7 +33,7 @@ impl Enemy {
             } else if self.route_stage == self.route.checkpoints.len() {
                 self.next_point = self.route.end;
             } else {
-                self.die_code = code::INTO_END;
+                f.events.push(Event::EnemyEnterEvent(self.id)) ;
             }
         }
         self.direction = direction;
