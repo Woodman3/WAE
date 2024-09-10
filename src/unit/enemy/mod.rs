@@ -85,44 +85,7 @@ impl Enemy {
             ..Default::default()
         }
     }
-    // pub(super) fn attack(&mut self, _bv: &mut Vec<Bullet>, o: OperatorRef) {
-    //     if self.stage.attack_time > 0.0 {
-    //         self.stage.attack_time -= PERIOD;
-    //     } else {
-    //         use super::AttackType::*;
-    //         match self.stage.attack_type {
-    //             Melee => {
-    //                 let d = FixedDamage {
-    //                     value: self.stage.atk,
-    //                     damage_type: self.stage.damage_type.clone(),
-    //                 };
-    //                 o.borrow_mut().be_damage(&d);
-    //                 // self.target.upgrade().unwrap().borrow_mut().be_damage(&d);
-    //             }
-    //             Ranged => {
-    //                 todo!("ranged enemy");
-    //                 //todo: ranged enemy
-    //                 // bv.push(Bullet::new(
-    //                 //     self.target.upgrade().unwrap(),
-    //                 //     Point::from(self.location),
-    //                 //     2f64,
-    //                 //     self.stage.damage_type.clone(),
-    //                 //     self.stage.damage,
-    //                 // ));
-    //             }
-    //             _ => {
-    //                 todo!("unknown attack type of enemy");
-    //             }
-    //         }
-    //         self.stage.attack_time = self.info.attack_time;
-    //     }
-    // }
     pub(crate) fn next(&mut self, f: &mut Frame) {
-        // if let Some(o) = self.be_block.upgrade() {
-        //     self.attack(&mut f.bullet_set, o);
-        // } else {
-        //     self.step();
-        // }
         for i in 0..self.mission_vec.len() {
             self.mission_vec[i](self, f);
         }
