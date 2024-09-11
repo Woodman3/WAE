@@ -7,7 +7,7 @@ use crate::event::doctor::OperatorRetreatEvent;
 use crate::event::Event;
 use crate::frame::Frame;
 use crate::unit::bullet::Bullet;
-use crate::unit::enemy::{EnemyShared, EnemyWithPriority};
+use crate::unit::enemy::{EnemyShared};
 use crate::unit::skill::effect::FixedDamage;
 use crate::unit::skill::Skill;
 use crate::utils::math::{Grid, Point};
@@ -34,7 +34,6 @@ pub(crate) struct Operator {
     pub(crate) location: Grid,
     pub(crate) re_deploy: f32,
     pub(crate) toward: Toward,
-    pub(crate) enemy_find: Vec<EnemyWithPriority>,
     #[serde(
         serialize_with = "super::enemy::serialize_enemy_shared",
         skip_deserializing
@@ -76,7 +75,6 @@ impl Operator {
 
     pub(crate) fn deep_clone(&self) -> Self {
         Operator {
-            enemy_find: Vec::<EnemyWithPriority>::new(),
             target: Weak::new(),
             // block: self.block.clone(),//todo
             ..self.clone()

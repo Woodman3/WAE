@@ -34,8 +34,6 @@ pub(crate) struct Enemy {
     pub(crate) info: super::UnitInfo,
     pub(crate) stage: super::UnitInfo,
     pub(crate) location: Point,
-    /// -1 mean haven't place
-    pub(crate) next_point: Point,
     pub(crate) direction: Point,
     pub(crate) route_stage: usize,
     pub(crate) die_code: u32,
@@ -50,12 +48,6 @@ pub(crate) struct Enemy {
     #[serde(skip)]
     pub(crate) mission_vec: Vec<fn(&mut Enemy, &mut Frame)>,
     pub(crate) skills: SkillSchedule,
-}
-#[derive(Debug, Clone, Default, Deserialize, Serialize)]
-pub struct EnemyWithPriority {
-    #[serde(serialize_with = "serialize_enemy_shared", skip_deserializing)]
-    pub enemy: EnemyShared,
-    pub time_stamp: u64,
 }
 
 impl Enemy {
@@ -171,26 +163,6 @@ impl PartialEq<Self> for Enemy {
 }
 
 impl Eq for Enemy {}
-
-impl Eq for EnemyWithPriority {}
-
-impl PartialEq<Self> for EnemyWithPriority {
-    fn eq(&self, other: &Self) -> bool {
-        self.time_stamp == other.time_stamp
-    }
-}
-
-impl PartialOrd<Self> for EnemyWithPriority {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        self.time_stamp.partial_cmp(&other.time_stamp)
-    }
-}
-
-impl Ord for EnemyWithPriority {
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.time_stamp.cmp(&other.time_stamp)
-    }
-}
 
 pub(crate) fn serialize_enemy_shared<S>(
     ptr: &EnemyShared,

@@ -25,18 +25,6 @@ impl EnemyPlaceEvent {
             .unwrap();
         e.route = c.route[self.enemy_route].clone();
         e.location = e.route.start;
-        e.next_point = match e
-            .route
-            .checkpoints
-            .iter()
-            .position(|c| matches!(c, CheckPoint::Move(_)))
-        {
-            Some(p) => match e.route.checkpoints[p] {
-                CheckPoint::Move(p) => p,
-                _ => e.route.end,
-            },
-            None => e.route.end,
-        };
         e.id = f.next_id;
         e.init();
         let e = Rc::new(RefCell::new(e));

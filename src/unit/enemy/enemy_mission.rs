@@ -1,5 +1,5 @@
 use crate::{
-    event::Event, frame::Frame, route, unit::code, utils::math::{self, to_target}
+    calculator::PERIOD, event::Event, frame::Frame, route::CheckPoint, unit::code, utils::math
 };
 
 use super::Enemy;
@@ -14,27 +14,33 @@ impl Enemy {
         if !matches!(self.be_block.upgrade(), None) {
             return;
         }
-        let (direction, new) = to_target(self.location, self.next_point, self.move_speed);
-        let distance = math::distance_from_segment_to_point(self.location, new, self.next_point);
+        let next_point;
+        if self.route_stage == self.route.checkpoints.len() {
+            next_point = self.route.end;
+        }else if self.route_stage < self.route.checkpoints.len() {
+            match &mut self.route.checkpoints[self.route_stage]{
+                CheckPoint::Move(p) => {
+                    next_point = *p;
+                }
+                CheckPoint::WaitForSeconds(t) => {
+                    if *t>0.0 {
+                        *t -= PERIOD;
+                    }else{
+                        self.route_stage += 1;
+                    }
+                    return;
+                }
+                _ => { return }
+
+            }
+        }else{
+            f.events.push(Event::EnemyEnterEvent(self.id)) ;
+            return ;
+        }
+        let (direction, new) = math::to_target(self.location, next_point, self.move_speed);
+        let distance = math::distance_from_segment_to_point(self.location, new, next_point);
         if distance <= code::MIN_DISTANCE {
             self.route_stage += 1;
-            if self.route_stage < self.route.checkpoints.len() {
-                use crate::route::CheckPoint;
-                self.next_point = self.route.end;
-                for i in self.route_stage..self.route.checkpoints.len() {
-                    match self.route.checkpoints[i] {
-                        CheckPoint::Move(p) => {
-                            self.next_point = p;
-                            break;
-                        }
-                        _ => continue,
-                    }
-                }
-            } else if self.route_stage == self.route.checkpoints.len() {
-                self.next_point = self.route.end;
-            } else {
-                f.events.push(Event::EnemyEnterEvent(self.id)) ;
-            }
         }
         self.direction = direction;
         self.location = new;

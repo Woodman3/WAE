@@ -177,9 +177,15 @@ fn find_file_in_dir(dir: &Path, file_name: &str) -> Result<String> {
 
 impl Into<CheckPoint> for OfficialCheckPoint {
     fn into(self) -> CheckPoint {
+        use OfficialCheckPointType::*;
         match self.tag {
-            OfficialCheckPointType::Move => CheckPoint::Move(self.position.into()),
-            _ => CheckPoint::None,
+            Move => CheckPoint::Move(self.position.into()),
+            WaitForSeconds => CheckPoint::WaitForSeconds(self.time as f64),
+            Disappear => todo!(),
+            AppearAtPos => todo!(),
+            WaitCurrentFragmentTime => todo!(),
+            WaitCurrentWaveTime => todo!(),
+            PatrolMove => todo!(),
         }
     }
 }
