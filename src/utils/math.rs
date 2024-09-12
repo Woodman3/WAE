@@ -244,8 +244,8 @@ pub fn to_target(location: Point, target: Point, move_speed: f64) -> (Point, Poi
     use crate::calculator::PERIOD;
     let direction = calculate_direction(target, location);
     let mut new = location.clone();
-    new.x += move_speed * direction.x * PERIOD;
-    new.y += move_speed * direction.y * PERIOD;
+    new.x += move_speed * direction.x * PERIOD as f64;
+    new.y += move_speed * direction.y * PERIOD as f64;
     (direction, new)
 }
 fn calculate_direction(target: Point, location: Point) -> Point {

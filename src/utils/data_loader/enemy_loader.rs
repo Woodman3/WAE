@@ -46,7 +46,7 @@ pub(super) struct OfficialEnemyAttribute {
     pub(super) block_cnt: OfficialEnemyDataTemplate<i64>,
     pub(super) move_speed: OfficialEnemyDataTemplate<f64>,
     pub(super) attack_speed: OfficialEnemyDataTemplate<f64>,
-    pub(super) base_attack_time: OfficialEnemyDataTemplate<f64>,
+    pub(super) base_attack_time: OfficialEnemyDataTemplate<f32>,
     pub(super) respawn_time: OfficialEnemyDataTemplate<i64>,
     pub(super) hp_recovery_per_sec: OfficialEnemyDataTemplate<f64>,
     pub(super) sp_recovery_per_sec: OfficialEnemyDataTemplate<f64>,

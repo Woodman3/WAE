@@ -11,23 +11,23 @@ pub(super) struct Spawner {
 
 #[derive(Clone, Debug, Default)]
 pub(super) struct Wave {
-    pub(super) pre_delay: f64,
+    pub(super) pre_delay: f32,
     pub(super) wave: Vec<SubWave>,
 }
 
 #[derive(Clone, Debug, Default)]
 pub(super) struct SubWave {
-    pub(super) pre_delay: f64,
+    pub(super) pre_delay: f32,
     pub(super) wave: Vec<SubSubWave>,
 }
 
 #[derive(Clone, Debug, Default)]
 pub(super) struct SubSubWave {
     pub(super) count: i32,
-    pub(super) interval: f64,
+    pub(super) interval: f32,
     pub(super) enemy: String,
     pub(super) route: u32,
-    pub(super) pre_delay: f64,
+    pub(super) pre_delay: f32,
     pub(super) cur_count: i32,
 }
 
@@ -95,7 +95,7 @@ impl SubSubWave {
     fn step(&mut self, f: &Frame) -> Vec<Event> {
         let ret = Vec::new();
         let cur_time = f.timer.subwave;
-        if cur_time >= self.pre_delay + self.cur_count as f64 * self.interval {
+        if cur_time >= self.pre_delay + self.cur_count as f32 * self.interval {
             self.cur_count+=1;
             return self.spawn(f)    
         }

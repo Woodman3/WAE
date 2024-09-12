@@ -31,7 +31,7 @@ pub struct UnitInfo {
     pub(super) atk: i64,
     pub(super) def: i64,
     pub(super) magic_resist: f64,
-    pub(super) attack_time: f64,
+    pub(super) attack_time: f32,
     pub(super) block_num: i64,
     pub(super) attack_type: AttackType,
     pub(super) cost: i32,

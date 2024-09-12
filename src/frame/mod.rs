@@ -43,7 +43,7 @@ impl Frame {
         self.operator_step();
         self.enemy_step();
         self.bullet_step();
-        self.cost += PERIOD as f32;
+        self.cost += PERIOD;
     }
     fn operator_step(&mut self) {
         let ov = self.operator_deploy.clone();

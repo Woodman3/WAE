@@ -15,7 +15,7 @@ use serde_json::Value;
 use std::collections::HashMap;
 use std::rc::Rc;
 
-pub(crate) static PERIOD: f64 = 0.0166;
+pub(crate) static PERIOD:f32 = 0.0166;
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 /// calculate
 #[derive(Debug, Default)]

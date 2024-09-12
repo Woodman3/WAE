@@ -80,7 +80,7 @@ impl Skill {
     pub(super) fn can_charge(&self) -> bool {
         self.sp_data.sp < self.sp_data.sp_cost || self.sp_data.overcharge
     }
-    pub(super) fn charge(&mut self, value: f64) {
+    pub(super) fn charge(&mut self, value: f32) {
         if self.can_charge() {
             self.sp_data.sp += value
         }

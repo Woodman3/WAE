@@ -91,7 +91,7 @@ pub(super) struct OfficialRoute {
 pub(super) struct OfficialCheckPoint {
     #[serde(alias = "type")]
     pub(super) tag: OfficialCheckPointType,
-    pub(super) time: f64,
+    pub(super) time: f32,
     pub(super) position: Grid,
     pub(super) reach_offset: Point,
     pub(super) reach_distance: f64,
@@ -180,7 +180,7 @@ impl Into<CheckPoint> for OfficialCheckPoint {
         use OfficialCheckPointType::*;
         match self.tag {
             Move => CheckPoint::Move(self.position.into()),
-            WaitForSeconds => CheckPoint::WaitForSeconds(self.time as f64),
+            WaitForSeconds => CheckPoint::WaitForSeconds(self.time),
             Disappear => todo!(),
             AppearAtPos => todo!(),
             WaitCurrentFragmentTime => todo!(),
@@ -255,10 +255,10 @@ impl Into<SubSubWave> for OfficialWaveAction {
     fn into(self) -> SubSubWave {
         SubSubWave {
             count: self.count as i32,
-            interval: self.interval as f64,
+            interval: self.interval as f32,
             enemy: self.key.clone(),
             route: self.route_index as u32,
-            pre_delay: self.pre_delay as f64,
+            pre_delay: self.pre_delay as f32,
             // cur_delay: self.pre_delay ,
             cur_count: 0,
             // cur_interval: self.interval as f32,
@@ -275,7 +275,7 @@ impl Into<SubWave> for OfficialWaveFragment {
             }
         }
         SubWave {
-            pre_delay: self.pre_delay as f64,
+            pre_delay: self.pre_delay,
             wave,
         }
     }
@@ -289,7 +289,7 @@ impl Into<Wave> for OfficialWave {
         }
         wave.reverse();
         Wave {
-            pre_delay: self.pre_delay as f64,
+            pre_delay: self.pre_delay ,
             wave,
         }
     }

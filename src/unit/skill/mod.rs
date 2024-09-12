@@ -17,18 +17,18 @@ pub(crate) struct Skill {
     pub(crate) schedule_type: ScheduleType,
     pub(crate) sp_data: SpData,
     ///skill time
-    pub(crate) duration: f64,
+    pub(crate) duration: f32,
     ///if in skill ,it show time remain,or is 0
-    pub(crate) last: f64,
+    pub(crate) last: f32,
     pub(crate) skill_entity: SkillEntity,
 }
 
 #[derive(Clone, Deserialize, Debug, Default, Serialize)]
 #[serde(default)]
 pub(crate) struct SpData {
-    pub(crate) sp_cost: f64,
+    pub(crate) sp_cost: f32,
     /// sp now
-    pub(crate) sp: f64,
+    pub(crate) sp: f32,
     pub(crate) overcharge: bool,
     pub(crate) charge_type: ChargeType,
 }

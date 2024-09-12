@@ -47,7 +47,7 @@ struct OfficialData {
     pub(super) block_cnt: i64,
     pub(super) move_speed: f64,
     pub(super) attack_speed: f64,
-    pub(super) base_attack_time: f64,
+    pub(super) base_attack_time: f32,
     pub(super) respawn_time: i64,
     pub(super) hp_recovery_per_sec: f32,
     pub(super) sp_recovery_per_sec: f32,
@@ -81,7 +81,7 @@ struct OfficialSkill {
     range_id: Option<String>,
     skill_type: String,
     duration_type: String,
-    duration: f64,
+    duration: f32,
     sp_data: OfficialSpData,
     blackboard: Vec<OfficialBlackBoard>,
 }
@@ -132,7 +132,7 @@ impl Into<Skill> for OfficialSkill {
             _ => TriggerType::None,
         };
         Skill {
-            duration: self.duration,
+            duration: self.duration as f32,
             trigger_type,
             sp_data: self.sp_data.into(),
             ..Default::default()
@@ -143,8 +143,8 @@ impl Into<Skill> for OfficialSkill {
 impl Into<SpData> for OfficialSpData {
     fn into(self) -> SpData {
         SpData {
-            sp_cost: self.sp_cost as f64,
-            sp: self.init_sp as f64,
+            sp_cost: self.sp_cost as f32 ,
+            sp: self.init_sp as f32,
             charge_type: match self.sp_type.as_str() {
                 "INCREASE_WITH_TIME" => ChargeType::Time,
                 "INCREASE_WITH_ATTACK" => ChargeType::Attack,

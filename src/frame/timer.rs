@@ -9,9 +9,9 @@ use crate::calculator::PERIOD;
 #[derive(Debug, Clone, Default, Deserialize, Serialize)]
 pub(crate) struct Timer{
     pub(crate) timestamp: u64,
-    pub(crate) global: f64,
-    pub(crate) wave: f64,
-    pub(crate) subwave: f64,
+    pub(crate) global: f32,
+    pub(crate) wave: f32,
+    pub(crate) subwave: f32,
 }
 
 impl Timer{
@@ -21,8 +21,8 @@ impl Timer{
     }
 }
 
-impl AddAssign<f64> for Timer{
-    fn add_assign(&mut self, rhs: f64) {
+impl AddAssign<f32> for Timer{
+    fn add_assign(&mut self, rhs: f32) {
         self.global += rhs;
         self.subwave += rhs;
         self.wave += rhs;
