@@ -270,7 +270,9 @@ impl Into<SubWave> for OfficialWaveFragment {
     fn into(self) -> SubWave {
         let mut wave = Vec::new();
         for a in self.actions.into_iter().rev() {
-            wave.push(a.into());
+            if a.action_type == "SPAWN" {
+                wave.push(a.into());
+            }
         }
         SubWave {
             pre_delay: self.pre_delay as f64,
@@ -285,6 +287,7 @@ impl Into<Wave> for OfficialWave {
         for f in self.fragments {
             wave.push(f.into());
         }
+        wave.reverse();
         Wave {
             pre_delay: self.pre_delay as f64,
             wave,
@@ -298,6 +301,7 @@ impl Into<Spawner> for Vec<OfficialWave> {
         for w in self.into_iter().rev() {
             wave.push(w.into());
         }
+        wave.reverse();
         Spawner { wave }
     }
 }
