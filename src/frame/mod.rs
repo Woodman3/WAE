@@ -1,3 +1,5 @@
+pub(crate) mod timer;
+
 use crate::calculator::{Calculator, PERIOD};
 use crate::event::Event;
 use crate::map;
@@ -9,6 +11,7 @@ use crate::unit::{code, skill};
 use log::info;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
+use timer::Timer;
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::fmt::{self, write};
@@ -19,7 +22,7 @@ pub(super) type EnemyRef = Rc<RefCell<Enemy>>;
 
 #[derive(Debug, Default, Clone, Deserialize, Serialize)]
 pub(super) struct Frame {
-    pub(super) timestamp: u64,
+    pub(super) timer: Timer,
     pub(super) enemy_set: Vec<EnemyRef>,
     pub(super) operator_deploy: HashMap<String, OperatorRef>,
     pub(super) operator_undeploy: HashMap<String, OperatorRef>,
@@ -139,13 +142,11 @@ impl fmt::Display for Frame {
         writeln!(
             f,
             "\
-timestamp:{timestamp}
 time:{time}
 num of enemy:{enemy_len}
 cost:{cost}
 enemy info:",
-            timestamp = self.timestamp,
-            time = self.timestamp as f64 * PERIOD,
+            time = self.timer,
             enemy_len = self.enemy_set.len(),
             cost = self.cost
         )?;

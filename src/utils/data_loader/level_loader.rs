@@ -255,13 +255,13 @@ impl Into<SubSubWave> for OfficialWaveAction {
     fn into(self) -> SubSubWave {
         SubSubWave {
             count: self.count as i32,
-            interval: self.interval as f32,
+            interval: self.interval as f64,
             enemy: self.key.clone(),
             route: self.route_index as u32,
-            pre_delay: self.pre_delay,
-            cur_delay: self.pre_delay,
+            pre_delay: self.pre_delay as f64,
+            // cur_delay: self.pre_delay ,
             cur_count: 0,
-            cur_interval: self.interval as f32,
+            // cur_interval: self.interval as f32,
         }
     }
 }
@@ -273,7 +273,7 @@ impl Into<SubWave> for OfficialWaveFragment {
             wave.push(a.into());
         }
         SubWave {
-            pre_delay: self.pre_delay,
+            pre_delay: self.pre_delay as f64,
             wave,
         }
     }
@@ -286,7 +286,7 @@ impl Into<Wave> for OfficialWave {
             wave.push(f.into());
         }
         Wave {
-            pre_delay: self.pre_delay,
+            pre_delay: self.pre_delay as f64,
             wave,
         }
     }

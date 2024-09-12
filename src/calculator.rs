@@ -41,7 +41,7 @@ impl Calculator {
         }
         self.time_remain -= 1;
         if let Some(mut f) = self.frame_vec.pop() {
-            f.timestamp += 1;
+            f.timer.step();
             self.process_frame(&mut f);
             self.frame_vec.push(f);
             true
