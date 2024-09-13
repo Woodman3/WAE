@@ -51,13 +51,13 @@ impl Calculator {
     }
     fn process_frame(&mut self, f: &mut Frame) {
         let mut ev = std::mem::take(&mut self.event_buffer);
-        if let Some(copilot) = &self.copilot {
-            ev.extend(copilot.query(f));
+        if let Some(copilot) = &mut self.copilot{
+            if let Some(action) = copilot.query(f) {
+                ev.push(action);
+            }
         }
         ev.extend(self.spawner.step(f));
         f.events.extend(ev);
-        // self.event_buffer.extend(ev);
-        // self.event(f);
         f.step(self);
     }
     pub(super) fn new(c: &Config) -> Result<Calculator> {

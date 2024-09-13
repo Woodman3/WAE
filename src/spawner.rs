@@ -32,12 +32,14 @@ pub(super) struct SubSubWave {
 }
 
 impl Spawner {
-    pub(super) fn step(&mut self, f: &Frame) -> Vec<Event> {
+    pub(super) fn step(&mut self, f: &mut Frame) -> Vec<Event> {
         let mut ret = Vec::new();
         if let Some(mut w) = self.wave.pop() {
             ret.extend(w.step(f));
             if !w.finished() {
                 self.wave.push(w);
+            }else{
+                f.timer.wave = 0.0;
             }
         }
         ret
@@ -45,7 +47,7 @@ impl Spawner {
 }
 
 impl Wave {
-    fn step(&mut self, f: &Frame) -> Vec<Event> {
+    fn step(&mut self, f: &mut Frame) -> Vec<Event> {
         let mut ret = Vec::new();
         // if self.pre_delay > 0.0 {
         //     self.pre_delay -= PERIOD;
@@ -55,13 +57,15 @@ impl Wave {
             ret.extend(sw.step(f));
             if !sw.finished() {
                 self.wave.push(sw);
+            }else{
+                // todo: 可能有更复杂的情况
+                f.timer.subwave = 0.0;
             }
         }
         ret
     }
 
     fn finished(&self) -> bool {
-        // self.pre_delay <= 0.0 && self.wave.len() == 0
         self.wave.len() == 0
     }
 }
@@ -69,14 +73,6 @@ impl Wave {
 impl SubWave {
     fn step(&mut self, f: &Frame) -> Vec<Event> {
         let mut ret = Vec::new();
-        // if self.pre_delay > 0.0 {
-        //     self.pre_delay -= PERIOD;
-        //     return ret;
-        // }
-        // for w in self.wave.iter_mut() {
-        //     ret.extend(w.step(f));
-        // }
-        // ret
         if f.timer.subwave >= self.pre_delay {
             for w in self.wave.iter_mut() {
                 ret.extend(w.step(f));
@@ -86,7 +82,6 @@ impl SubWave {
         ret
     }
     fn finished(&self) -> bool {
-        // self.pre_delay <= 0.0 && self.wave.len() == 0
         self.wave.len() == 0
     }
 }
@@ -99,24 +94,6 @@ impl SubSubWave {
             self.cur_count+=1;
             return self.spawn(f)    
         }
-        // if self.cur_count == 0 {
-        //     if self.cur_delay > 0.0 {
-        //         self.cur_delay -= PERIOD as f32;
-        //         ret
-        //     } else {
-        //         self.cur_count += 1;
-        //         self.spawn(f)
-        //     }
-        // } else {
-        //     if self.cur_interval > 0.0 {
-        //         self.cur_interval -= PERIOD as f32;
-        //         ret
-        //     } else {
-        //         self.cur_count += 1;
-        //         self.cur_interval = self.interval;
-        //         self.spawn(f)
-        //     }
-        // }
         ret
     }
     fn spawn(&mut self, _f: &Frame) -> Vec<Event> {

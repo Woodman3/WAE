@@ -183,10 +183,11 @@ impl CopilotAction {
     fn check(&self, f: &Frame) -> bool {
         match self {
             CopilotAction::Deploy(d) => {
-                if !f.operator_undeploy.contains_key(&d.name) {
-                    return false;
+                if let Some(o) = f.operator_undeploy.get(&d.name) {
+                    o.borrow().stage.cost as f32 <= f.cost && d.condition.as_ref().map_or(true, |d| d.check(f))
+                }else {
+                    false
                 }
-                d.condition.as_ref().map_or(true, |c| c.check(f))
             }
             CopilotAction::Skill(_s) => true,
             CopilotAction::Retreat(_r) => true,
@@ -200,16 +201,16 @@ impl CopilotActionCondition {
     //todo: different condition may conflict
     pub(crate) fn check(&self, f: &Frame) -> bool {
         if let Some(k) = self.kills {
-            if f.kill_count >= k.into() {
-                return true;
+            if f.kill_count < k.into() {
+                return false;
             }
         }
         if let Some(c) = self.costs {
-            if f.cost >= c.into() {
-                return true;
+            if f.cost < c.into() {
+                return false;
             }
         }
-        false
+        true
     }
 }
 
@@ -219,7 +220,8 @@ impl Copilot {
         game_data_path: P,
     ) -> Result<Calculator> {
         let json = load_json_file(copilot_path)?;
-        let copilot_data: CopilotData = serde_json::from_value(json)?;
+        let mut copilot_data: CopilotData = serde_json::from_value(json)?;
+        copilot_data.actions.reverse(); 
         let loader = Loader::new(game_data_path)?;
         let mut calculator = loader.load_level_by_name(copilot_data.stage_name.clone())?;
         for o in copilot_data.operators.iter() {
@@ -272,18 +274,26 @@ impl Copilot {
         });
         Ok(calculator)
     }
-    pub(crate) fn query(&self, f: &Frame) -> Vec<Event> {
-        let mut v = Vec::new();
-        for a in self.copilot_data.actions.iter() {
+    pub(crate) fn query(&mut self, f: &Frame) -> Option<Event> {
+        if let Some(a) = self.copilot_data.actions.pop(){
             if a.check(f) {
                 if let Ok(e) = a.clone().try_into() {
-                    v.push(e);
-                    // we force only one action can be execute in one frame
-                    break;
+                    return Some(e)
                 }
+            }else {
+                self.copilot_data.actions.push(a); 
             }
         }
-        v
+        // for a in self.copilot_data.actions.iter() {
+        //     if a.check(f) {
+        //         if let Ok(e) = a.clone().try_into() {
+        //             v.push(e);
+        //             // we force only one action can be execute in one frame
+        //             break;
+        //         }
+        //     }
+        // }
+        None
     }
 }
 
