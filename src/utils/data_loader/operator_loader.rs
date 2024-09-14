@@ -1,4 +1,7 @@
+use std::default;
+
 use super::Loader;
+use super::OfficialBlackBoard;
 use super::Result;
 use crate::unit::operator::Operator;
 use crate::unit::scope::Scope;
@@ -9,12 +12,13 @@ use crate::unit::skill::{Skill, SpData};
 use crate::unit::UnitInfo;
 use crate::utils::math::Grid;
 use crate::utils::math::GridRect;
+use serde::de::DeserializeOwned;
 use serde::Deserialize;
 use serde_json::{from_value, Value};
 
 #[derive(Deserialize, Default, Debug)]
 #[serde(rename_all = "camelCase")]
-struct OfficialOperator {
+pub(super) struct OfficialOperator {
     pub(super) name: String,
     pub(super) display_number: String,
     pub(super) appellation: String,
@@ -25,20 +29,20 @@ struct OfficialOperator {
 }
 #[derive(Deserialize, Default, Debug)]
 #[serde(rename_all = "camelCase")]
-struct OfficialPhase {
+pub(super) struct OfficialPhase {
     pub(super) range_id: String,
     pub(super) max_level: u32,
     pub(super) attributes_key_frames: Vec<OfficialKeyFrame>,
 }
 #[derive(Deserialize, Default, Debug)]
 #[serde(rename_all = "camelCase")]
-struct OfficialKeyFrame {
+pub(super) struct OfficialKeyFrame {
     pub(super) level: u32,
     pub(super) data: OfficialData,
 }
 #[derive(Deserialize, Default, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
-struct OfficialData {
+pub(super) struct OfficialData {
     pub(super) max_hp: i64,
     pub(super) atk: i64,
     pub(super) def: i64,
@@ -65,44 +69,37 @@ struct OfficialData {
 }
 
 #[derive(Deserialize, Default, Debug)]
-struct OfficialRange {
-    grids: Vec<Grid>,
+pub(super) struct OfficialRange {
+    pub(super) grids: Vec<Grid>,
 }
 
 #[derive(Deserialize, Default, Debug)]
 #[serde(rename_all = "camelCase")]
-struct OfficialSkillsDescription {
+pub(super) struct OfficialSkillsDescription {
     pub(super) skill_id: String,
 }
 
 #[derive(Deserialize, Default, Debug)]
 #[serde(rename_all = "camelCase")]
-struct OfficialSkill {
-    range_id: Option<String>,
-    skill_type: String,
-    duration_type: String,
-    duration: f32,
-    sp_data: OfficialSpData,
-    blackboard: Vec<OfficialBlackBoard>,
+pub(super) struct OfficialSkill {
+    pub(super) range_id: Option<String>,
+    pub(super) skill_type: String,
+    pub(super) duration_type: String,
+    pub(super) duration: f32,
+    pub(super) sp_data: OfficialSpData,
+    pub(super) blackboard: Vec<OfficialBlackBoard>,
 }
 
 #[derive(Deserialize, Default, Debug)]
 #[serde(rename_all = "camelCase")]
-struct OfficialSpData {
-    sp_type: String,
-    level_up_cost: Option<u32>,
-    max_charge_time: u32,
-    sp_cost: u32,
-    init_sp: u32,
-    increment: f32,
-}
-
-#[derive(Deserialize, Default, Debug)]
-#[serde(rename_all = "camelCase")]
-struct OfficialBlackBoard {
-    key: String,
-    value: f64,
-    value_str: Option<String>,
+pub(super) struct OfficialSpData {
+    // 这个字段有可能是数字也有可能是字符串
+    pub(super) sp_type: Value,
+    pub(super) level_up_cost: Option<u32>,
+    pub(super) max_charge_time: u32,
+    pub(super) sp_cost: u32,
+    pub(super) init_sp: u32,
+    pub(super) increment: f32,
 }
 
 impl Into<UnitInfo> for OfficialData {
@@ -145,11 +142,23 @@ impl Into<SpData> for OfficialSpData {
         SpData {
             sp_cost: self.sp_cost as f32 ,
             sp: self.init_sp as f32,
-            charge_type: match self.sp_type.as_str() {
-                "INCREASE_WITH_TIME" => ChargeType::Time,
-                "INCREASE_WITH_ATTACK" => ChargeType::Attack,
-                "INCREASE_WITH_BE_HIT" => ChargeType::BeHit,
-                _ => ChargeType::None,
+            charge_type: match self.sp_type {
+                Value::Number(n) =>{
+                    if n.as_u64().unwrap()==8{
+                        ChargeType::None
+                    }else{
+                        ChargeType::Time
+                    }
+                } ,
+                Value::String(s) =>{
+                    match s.as_str(){
+                        "AUTO" => ChargeType::Time, 
+                        "MANUAL" => ChargeType::Attack,
+                        _ => ChargeType::default(),
+
+                    }
+                } ,
+                _ => ChargeType::default(),
             },
             overcharge: false,
         }

@@ -6,6 +6,7 @@ mod test;
 
 use super::load_json_file;
 use enemy_loader::{OfficialEnemy, OfficialEnemyValue};
+use serde::{Deserialize, Serialize};
 use serde_json::{from_value, Value};
 use std::{
     collections::HashMap,
@@ -22,6 +23,14 @@ pub(crate) struct Loader {
     gamedata_const: Value,
     skill_table: Value,
     enemy_database: HashMap<String, Vec<OfficialEnemyValue>>,
+}
+
+#[derive(Deserialize, Default, Debug)]
+#[serde(rename_all = "camelCase")]
+struct OfficialBlackBoard {
+    key: String,
+    value: f32,
+    value_str: Option<String>,
 }
 
 impl Loader {

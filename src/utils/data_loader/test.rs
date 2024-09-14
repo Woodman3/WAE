@@ -123,6 +123,43 @@ fn load_level_test() {
 }
 
 #[test]
+fn test_skill(){
+    let mut l: Loader = Loader::new("./ArknightsGameData").unwrap();
+    let mut list = HashMap::new();
+    let mut fail_skill = vec![];
+    let mut fail_o = vec![];
+    for (_, v) in l.character_table.as_object().unwrap() {
+        if let Ok(o) = from_value::<operator_loader::OfficialOperator>(v.clone()){
+            for sk in o.skills{
+                if let Ok(sv) = serde_path_to_error::deserialize::<Value,Vec<operator_loader::OfficialSkill>>(std::mem::take(&mut l.skill_table[sk.skill_id.clone()]["levels"])){
+                    for s in sv{
+                        for b in s.blackboard{
+                            let key = b.key;
+                            if list.contains_key(key.as_str()){
+                                *list.get_mut(key.as_str()).unwrap()+=1;
+                            }else{
+                                list.insert(key,1);
+                            }
+                        }
+                    }
+                }else{
+                    fail_skill.push(sk.skill_id);
+                }
+            }
+        }else{
+            fail_o.push(v["name"].as_str().unwrap().to_string());
+        }
+    }
+    let mut list:Vec<(String, i32)> = list.into_iter().collect();
+    list.sort_by(|a,b|b.1.cmp(&a.1));
+    println!("skill blackboard :{:?}",list);
+    println!("-------------------");
+    println!("fail skill :{:?}",fail_skill);
+    println!("-------------------");
+    println!("fail operator :{:?}",fail_o);
+}
+
+#[test]
 fn single_test() {
     let path = "./ArknightsGameData";
     let loader = Loader::new(path).unwrap();
