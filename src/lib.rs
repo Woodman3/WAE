@@ -1,40 +1,62 @@
-#![allow(non_snake_case)]
-#![allow(unused)]
 #![allow(dead_code)]
-use std::{cell::OnceCell, os::raw::c_char, ptr::{null_mut}};
+#![allow(unreachable_code)]
 use crate::calculator::Calculator;
-use std::ffi::{CString,CStr};
-use serde_json::Value;
-use timeline::action_to_event;
+use std::ffi::{CStr, CString};
+use std::{cell::OnceCell, os::raw::c_char, ptr::null_mut};
 
 //mod block;
 pub mod calculator;
+mod demo;
+pub mod event;
 pub mod frame;
 pub mod map;
-pub mod timeline;
+pub mod route;
+mod spawner;
 pub mod unit;
 pub mod utils;
-mod demo;
 
-static mut INSTANCE:OnceCell<Calculator> = OnceCell::new();
+static mut INSTANCE: OnceCell<Calculator> = OnceCell::new();
 
 /// init calculator and make first frame,only shoule be use once
 /// # args
-/// * `path` - the config directory 
+/// * `path` - the config directory
 #[no_mangle]
-pub unsafe extern "C" fn init(path:String)->u8{
-    if let Ok(c) = utils::config::Config::new(path){
-        if let Ok(ca) = calculator::Calculator::new(&c){
-            if let Ok(_)=INSTANCE.set(ca){
-                return 0
-            }
-            println!("instance set fail!");
-        }else{
-            println!("calculator new fail,please check config");
-        }
-    }else{
-        println!("can't load config file");
+pub unsafe extern "C" fn init(path: *const c_char) -> u8 {
+    if path.is_null() {
+        println!("pointer can't be null!");
+        return 1;
     }
+    let cstr = CStr::from_ptr(path);
+    if let Ok(path) = cstr.to_str() {
+        // if let Ok(c) = utils::config::Config::new(path){
+        //     if let Ok(ca) = calculator::Calculator::new(&c){
+        //         if let Ok(_)=INSTANCE.set(ca){
+        //             return 0
+        //         }
+        //         println!("instance set fail!");
+        //     }else{
+        //         println!("calculator new fail,please check config");
+        //     }
+        // }else{
+        //     println!("can't load config file");
+        // }
+        match utils::config::Config::new(path) {
+            Ok(c) => {
+                if let Ok(ca) = calculator::Calculator::new(&c) {
+                    if let Ok(_) = INSTANCE.set(ca) {
+                        return 0;
+                    }
+                    println!("instance set fail!");
+                } else {
+                    println!("calculator new fail,please check config");
+                }
+            }
+            Err(e) => {
+                println!("can't load config file,Error message:{:?}", e);
+            }
+        }
+    }
+    println!("can't convert cstring to ruststr");
     1
 }
 
@@ -43,13 +65,13 @@ pub unsafe extern "C" fn init(path:String)->u8{
 /// * `0` step gose well
 /// * `1` step gose wrong
 #[no_mangle]
-pub unsafe extern "C" fn step()->u8{
-    if let Some(c) = INSTANCE.get_mut(){
-        if c.step(){
-            return 0
+pub unsafe extern "C" fn step() -> u8 {
+    if let Some(c) = INSTANCE.get_mut() {
+        if c.step() {
+            return 0;
         }
         println!("can't step");
-    }else{
+    } else {
         println!("can't get instance");
     }
     1
@@ -59,17 +81,17 @@ pub unsafe extern "C" fn step()->u8{
 /// return value is a pointer of string,you should use `free_str` to spare space
 /// the string is a json
 #[no_mangle]
-pub unsafe extern "C" fn get_obs()->*mut c_char{
-    if let Some(ca) = INSTANCE.get(){
-        if let Some(json) = ca.get_obs(){
-            if let Ok(r)=CString::new(json.to_string()){
-                return r.into_raw()
+pub unsafe extern "C" fn get_obs() -> *mut c_char {
+    if let Some(ca) = INSTANCE.get() {
+        if let Some(json) = ca.get_obs() {
+            if let Ok(r) = CString::new(json.to_string()) {
+                return r.into_raw();
             }
             println!("can't convert json to CString");
-        }else{
+        } else {
             println!("can't get json");
         }
-    }else{
+    } else {
         println!("can't get instance");
     }
     null_mut()
@@ -79,17 +101,17 @@ pub unsafe extern "C" fn get_obs()->*mut c_char{
 /// return value is a pointer of string,you should use `free_str` to spare space
 /// the string is a json
 #[no_mangle]
-pub unsafe extern "C" fn get_acs()->*mut c_char{
-    if let Some(ca) = INSTANCE.get(){
-        if let Some(json) = ca.get_acs(){
-            if let Ok(r)=CString::new(json.to_string()){
-                return r.into_raw()
+pub unsafe extern "C" fn get_acs() -> *mut c_char {
+    if let Some(ca) = INSTANCE.get() {
+        if let Some(json) = ca.get_acs() {
+            if let Ok(r) = CString::new(json.to_string()) {
+                return r.into_raw();
             }
             println!("can't convert json to CString");
-        }else{
+        } else {
             println!("can't get json");
         }
-    }else{
+    } else {
         println!("can't get instance");
     }
     null_mut()
@@ -101,35 +123,56 @@ pub unsafe extern "C" fn get_acs()->*mut c_char{
 /// * `0` action add well
 /// * `1` action add wrong
 #[no_mangle]
-pub unsafe extern "C" fn action(args:*const c_char)->u8{
-    if args.is_null(){
+pub unsafe extern "C" fn action(args: *const c_char) -> u8 {
+    if args.is_null() {
         println!("pointer can't be null!");
-        return 1 
+        return 1;
     }
     let cstr = CStr::from_ptr(args);
-    if let Ok(js) = cstr.to_str(){
-        if let Ok(json) =serde_json::from_str::<Value>(js){ 
-            if let Ok(e) = action_to_event(&json){
-                if let Some(Ca) = INSTANCE.get_mut(){
-                    Ca.insert_event(e);
-                    return 0
-                } 
-                println!("can't get instance");
+    if let Ok(js) = cstr.to_str() {
+        if let Ok(e) = serde_json::from_str::<event::Event>(js) {
+            if let Some(ca) = INSTANCE.get_mut() {
+                // Ca.insert_event(e);
+                ca.event_buffer.extend(std::iter::once(e));
+                todo!("insert_event");
+                return 0;
             }
-            println!("can't convert json to action");
-        } 
-        println!("can't convert str to json");
+            println!("can't get instance");
+        }
+        println!("can't convert json to action");
     }
     println!("can't convert cstring to ruststr");
     1
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn free_str(str:*mut c_char)->u8{
-    if !str.is_null(){
+pub unsafe extern "C" fn free_str(str: *mut c_char) -> u8 {
+    if !str.is_null() {
         drop(CString::from_raw(str));
-        return 0
+        return 0;
     }
     println!("pointer can't be null!");
     1
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn free_instance() {
+    INSTANCE.take();
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn get_frame() -> *mut c_char {
+    if let Some(ca) = INSTANCE.get() {
+        if let Some(json) = ca.get_frame() {
+            if let Ok(r) = CString::new(json.to_string()) {
+                return r.into_raw();
+            }
+            println!("can't convert json to CString");
+        } else {
+            println!("can't get json");
+        }
+    } else {
+        println!("can't get instance");
+    }
+    null_mut()
 }

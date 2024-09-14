@@ -1,7 +1,7 @@
 {
   "Skadi": {
     "skill1": {
-      "charge_type":"Auto",
+      "charge_type":"Time",
       "trigger_type": "Manual",
       "schedule_type": "PreEmptive",
       "duration": 10.0,
@@ -37,8 +37,8 @@
       ]
     },
     "skill3": {
-      "charge_type":"Auto",
-      "trigger_type": "Auto",
+      "charge_type":"Time",
+      "trigger_type": "AUTO",
       "schedule_type": "PreEmptive",
       "duration": 10.0,
       "sp_cost": 30.0,

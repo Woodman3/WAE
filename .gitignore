@@ -3,5 +3,8 @@ target/
 Session.vim
 work_init.sh
 think/.obsidian
+example/ffi
 config.toml
-
+*.code-workspace
+frame.json
+image.png

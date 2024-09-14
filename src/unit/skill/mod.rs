@@ -1,77 +1,62 @@
 pub mod effect;
-pub mod skill_type;
-pub mod skill_schedule;
 mod skill_fn;
-use std::cell::RefCell;
-use std::collections::HashMap;
-use std::rc::{Weak};
-use log::warn;
-use serde::{Deserialize, Serialize};
-use crate::frame::OperatorRef;
-use crate::unit::enemy::Enemy;
-use crate::unit::skill::effect::Effect;
-use crate::utils::config::Config;
-use skill_type::*;
+pub mod skill_schedule;
+pub mod skill_type;
 use crate::unit::scope::Scope;
+use crate::unit::skill::effect::Effect;
+use serde::{Deserialize, Serialize};
+use skill_type::*;
 
-#[derive(Clone,Deserialize,Debug,Default,Serialize)]
+use super::enemy::EnemyShared;
+use super::operator::OperatorShared;
+
+#[derive(Clone, Deserialize, Debug, Default, Serialize)]
 #[serde(default)]
-pub struct Skill{
-    pub charge_type: ChargeType,
-    pub trigger_type:TriggerType,
-    pub schedule_type:ScheduleType,
-    pub duration:f64, ///skill time
-    pub last:f64,///if in skill ,it show time remain,or is 0
-    pub sp_cost:f64,
-    pub sp:f64,
-    overcharge:bool,
-    skill_entity:SkillEntity,
+pub(crate) struct Skill {
+    pub(crate) trigger_type: TriggerType,
+    pub(crate) schedule_type: ScheduleType,
+    pub(crate) sp_data: SpData,
+    ///skill time
+    pub(crate) duration: f32,
+    ///if in skill ,it show time remain,or is 0
+    pub(crate) last: f32,
+    pub(crate) skill_entity: SkillEntity,
 }
-#[derive(Deserialize,Debug,Default,Clone,Serialize)]
+
+#[derive(Clone, Deserialize, Debug, Default, Serialize)]
+#[serde(default)]
+pub(crate) struct SpData {
+    pub(crate) sp_cost: f32,
+    /// sp now
+    pub(crate) sp: f32,
+    pub(crate) overcharge: bool,
+    pub(crate) charge_type: ChargeType,
+}
+#[derive(Deserialize, Debug, Default, Clone, Serialize)]
 pub(crate) struct ToEnemySkill {
     #[serde(skip)]
-    pub(crate) target:Vec<Weak<RefCell<Enemy>>>,
-    pub(self) target_num:usize,
-    pub(crate) effect:Effect,
-    pub(self) attack_type:AttackType,
-    pub(self) search_scope:Option<Scope>,
+    pub(crate) target: Vec<EnemyShared>,
+    pub(crate) target_num: usize,
+    pub(crate) effect: Effect,
+    pub(crate) attack_type: AttackType,
+    pub(crate) search_scope: Option<Scope>,
 }
 
-
-pub(crate) struct NotDirectSkill{
+#[derive(Deserialize, Debug, Default, Clone, Serialize)]
+pub(crate) struct ToOperatorSkill {
+    #[serde(skip)]
+    pub(crate) target: Vec<OperatorShared>,
+    pub(crate) target_num: usize,
+    pub(crate) effect: Effect,
+    pub(crate) attack_type: AttackType,
+    pub(crate) search_scope: Option<Scope>,
 }
 
-#[derive(Default,Deserialize,Debug,Clone,Serialize)]
-#[serde(tag="type")]
-enum SkillEntity{
+#[derive(Default, Deserialize, Debug, Clone, Serialize)]
+#[serde(tag = "type")]
+pub(crate) enum SkillEntity {
     ToEnemySkill(ToEnemySkill),
+    ToOperatorSkill(ToOperatorSkill),
     #[default]
     None,
 }
-
-pub fn config_skill(c:&Config,os:&HashMap<String, OperatorRef>){
-    for (key,skill) in c.doctor["skill"].as_object().unwrap(){
-        if let Some(value) = c.skill.get(key).unwrap().get(skill.as_str().unwrap()){
-            if let Some(o) =os.get(key){
-                o.borrow_mut().skill_ready.push(serde_json::from_value(value.clone()).unwrap());
-            } else{
-                warn!("unknown operator name in skill config!")
-            }
-        } else{
-            warn!("unknown skill name in skill config!,skill name:{}",skill)
-        }
-    }
-}
-impl Skill{
-    pub fn ready(&self)->bool{
-        self.last!=0.0&&self.sp>=self.sp_cost
-    }
-    pub fn can_charge(&self)->bool{ self.sp<self.sp_cost||self.overcharge }
-    pub fn charge(&mut self,value:f64){
-        if self.can_charge(){
-            self.sp+=value
-        }
-    }
-
-}
-

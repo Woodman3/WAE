@@ -1,41 +1,46 @@
+use serde::{Deserialize, Serialize};
 use std::cell::RefCell;
 use std::rc::Rc;
 // use std::collections::HashMap;
 use serde_json::Value;
 // use serde_json::Value;
-use super::Event;
 use crate::calculator::Calculator;
 use crate::frame::Frame;
+use crate::route::CheckPoint;
+use crate::unit::skill::skill_schedule::SkillSchedule;
+use crate::unit::Unit;
 use crate::utils::error::ConfigParseError;
-type Result<T> = std::result::Result<T,Box<dyn std::error::Error>>;
-#[derive(Debug)]
-pub struct EnemyPlaceEvent {
-    enemy_key: String,
-    enemy_route: usize,
+type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
+#[derive(Debug, Deserialize, Serialize, Clone, Default)]
+pub(crate) struct EnemyPlaceEvent {
+    pub(crate) enemy_key: String,
+    pub(crate) enemy_route: usize,
 }
-impl Event for EnemyPlaceEvent {
-    fn happen(&self, f: &mut Frame, c: &Calculator) {
+impl EnemyPlaceEvent {
+    pub(super) fn happen(&self, f: &mut Frame, c: &Calculator) {
         let mut e = c
             .enemy_initial
             .get(self.enemy_key.as_str())
             .cloned()
             .unwrap();
-        e.route = Some(Rc::clone(&c.route[self.enemy_route]));
-        e.location = c.route[self.enemy_route][0];
-        e.next_point = c.route[self.enemy_route][1];
-        e.id=f.next_id;
-        f.next_id+=1;
-        f.enemy_set.push(Rc::new(RefCell::new(e)));
+        e.route = c.route[self.enemy_route].clone();
+        e.location = e.route.start;
+        e.id = f.next_id;
+        e.init();
+        let e = Rc::new(RefCell::new(e));
+        f.next_id += 1;
+        f.enemy_set.push(e);
     }
-}
-
-impl EnemyPlaceEvent{
-    pub fn new(v:&Value)->Result<EnemyPlaceEvent>{
-        let enemy_key=String::from(v[2].as_str().ok_or(ConfigParseError("Enemy key can't translate to str in timeline".into()))?);
-        let enemy_route=v[3].as_u64().ok_or(ConfigParseError("Enemy route can't translate to u64 in timeline".into()))? as usize;
-        Ok(EnemyPlaceEvent{
+    pub(super) fn new(v: &Value) -> Result<EnemyPlaceEvent> {
+        let enemy_key = String::from(v[2].as_str().ok_or(ConfigParseError(
+            "Enemy key can't translate to str in timeline".into(),
+        ))?);
+        let enemy_route = v[3].as_u64().ok_or(ConfigParseError(
+            "Enemy route can't translate to u64 in timeline".into(),
+        ))? as usize;
+        Ok(EnemyPlaceEvent {
             enemy_key,
-            enemy_route
+            enemy_route,
         })
     }
 }

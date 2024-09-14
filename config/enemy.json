@@ -3,7 +3,7 @@
     "name": "Dog",
     "move_speed":1,
     "info":{
-      "damage_type":"Magic",
+      "damage_type":"MAGICAL",
       "hp":2000,
       "aspd":1,
       "atk":100,
@@ -11,14 +11,14 @@
       "magic_resist":0.1,
       "attack_time":0.1,
       "block_num":1,
-      "attack_type": "Melee"
+      "attack_type": "MELEE"
     }
   },
   "Slug":{
     "name": "Slug",
     "move_speed":0.5,
     "info":{
-      "damage_type":"Magic",
+      "damage_type":"MAGICAL",
       "hp":500,
       "aspd":1,
       "atk":100,
@@ -26,7 +26,7 @@
       "magic_resist":0.1,
       "attack_time":0.3,
       "block_num":1,
-      "attack_type": "Melee"
+      "attack_type": "MELEE"
     }
   }
 }

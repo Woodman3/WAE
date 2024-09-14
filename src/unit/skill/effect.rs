@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
-#[derive(Clone,Deserialize,Debug,PartialEq,Eq,PartialOrd,Ord,Serialize)]
-pub enum ChangeType{
+#[derive(Clone, Deserialize, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize)]
+pub(crate) enum ChangeType {
     ///directly add
     DA,
     ///directly mul
@@ -10,8 +10,8 @@ pub enum ChangeType{
     ///lastly mul
     LM,
 }
-#[derive(Clone,Deserialize,Debug,Serialize)]
-pub enum ChangeClass{
+#[derive(Clone, Deserialize, Debug, Serialize)]
+pub(crate) enum ChangeClass {
     ASPD,
     ATK,
     DEF,
@@ -19,14 +19,14 @@ pub enum ChangeClass{
     Hp,
 }
 
-#[derive(Deserialize,Debug,Clone,Serialize)]
-pub(crate) struct Change{
-    pub(super) change_type:ChangeType,
-    pub(super) change_class:ChangeClass,
+#[derive(Deserialize, Debug, Clone, Serialize)]
+pub(crate) struct Change {
+    pub(super) change_type: ChangeType,
+    pub(super) change_class: ChangeClass,
 }
 
-#[derive(Default,Deserialize,Debug,Clone,Serialize)]
-pub(crate) enum TargetType{
+#[derive(Default, Deserialize, Debug, Clone, Serialize)]
+pub(crate) enum TargetType {
     Operator,
     Enemy,
     #[default]
@@ -34,15 +34,15 @@ pub(crate) enum TargetType{
     Friend,
 }
 
-#[derive(Clone,Deserialize,Debug,Serialize)]
-pub struct Buff{
-    pub change_type:ChangeType,
-    pub change_class:ChangeClass,
-    pub value:f64,
+#[derive(Clone, Deserialize, Debug, Serialize)]
+pub(crate) struct Buff {
+    pub(crate) change_type: ChangeType,
+    pub(crate) change_class: ChangeClass,
+    pub(crate) value: f64,
 }
-#[derive(Clone,Deserialize,Debug,Default,Serialize)]
-#[serde(tag="type")]
-pub(crate) enum Effect{
+#[derive(Clone, Deserialize, Debug, Default, Serialize)]
+#[serde(tag = "type")]
+pub(crate) enum Effect {
     Buff(Buff),
     FixedDamage(FixedDamage),
     Damage(Damage),
@@ -50,22 +50,27 @@ pub(crate) enum Effect{
     None,
 }
 
-#[derive(Debug,Clone,Deserialize,Serialize)]
-pub struct FixedDamage {
-    pub value:f64,
-    pub damage_type:DamageType,
+// i don't know why i make this struct
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub(crate) struct FixedDamage {
+    pub(crate) value: i64,
+    pub(crate) damage_type: DamageType,
 }
 
-#[derive(Clone,Deserialize,Debug,Serialize)]
-pub(crate) struct Damage{
-    #[serde(skip)]//from operator ,don't need to set
-    pub(super) value:f64,
-    pub(super) change:Option<Change>,
+#[derive(Clone, Deserialize, Debug, Serialize)]
+pub(crate) struct Damage {
+    // #[serde(skip)] //from operator ,don't need to set
+    pub(crate) value: i64,
+    pub(crate) change: Option<Change>,
+    pub(crate) damage_type: DamageType,
 }
-#[derive(Debug,Clone,Copy,Deserialize,Default,Serialize)]
-pub enum DamageType {
+#[derive(Debug, Clone, Copy, Deserialize, Default, Serialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub(crate) enum DamageType {
     #[default]
+    None,
     Physical,
-    Magic,
+    Magical,
+    Heal,
     Real,
 }

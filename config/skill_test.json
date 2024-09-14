@@ -1,8 +1,8 @@
 {
   "Skadi": {
     "skill1": {
-      "charge_type":"Auto",
-      "trigger_type": "Manual",
+      "charge_type":"Time",
+      "trigger_type": "MANUAL",
       "schedule_type": "PreEmptive",
       "duration": 10.0,
       "sp_cost": 30.0,
@@ -17,7 +17,7 @@
             "change_class":"ATK"
           }
         },
-        "attack_type": "Melee",
+        "attack_type": "MELEE",
         "target_num": 1
       }
     }
