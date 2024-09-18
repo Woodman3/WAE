@@ -2,20 +2,18 @@ pub(crate) mod timer;
 
 use crate::calculator::{Calculator, PERIOD};
 use crate::event::Event;
-use crate::map::{self, Map};
+use crate::map::Map;
 use crate::unit::bullet::Bullet;
+use crate::unit::code;
 use crate::unit::enemy::Enemy;
 use crate::unit::operator::Operator;
-use crate::unit::skill::skill_schedule::SkillSchedule;
-use crate::unit::{code, skill};
-use log::info;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use timer::Timer;
 use std::cell::RefCell;
 use std::collections::HashMap;
-use std::fmt::{self, write};
+use std::fmt::{self};
 use std::rc::Rc;
+use timer::Timer;
 
 pub(super) type OperatorRef = Rc<RefCell<Operator>>;
 pub(super) type EnemyRef = Rc<RefCell<Enemy>>;
@@ -32,7 +30,7 @@ pub(super) struct Frame {
     pub(super) next_id: usize,
     pub(super) kill_count: u32,
     pub(super) cost: f32,
-    pub(super) life_point:i8,
+    pub(super) life_point: i8,
     pub(super) events: Vec<Event>,
 }
 
@@ -167,17 +165,30 @@ impl<'de> Deserialize<'de> for Frame {
         D: serde::Deserializer<'de>,
     {
         let v = serde_json::Value::deserialize(deserializer)?;
-        let map: Map = serde_json::from_value( v["map"].clone()).map_err(serde::de::Error::custom)?;
-        let timer: Timer = serde_json::from_value(v["timer"].clone()).map_err(serde::de::Error::custom)?;
-        let enemy_set: Vec<EnemyRef> = serde_json::from_value(v["enemy_set"].clone()).map_err(serde::de::Error::custom)?;
-        let operator_deploy: HashMap<String, OperatorRef> = serde_json::from_value(v["operator_deploy"].clone()).map_err(serde::de::Error::custom)?;
-        let operator_undeploy: HashMap<String, OperatorRef> = serde_json::from_value(v["operator_undeploy"].clone()).map_err(serde::de::Error::custom)?;
-        let bullet_set: Vec<Bullet> = serde_json::from_value(v["bullet_set"].clone()).map_err(serde::de::Error::custom)?;
-        let next_id: usize = serde_json::from_value(v["next_id"].clone()).map_err(serde::de::Error::custom)?;
-        let kill_count: u32 = serde_json::from_value(v["kill_count"].clone()).map_err(serde::de::Error::custom)?;
-        let cost: f32 = serde_json::from_value(v["cost"].clone()).map_err(serde::de::Error::custom)?;
-        let life_point: i8 = serde_json::from_value(v["life_point"].clone()).map_err(serde::de::Error::custom)?;
-        let events: Vec<Event> = serde_json::from_value(v["events"].clone()).map_err(serde::de::Error::custom)?;
+        let map: Map =
+            serde_json::from_value(v["map"].clone()).map_err(serde::de::Error::custom)?;
+        let timer: Timer =
+            serde_json::from_value(v["timer"].clone()).map_err(serde::de::Error::custom)?;
+        let enemy_set: Vec<EnemyRef> =
+            serde_json::from_value(v["enemy_set"].clone()).map_err(serde::de::Error::custom)?;
+        let operator_deploy: HashMap<String, OperatorRef> =
+            serde_json::from_value(v["operator_deploy"].clone())
+                .map_err(serde::de::Error::custom)?;
+        let operator_undeploy: HashMap<String, OperatorRef> =
+            serde_json::from_value(v["operator_undeploy"].clone())
+                .map_err(serde::de::Error::custom)?;
+        let bullet_set: Vec<Bullet> =
+            serde_json::from_value(v["bullet_set"].clone()).map_err(serde::de::Error::custom)?;
+        let next_id: usize =
+            serde_json::from_value(v["next_id"].clone()).map_err(serde::de::Error::custom)?;
+        let kill_count: u32 =
+            serde_json::from_value(v["kill_count"].clone()).map_err(serde::de::Error::custom)?;
+        let cost: f32 =
+            serde_json::from_value(v["cost"].clone()).map_err(serde::de::Error::custom)?;
+        let life_point: i8 =
+            serde_json::from_value(v["life_point"].clone()).map_err(serde::de::Error::custom)?;
+        let events: Vec<Event> =
+            serde_json::from_value(v["events"].clone()).map_err(serde::de::Error::custom)?;
         for i in 0..enemy_set.len() {
             let mut e = enemy_set[i].borrow_mut();
             let name = v["enemy_set"][i]["be_block"].as_str().unwrap();

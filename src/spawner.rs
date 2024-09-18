@@ -1,5 +1,4 @@
 use crate::{
-    calculator::PERIOD,
     event::{hostile::EnemyPlaceEvent, Event},
     frame::Frame,
 };
@@ -38,7 +37,7 @@ impl Spawner {
             ret.extend(w.step(f));
             if !w.finished() {
                 self.wave.push(w);
-            }else{
+            } else {
                 f.timer.wave = 0.0;
             }
         }
@@ -57,7 +56,7 @@ impl Wave {
             ret.extend(sw.step(f));
             if !sw.finished() {
                 self.wave.push(sw);
-            }else{
+            } else {
                 // todo: 可能有更复杂的情况
                 f.timer.subwave = 0.0;
             }
@@ -91,8 +90,8 @@ impl SubSubWave {
         let ret = Vec::new();
         let cur_time = f.timer.subwave;
         if cur_time >= self.pre_delay + self.cur_count as f32 * self.interval {
-            self.cur_count+=1;
-            return self.spawn(f)    
+            self.cur_count += 1;
+            return self.spawn(f);
         }
         ret
     }

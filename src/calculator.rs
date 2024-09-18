@@ -15,7 +15,7 @@ use serde_json::Value;
 use std::collections::HashMap;
 use std::rc::Rc;
 
-pub(crate) static PERIOD:f32 = 0.0166;
+pub(crate) static PERIOD: f32 = 0.0166;
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 /// calculate
 #[derive(Debug, Default)]
@@ -51,7 +51,7 @@ impl Calculator {
     }
     fn process_frame(&mut self, f: &mut Frame) {
         let mut ev = std::mem::take(&mut self.event_buffer);
-        if let Some(copilot) = &mut self.copilot{
+        if let Some(copilot) = &mut self.copilot {
             if let Some(action) = copilot.query(f) {
                 ev.push(action);
             }
@@ -106,7 +106,7 @@ impl Calculator {
         }
     }
     pub(super) fn has_end(&self) -> bool {
-        self.star != -1 || self.time_remain == 0 
+        self.star != -1 || self.time_remain == 0
     }
 
     pub(super) fn get_obs(&self) -> Option<Value> {

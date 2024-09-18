@@ -5,7 +5,7 @@ use crate::frame::Frame;
 use crate::map::Map;
 use crate::unit::bullet::Bullet;
 use crate::unit::skill::{Skill, SkillEntity, ToEnemySkill};
-use crate::unit::{Unit, UnitInfo};
+use crate::unit::Unit;
 use crate::utils::math::Point;
 use std::fmt::{Display, Formatter};
 use std::rc::Rc;

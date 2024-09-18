@@ -1,19 +1,15 @@
-use crate::calculator::PERIOD;
 use crate::event::Event;
-use crate::frame::{Frame, OperatorRef};
+use crate::frame::Frame;
 use crate::route::Route;
 use crate::unit::bullet::Bullet;
 use crate::unit::operator::OperatorShared;
-use crate::unit::skill::effect::FixedDamage;
 use crate::utils::math::Point;
-use log::trace;
 use serde::ser::Serializer;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::cell::RefCell;
-use std::cmp::Ordering;
 use std::fmt;
-use std::rc::{Rc, Weak};
+use std::rc::Weak;
 
 use super::skill::effect::{self, Damage, Effect};
 use super::skill::skill_schedule::SkillSchedule;

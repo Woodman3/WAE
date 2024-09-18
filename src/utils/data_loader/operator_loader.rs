@@ -1,5 +1,3 @@
-use std::default;
-
 use super::Loader;
 use super::OfficialBlackBoard;
 use super::Result;
@@ -12,7 +10,6 @@ use crate::unit::skill::{Skill, SpData};
 use crate::unit::UnitInfo;
 use crate::utils::math::Grid;
 use crate::utils::math::GridRect;
-use serde::de::DeserializeOwned;
 use serde::Deserialize;
 use serde_json::{from_value, Value};
 
@@ -140,24 +137,21 @@ impl Into<Skill> for OfficialSkill {
 impl Into<SpData> for OfficialSpData {
     fn into(self) -> SpData {
         SpData {
-            sp_cost: self.sp_cost as f32 ,
+            sp_cost: self.sp_cost as f32,
             sp: self.init_sp as f32,
             charge_type: match self.sp_type {
-                Value::Number(n) =>{
-                    if n.as_u64().unwrap()==8{
+                Value::Number(n) => {
+                    if n.as_u64().unwrap() == 8 {
                         ChargeType::None
-                    }else{
+                    } else {
                         ChargeType::Time
                     }
-                } ,
-                Value::String(s) =>{
-                    match s.as_str(){
-                        "AUTO" => ChargeType::Time, 
-                        "MANUAL" => ChargeType::Attack,
-                        _ => ChargeType::default(),
-
-                    }
-                } ,
+                }
+                Value::String(s) => match s.as_str() {
+                    "AUTO" => ChargeType::Time,
+                    "MANUAL" => ChargeType::Attack,
+                    _ => ChargeType::default(),
+                },
                 _ => ChargeType::default(),
             },
             overcharge: false,

@@ -1,11 +1,6 @@
-use crate::calculator::PERIOD;
 use crate::frame::Frame;
-use crate::unit::bullet::Bullet;
 use crate::unit::operator::Operator;
-use crate::unit::skill::effect::FixedDamage;
-use crate::unit::Unit;
-use crate::utils::math::Point;
-use std::rc::{Rc, Weak};
+use std::rc::Rc;
 
 impl Operator {
     // pub(super) fn attack(&mut self, f: &mut Frame) {

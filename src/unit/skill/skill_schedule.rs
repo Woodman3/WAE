@@ -3,9 +3,7 @@ use serde::{Deserialize, Serialize};
 use crate::calculator::PERIOD;
 use crate::frame::Frame;
 use crate::unit::skill::Skill;
-use crate::unit::Unit;
 use std::fmt::{self, Display, Formatter};
-use std::rc::Rc;
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[serde(default)]

@@ -7,8 +7,7 @@ pub mod skill;
 
 use scope::Scope;
 use serde::{Deserialize, Serialize};
-use std::cell::{Ref, RefCell};
-use std::default;
+use std::cell::RefCell;
 use std::fmt::Debug;
 use std::rc::{Rc, Weak};
 
@@ -19,7 +18,7 @@ use crate::unit::skill::skill_type::AttackType;
 use crate::utils::math::Point;
 use enemy::Enemy;
 use operator::Operator;
-use skill::effect::{Damage, Effect, FixedDamage};
+use skill::effect::{Damage, Effect};
 
 #[derive(Debug, Clone, Default, Deserialize, Serialize)]
 pub struct UnitInfo {

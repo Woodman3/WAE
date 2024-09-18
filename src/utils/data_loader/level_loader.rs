@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use std::i64;
 use std::path::Path;
 use std::path::PathBuf;
-use std::rc::{Rc, Weak};
+use std::rc::Weak;
 
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -289,7 +289,7 @@ impl Into<Wave> for OfficialWave {
         }
         wave.reverse();
         Wave {
-            pre_delay: self.pre_delay ,
+            pre_delay: self.pre_delay,
             wave,
         }
     }
@@ -367,7 +367,7 @@ impl Loader {
         let f = Frame {
             map,
             cost: level.options.initial_cost as f32,
-            life_point:level.options.max_life_point as i8,
+            life_point: level.options.max_life_point as i8,
             ..Default::default()
         };
         let c = Calculator {

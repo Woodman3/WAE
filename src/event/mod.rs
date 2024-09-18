@@ -1,15 +1,13 @@
 use crate::calculator::Calculator;
-use crate::event::doctor::{OperatorDeployEvent, OperatorRetreatEvent, OperatorSkillEvent};
+use crate::event::doctor::{OperatorDeployEvent, OperatorSkillEvent};
 use crate::event::hostile::EnemyPlaceEvent;
 use crate::frame::{Frame, OperatorRef};
 use crate::unit::operator::OperatorShared;
-use crate::utils::config::Config;
 use crate::utils::error::ConfigParseError;
 use doctor::{UnitRetreatEvent, UnitSkillEvent};
 use log::info;
 use serde::{Deserialize, Serialize};
 use serde_json::{from_value, Value};
-use std::collections::VecDeque;
 use std::fmt::Debug;
 use std::rc::Rc;
 
@@ -58,9 +56,9 @@ impl Event {
             }
             Event::EnemyEnterEvent(id) => {
                 f.enemy_set.retain(|e| e.borrow().id != *id);
-                f.life_point-=1;
-                if(f.life_point<=0){
-                    c.star=0;
+                f.life_point -= 1;
+                if f.life_point <= 0 {
+                    c.star = 0;
                 }
                 info!("an enemy enter end");
             }

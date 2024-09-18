@@ -1,4 +1,4 @@
-#![allow(dead_code)]
+#![allow(dead_code, unused_variables)]
 #![allow(unreachable_code)]
 use crate::calculator::Calculator;
 use std::ffi::{CStr, CString};

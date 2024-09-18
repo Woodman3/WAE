@@ -5,8 +5,6 @@ use crate::utils::math::{distance_from_segment_to_point, to_target, Point};
 
 use std::fmt::{Display, Formatter};
 
-use crate::unit::skill::effect::{DamageType, FixedDamage};
-
 use super::skill::effect::Effect;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

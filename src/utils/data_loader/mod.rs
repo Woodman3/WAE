@@ -6,7 +6,7 @@ mod test;
 
 use super::load_json_file;
 use enemy_loader::{OfficialEnemy, OfficialEnemyValue};
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use serde_json::{from_value, Value};
 use std::{
     collections::HashMap,

@@ -184,8 +184,9 @@ impl CopilotAction {
         match self {
             CopilotAction::Deploy(d) => {
                 if let Some(o) = f.operator_undeploy.get(&d.name) {
-                    o.borrow().stage.cost as f32 <= f.cost && d.condition.as_ref().map_or(true, |d| d.check(f))
-                }else {
+                    o.borrow().stage.cost as f32 <= f.cost
+                        && d.condition.as_ref().map_or(true, |d| d.check(f))
+                } else {
                     false
                 }
             }
@@ -221,7 +222,7 @@ impl Copilot {
     ) -> Result<Calculator> {
         let json = load_json_file(copilot_path)?;
         let mut copilot_data: CopilotData = serde_json::from_value(json)?;
-        copilot_data.actions.reverse(); 
+        copilot_data.actions.reverse();
         let loader = Loader::new(game_data_path)?;
         let mut calculator = loader.load_level_by_name(copilot_data.stage_name.clone())?;
         for o in copilot_data.operators.iter() {
@@ -275,13 +276,13 @@ impl Copilot {
         Ok(calculator)
     }
     pub(crate) fn query(&mut self, f: &Frame) -> Option<Event> {
-        if let Some(a) = self.copilot_data.actions.pop(){
+        if let Some(a) = self.copilot_data.actions.pop() {
             if a.check(f) {
                 if let Ok(e) = a.clone().try_into() {
-                    return Some(e)
+                    return Some(e);
                 }
-            }else {
-                self.copilot_data.actions.push(a); 
+            } else {
+                self.copilot_data.actions.push(a);
             }
         }
         // for a in self.copilot_data.actions.iter() {
