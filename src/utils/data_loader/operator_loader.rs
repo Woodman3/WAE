@@ -1,5 +1,5 @@
 use super::Loader;
-use super::OfficialBlackBoard;
+use super::skill_loader::OfficialBlackBoard;
 use super::Result;
 use crate::unit::operator::Operator;
 use crate::unit::scope::Scope;
@@ -210,7 +210,7 @@ impl Loader {
         if level >= 1 && level <= max_level && skill_level >= 1 && skill_level <= max_skill_level {
             let mut r = from_value::<OfficialRange>(self.range_table[op.range_id.clone()].clone())?;
             let at = from_value::<AttackType>(Value::String(oo.position.clone()))?;
-            let _skill = if skill_index == 0 {
+            let skill = if skill_index == 0 {
                 Skill::default()
             } else {
                 let sd = oo.skills.get(skill_index - 1).ok_or(format!(
@@ -233,7 +233,7 @@ impl Loader {
             o.info = ui.clone();
             o.stage = ui;
             o.name = name;
-            // o.skills.skill_block.push(skill);
+            o.skills.skill_block.push(skill);
             return Ok(o);
         } else {
             return Err("Level or skill level out of range,max_level is {max_level},max_skill_level is {max_skill_level}".into());

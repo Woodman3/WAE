@@ -1,6 +1,7 @@
 pub(crate) mod enemy_loader;
 pub(crate) mod level_loader;
 pub(crate) mod operator_loader;
+pub(crate) mod skill_loader;
 #[cfg(test)]
 mod test;
 
@@ -25,13 +26,6 @@ pub(crate) struct Loader {
     enemy_database: HashMap<String, Vec<OfficialEnemyValue>>,
 }
 
-#[derive(Deserialize, Default, Debug)]
-#[serde(rename_all = "camelCase")]
-struct OfficialBlackBoard {
-    key: String,
-    value: f32,
-    value_str: Option<String>,
-}
 
 impl Loader {
     pub(crate) fn new<P: AsRef<Path>>(path: P) -> Result<Loader> {
