@@ -1,5 +1,7 @@
 use crate::frame::Frame;
 use crate::unit::operator::Operator;
+use crate::unit::skill::skill_schedule::SkillMessage;
+use crate::unit::skill::skill_type::SkillExtra;
 use std::rc::Rc;
 
 impl Operator {
@@ -53,6 +55,9 @@ impl Operator {
         let sv = self.skills.step(f);
         for s in sv.iter() {
             s.shoot(f, self.location.into());
+            if matches!(s.extra,Some(SkillExtra::DefaultAttack) ) {
+                self.skills.message_buffer.push(SkillMessage::Attack);
+            }
         }
         self.skills.skill_block.extend(sv);
     }

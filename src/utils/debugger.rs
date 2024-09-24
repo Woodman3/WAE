@@ -37,9 +37,17 @@ impl log::Log for DebugLogger {
 }
 
 impl Debugger {
-    // pub(crate) fn new(_cc: &eframe::CreationContext<'_>, c: Calculator) -> Self {
-    //     Self { c, run: false }
-    // }
+    pub(crate) fn new(cc: &eframe::CreationContext<'_>,c: Calculator, receiver: Receiver<String>) -> Self {
+        Self::setup_custom_fonts(&cc.egui_ctx);
+        Self {
+            c,
+            run: false,
+            paint: false,
+            log_receiver: Arc::new(Mutex::new(receiver)),
+            log_messages: Arc::new(Mutex::new(Vec::new())),
+        }
+    }
+
     fn paint_info(&self, f: &Frame, ui: &mut Ui) {
         // let text=RichText("a text".into());
         let mut info = egui::text::LayoutJob::default();
@@ -83,6 +91,35 @@ impl Debugger {
             egui::ColorImage::from_rgba_unmultiplied([width as usize, height as usize], &img);
         let texture = ctx.load_texture("frame", image_data, egui::TextureOptions::LINEAR);
         ui.image((texture.id(), texture.size_vec2()));
+    }
+
+    fn setup_custom_fonts(ctx: &egui::Context) {
+        // Start with the default fonts (we will be adding to them rather than replacing them).
+        let mut fonts = egui::FontDefinitions::default();
+
+        // Install my own font (maybe supporting non-latin characters).
+        // .ttf and .otf files supported.
+        fonts.font_data.insert(
+            "MiSan".to_owned(),
+            egui::FontData::from_static(include_bytes!("../../assets/MiSans-Regular.otf")),
+        );
+
+        // Put my font first (highest priority) for proportional text:
+        fonts
+            .families
+            .entry(egui::FontFamily::Proportional)
+            .or_default()
+            .insert(0, "MiSan".to_owned());
+
+        // Put my font as last fallback for monospace:
+        fonts
+            .families
+            .entry(egui::FontFamily::Monospace)
+            .or_default()
+            .push("MiSan".to_owned());
+
+        // Tell egui to use these fonts:
+        ctx.set_fonts(fonts);
     }
 }
 impl eframe::App for Debugger {

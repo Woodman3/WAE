@@ -1,3 +1,5 @@
+use std::default;
+
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Deserialize, Debug, Default, PartialEq, Serialize)]
@@ -39,4 +41,10 @@ pub(super) enum SkillStage {
     Standby,
     AnimationBefore(f64),
     AfterAttack(f64),
+}
+
+#[derive(Clone, Deserialize, Debug, Default, Serialize)]
+pub(crate) enum SkillExtra{
+    #[default]
+    DefaultAttack,
 }
