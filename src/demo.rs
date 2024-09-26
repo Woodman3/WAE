@@ -1,75 +1,91 @@
-use serde::ser::{SerializeStruct, Serializer};
-use serde::{Deserialize, Serialize};
-use std::{
-    cell::RefCell,
-    rc::{Rc, Weak},
-};
+use std::{any::Any, collections::HashMap};
+use regex::Regex;
+use serde::de;
 
-#[derive(Deserialize, Debug, Default)]
-struct A {
-    id: u32,
-    #[serde(skip)]
-    pub b: Weak<RefCell<B>>,
-}
-#[derive(Deserialize, Debug, Default)]
-struct B {
-    id: u32,
-    #[serde(skip)]
-    pub a: Weak<RefCell<A>>,
-}
-#[derive(Deserialize, Debug, Default)]
-struct C {
-    a: Rc<RefCell<A>>,
-    b: Rc<RefCell<B>>,
+#[derive(Debug)]
+struct Frame{
+    a:Vec<A>, 
+    b:HashMap<String,B>
 }
 
-impl Serialize for A {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        let mut state = serializer.serialize_struct("A", 2)?;
-        state.serialize_field("id", &self.id)?;
-        let id = self.b.upgrade().unwrap().borrow().id;
-        state.serialize_field("b", &id)?;
-        state.end()
+#[derive(Debug)]
+struct A{
+    val:i32
+}
+
+#[derive(Debug)]
+struct B{
+    val:i32
+}
+
+#[derive(Debug)]
+enum Pointer<'a>{
+    Frame(&'a Frame),
+    A(&'a A),
+    B(&'a B),
+    Val(&'a i32)
+}
+
+#[test] 
+fn fun(){
+    let mut f = Frame{
+        a:vec![A{val:1},A{val:2}],
+        b:HashMap::new()
+    };    
+    f.b.insert("0".to_string(),B{val:3});
+    let input = "p a[0].val";
+    let re = Regex::new(r"^\s*(\w+)\s*(.*)").unwrap();
+    if let Some(caps) = re.captures(input){
+        let command = caps.get(1).unwrap().as_str();
+        let object = caps.get(2).unwrap().as_str();
+        match command{
+            "p" => {
+                let mut obj = Pointer::Frame(&f);
+                for field in object.split('.'){
+                    if field.ends_with("]") {
+                        let re = Regex::new(r"(\w+)\[(\d+)\]").unwrap();
+                        if let Some(caps) = re.captures(field){
+                            let field = caps.get(1).unwrap().as_str();
+                            let mut index = caps.get(2).unwrap().as_str();
+                            match field{
+                                "a" => {
+                                    let index: usize = index.parse().unwrap();
+                                    obj = match obj{
+                                        Pointer::Frame(obj) => Pointer::A(&obj.a[index]),
+                                        _ => {panic!("Invalid field: {}",field);}
+                                    };
+                                },
+                                "b" => {
+                                    obj = match obj{
+                                        Pointer::Frame(obj) => Pointer::B(&obj.b[index]),
+                                        _ => {panic!("Invalid field: {}",field);}
+                                    };
+                                },
+                                _ => {
+                                    panic!("Invalid field: {}",field);
+                                }
+                            }
+                        }
+                    }else{
+                        match field{
+                            "val" =>{
+                                obj = match obj{
+                                    Pointer::A(obj) => Pointer::Val(&obj.val),
+                                    Pointer::B(obj) => Pointer::Val(&obj.val),
+                                    _ => {panic!("Invalid field: {}",field);}
+                                }
+                            }
+                            _ => {
+                                panic!("Invalid field: {}",field);
+                            }
+                        }
+                    }
+                }
+                println!("{:?}",obj);
+            },
+            _ => {
+                panic!("Invalid command: {}",command);
+            }
+        }
     }
-}
-impl Serialize for B {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        let mut state = serializer.serialize_struct("B", 2)?;
-        state.serialize_field("id", &self.id)?;
-        let id = self.a.upgrade().unwrap().borrow().id;
-        state.serialize_field("a", &id)?;
-        state.end()
-    }
-}
-// impl Serialize for C{
-//     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-//     where
-//         S: Serializer {
-//             let mut state = serializer.serialize_struct("C", 2)?;
-//             state.serialize_field("a", self.a.borrow().deref())?;
-//             state.serialize_field("b", self.b.borrow().deref())?;
-//             state.end()
-//     }
-// }
-// impl Deserialize for C{
-//     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-//     where
-//         D: serde::Deserializer<'de> {
-//             #[derive(Deserialize)]
-//             enum Field {A,B};
-
-//     }
-// }
-
-#[test]
-fn test() {
-    let v = serde_json::Value::Null;
-    let s = serde_json::to_string(&v).unwrap();
-    println!("{s}")
 }

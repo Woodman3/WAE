@@ -10,7 +10,7 @@ use crate::utils::math::Point;
 use std::fmt::{Display, Formatter};
 use std::rc::Rc;
 
-use super::ToOperatorSkill;
+use super::{SpData, ToOperatorSkill};
 
 impl ToEnemySkill {
     pub(crate) fn search(&mut self, m: &Map) -> bool {
@@ -140,5 +140,17 @@ impl Skill {
             }
             SkillEntity::None => {}
         }
+    }
+}
+
+// impl Display for Skill{
+//     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+//         writeln!(f,format!(""))
+//     }
+// }
+
+impl Display for SpData{
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        writeln!(f,"sp_cost:{}",self.sp_cost)
     }
 }

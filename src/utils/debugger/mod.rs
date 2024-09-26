@@ -1,11 +1,16 @@
+pub(crate) mod debug_config;
+
+use super::load_json_file;
 use super::render::Render;
 use crate::calculator::Calculator;
 use crate::frame::Frame;
+use debug_config::DebugConfig;
 use eframe::egui;
 use eframe::egui::{Context, TextFormat, Ui};
 use egui_extras::install_image_loaders;
 
 use log::{Level, Metadata, Record};
+use std::path::Path;
 use std::sync::mpsc::{Receiver, Sender};
 use std::sync::{Arc, Mutex};
 pub(crate) struct Debugger {
@@ -14,6 +19,7 @@ pub(crate) struct Debugger {
     pub(crate) paint: bool,
     pub(crate) log_receiver: Arc<Mutex<Receiver<String>>>,
     pub(crate) log_messages: Arc<Mutex<Vec<String>>>,
+    config: DebugConfig,
 }
 
 pub(crate) struct DebugLogger {
@@ -37,38 +43,45 @@ impl log::Log for DebugLogger {
 }
 
 impl Debugger {
-    pub(crate) fn new(cc: &eframe::CreationContext<'_>,c: Calculator, receiver: Receiver<String>) -> Self {
+    pub(crate) fn new(cc: &eframe::CreationContext<'_>,c: Calculator, receiver: Receiver<String>,config_path:&Path) -> Self {
         Self::setup_custom_fonts(&cc.egui_ctx);
+        let config:DebugConfig = load_json_file(config_path).unwrap_or_default(); 
         Self {
             c,
             run: false,
             paint: false,
             log_receiver: Arc::new(Mutex::new(receiver)),
             log_messages: Arc::new(Mutex::new(Vec::new())),
+            config
         }
     }
 
-    fn paint_info(&self, f: &Frame, ui: &mut Ui) {
-        // let text=RichText("a text".into());
-        let mut info = egui::text::LayoutJob::default();
-        let text_format = TextFormat::default();
-        let text = format!("{}\n", f);
-        info.append(text.as_str(), 0.0, text_format.clone());
-        // for e in f.enemy_set.iter() {
-        //     let e = e.borrow();
-        //     let text = format!("{e}\n");
-        //     info.append(text.as_str(), 0.0, text_format.clone());
-        // }
-        // for (name, o) in f.operator_deploy.iter() {
-        //     let o = o.borrow();
-        //     let text = format!("{name},{o}\n");
-        //     info.append(text.as_str(), 0.0, text_format.clone());
-        // }
-        // for b in f.bullet_set.iter() {
-        //     let text = format!("{b}");
-        //     info.append(text.as_str(), 0.0, text_format.clone());
-        // }
-        ui.label(info);
+    fn paint_info(&mut self, f: &Frame, ui: &mut Ui) {
+        let config = &mut self.config;
+        ui.checkbox(&mut config.operator, "operator");
+        ui.checkbox(&mut config.timer.0, "timer");
+        ui.checkbox(&mut config.enemy, "enemy");
+        let text_format = TextFormat::default(); 
+        if config.timer.0 {
+            let config = &mut config.timer.1;
+            ui.collapsing("timer",|ui|{
+                ui.checkbox(&mut config.global, "global");
+                if config.global {
+                    ui.label(format!("global:{}",f.timer.global));
+                }
+                ui.checkbox(&mut config.subwave, "fragment");
+                if config.subwave {
+                    ui.label(format!("subwave:{}",f.timer.subwave));
+                }
+                ui.checkbox(&mut config.wave, "wave");
+                if config.wave {
+                    ui.label(format!("wave:{}",f.timer.wave));
+                }
+            });
+        };
+        
+        // info.append(text.as_str(), 0.0, text_format.clone());
+        // ui.label(info);
     }
     fn paint_log(&self, ui: &mut Ui) {
         let receiver = self.log_receiver.lock().unwrap();
@@ -101,7 +114,7 @@ impl Debugger {
         // .ttf and .otf files supported.
         fonts.font_data.insert(
             "MiSan".to_owned(),
-            egui::FontData::from_static(include_bytes!("../../assets/MiSans-Regular.otf")),
+            egui::FontData::from_static(include_bytes!("../../../assets/MiSans-Regular.otf")),
         );
 
         // Put my font first (highest priority) for proportional text:
@@ -121,6 +134,27 @@ impl Debugger {
         // Tell egui to use these fonts:
         ctx.set_fonts(fonts);
     }
+    
+    fn debug_window(&mut self,ui: &mut Ui){
+        ui.checkbox(&mut self.run, "run");
+        ui.checkbox(&mut self.paint, "paint");
+        
+        if ui.button("next").clicked() || self.run {
+            self.c.step();
+        };
+        if ui.button("save_frame").clicked() {
+            if let Some(f) = self.c.get_frame() {
+                let j = serde_json::to_string_pretty(f).unwrap();
+                std::fs::write("frame.json", j).unwrap();
+            }
+        }
+        let f = self.c.frame_vec.pop().unwrap();
+        egui::ScrollArea::vertical().show(ui, |ui| {
+            self.paint_info(&f, ui);
+        });
+        self.c.frame_vec.push(f);
+    }
+
 }
 impl eframe::App for Debugger {
     fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
@@ -139,20 +173,7 @@ impl eframe::App for Debugger {
             .min_width(200.0)
             .resizable(true)
             .show(ctx, |ui| {
-                ui.checkbox(&mut self.run, "run");
-                ui.checkbox(&mut self.paint, "paint");
-                if ui.button("next").clicked() || self.run {
-                    self.c.step();
-                };
-                if ui.button("save_frame").clicked() {
-                    if let Some(f) = self.c.get_frame() {
-                        let j = serde_json::to_string_pretty(f).unwrap();
-                        std::fs::write("frame.json", j).unwrap();
-                    }
-                }
-                egui::ScrollArea::vertical().show(ui, |ui| {
-                    self.paint_info(&self.c.frame_vec[0], ui);
-                });
+                self.debug_window(ui);
             });
         egui::CentralPanel::default().show(ctx, |ui| {
             if self.paint {

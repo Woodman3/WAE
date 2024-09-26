@@ -38,7 +38,7 @@ fn main() {
         "BEC",
         native_config,
         Box::new(|cc| {
-            Ok(Box::new(Debugger::new(cc, ca,receiver)))
+            Ok(Box::new(Debugger::new(cc, ca,receiver,"./config/debugger_config.json".as_ref())))
         }),
     );
 }

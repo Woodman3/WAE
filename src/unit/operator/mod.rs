@@ -155,11 +155,13 @@ impl Display for Operator {
         loc:{}\n\
         block_num:{}\n\
         block_vec_len:{}\n\
+        skills:{}
         ",
             self.name,
             self.location,
             self.stage.block_num,
             self.block_vec.len(),
+            self.skills,
         )?;
         Ok(())
     }

@@ -7,6 +7,8 @@ pub mod math;
 pub(super) mod render;
 mod render_config;
 
+use serde::de::DeserializeOwned;
+use serde::Deserialize;
 use serde_json::Value;
 use std::fs::File;
 use std::io::BufReader;
@@ -23,9 +25,9 @@ pub fn get_short_type_name<'a, T>() -> &'a str {
     tn
 }
 
-fn load_json_file<P: AsRef<Path>>(path: P) -> Result<Value> {
+fn load_json_file<P: AsRef<Path>,T:DeserializeOwned>(path: P) -> Result<T> {
     let file = File::open(path)?;
     let reader = BufReader::new(file);
-    let value = serde_json::from_reader(reader)?;
-    Ok(value)
+    let r = serde_json::from_reader(reader)?;
+    Ok(r)
 }

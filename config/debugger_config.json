@@ -1,0 +1,9 @@
+{
+    "operator":false,
+    "enemy":false,
+    "timer" :[true,{
+        "global":true,
+        "subwave" : false,
+        "wave" :false
+    }]
+}
