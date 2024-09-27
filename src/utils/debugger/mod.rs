@@ -13,14 +13,14 @@ use log::{Level, Metadata, Record};
 use std::path::Path;
 use std::sync::mpsc::{Receiver, Sender};
 use std::sync::{Arc, Mutex};
-pub(crate) struct Debugger<'a> {
+pub(crate) struct Debugger {
     pub(crate) c: Calculator,
     pub(crate) run: bool,
     pub(crate) paint: bool,
     pub(crate) log_receiver: Arc<Mutex<Receiver<String>>>,
     pub(crate) log_messages: Arc<Mutex<Vec<String>>>,
     debugger_input: String,
-    buffer: Vec<Pointer<'a>>,
+    buffer: Vec<Pointer>,
 }
 
 pub(crate) struct DebugLogger {
@@ -43,7 +43,7 @@ impl log::Log for DebugLogger {
     fn flush(&self) {}
 }
 
-impl Debugger<'_> {
+impl Debugger {
     pub(crate) fn new(cc: &eframe::CreationContext<'_>,c: Calculator, receiver: Receiver<String>,config_path:&Path) -> Self {
         Self::setup_custom_fonts(&cc.egui_ctx);
         // let config:DebugConfig = load_json_file(config_path).unwrap_or_default(); 
@@ -155,59 +155,73 @@ impl Debugger<'_> {
         egui::ScrollArea::vertical().show(ui, |ui| {
             // self.paint_info(&f, ui);
             self.debugger_command(ctx, ui ); 
+            unsafe{
+                Self::show_pointer(ui,&self.buffer);
+            }
         });
     }
 
     fn debugger_command(&mut self,ctx: &Context,ui:&mut Ui){
-    //     let f = self.c.frame_vec.last().unwrap();
-    //     if ctx.input(|i| i.key_pressed(egui::Key::Enter)){
-    //         match parser(&self.debugger_input.as_str(), &f){
-    //             Ok(obj) => {
-    //                 self.buffer.push(obj);
-    //             },
-    //             Err(e) => {
-    //                 self.log_messages.lock().unwrap().push(format!("Error: {:?}", e));
-    //             }
-    //         }
-    //         for p in self.buffer.iter(){
-    //             match p{
-    //                     Pointer::Frame(obj) => {
-    //                         ui.label(format!("Frame: {:?}", obj));
-    //                     },
-    //                     Pointer::Enemies(obj) => {
-    //                         ui.label(format!("Enemies: {:?}", obj));
-    //                     },
-    //                     Pointer::Operators(obj) => {
-    //                         ui.label(format!("Operators: {:?}", obj));
-    //                     },
-    //                     Pointer::Map(obj) => {
-    //                         ui.label(format!("Map: {:?}", obj));
-    //                     },
-    //                     Pointer::BulletSet(obj) => {
-    //                         ui.label(format!("BulletSet: {:?}", obj));
-    //                     },
-    //                     Pointer::Events(obj) => {
-    //                         ui.label(format!("Events: {:?}", obj));
-    //                     },
-    //                     Pointer::Usize(obj) => {
-    //                         ui.label(format!("Usize: {:?}", obj));
-    //                     },
-    //                     Pointer::U32(obj) => {
-    //                         ui.label(format!("U32: {:?}", obj));
-    //                     },
-    //                     Pointer::F32(obj) => {
-    //                         ui.label(format!("F32: {:?}", obj));
-    //                     },
-    //                     Pointer::Timer(obj) =>{
-    //                         ui.label(format!("Timer: {:?}", obj));
-    //                     } ,
-    //             }
-    //     }
-    // }
+        let f = self.c.frame_vec.last().unwrap();
+        if ctx.input(|i| i.key_pressed(egui::Key::Enter)){
+            unsafe{
+                match parser(&self.debugger_input.as_str(), &f){
+                    Ok(obj) => {
+                        self.buffer.push(obj);
+                    },
+                    Err(e) => {
+                        self.log_messages.lock().unwrap().push(format!("Error: {:?}", e));
+                    }
+                }
+            }
+        }
+    }
+
+    unsafe fn show_pointer(ui: &mut Ui,pointers:&Vec<Pointer>){
+        for p in pointers.iter(){
+            match p{
+                Pointer::Frame(obj) => {
+                    ui.label(format!("Frame: {:?}", **obj));
+                },
+                Pointer::Enemies(obj) => {
+                    ui.label(format!("Enemies: {:?}", **obj));
+                },
+                Pointer::Operators(obj) => {
+                    ui.label(format!("Operators: {:?}", **obj));
+                },
+                Pointer::Map(obj) => {
+                    ui.label(format!("Map: {:?}", **obj));
+                },
+                Pointer::BulletSet(obj) => {
+                    ui.label(format!("BulletSet: {:?}", **obj));
+                },
+                Pointer::Events(obj) => {
+                    ui.label(format!("Events: {:?}", **obj));
+                },
+                Pointer::Usize(obj) => {
+                    ui.label(format!("Usize: {:?}", **obj));
+                },
+                Pointer::U32(obj) => {
+                    ui.label(format!("U32: {:?}", **obj));
+                },
+                Pointer::F32(obj) => {
+                    ui.label(format!("F32: {:?}", **obj));
+                },
+                Pointer::Timer(obj) =>{
+                    ui.label(format!("Timer: {:?}", **obj));
+                } ,
+                Pointer::Enemy(obj) =>{
+                    ui.label(format!("Enemy: {:?}", obj));
+                },
+                Pointer::Operator(obj) =>{
+                    ui.label(format!("Operator: {:?}", obj));
+                },
+            }
+        }
     }
 
 }
-impl eframe::App for Debugger<'_> {
+impl eframe::App for Debugger {
     fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
         egui::Context::request_repaint(ctx);
         install_image_loaders(ctx);
