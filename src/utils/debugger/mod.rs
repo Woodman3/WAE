@@ -9,7 +9,8 @@ use eframe::egui;
 use eframe::egui::{Context, TextFormat, Ui};
 use egui_extras::install_image_loaders;
 
-use log::{Level, Metadata, Record};
+use log::{error, Level, Metadata, Record};
+use serde::{Deserialize, Serialize};
 use std::path::Path;
 use std::sync::mpsc::{Receiver, Sender};
 use std::sync::{Arc, Mutex};
@@ -21,7 +22,13 @@ pub(crate) struct Debugger {
     pub(crate) log_messages: Arc<Mutex<Vec<String>>>,
     debugger_input: String,
     buffer: Vec<Pointer>,
+    config: DebuggerConfig,
 }
+
+#[derive(Debug, Default, Deserialize, Serialize)]
+struct DebuggerConfig{
+    init_command:Vec<String>,
+} 
 
 pub(crate) struct DebugLogger {
     pub(crate) sender: Sender<String>,
@@ -46,7 +53,21 @@ impl log::Log for DebugLogger {
 impl Debugger {
     pub(crate) fn new(cc: &eframe::CreationContext<'_>,c: Calculator, receiver: Receiver<String>,config_path:&Path) -> Self {
         Self::setup_custom_fonts(&cc.egui_ctx);
-        // let config:DebugConfig = load_json_file(config_path).unwrap_or_default(); 
+        let config:DebuggerConfig = load_json_file(config_path).unwrap_or_default(); 
+        let f = c.frame_vec.last().unwrap();
+        let mut buffer = Vec::new();
+        for command in config.init_command.iter(){
+            unsafe{
+                match parser(command, &f){
+                    Ok(obj) => {
+                        buffer.push(obj);
+                    },
+                    Err(e) => {
+                        error!("parser error : {:?}", e);
+                    }
+                }
+            }
+        }
         Self {
             c,
             run: false,
@@ -55,7 +76,8 @@ impl Debugger {
             log_messages: Arc::new(Mutex::new(Vec::new())),
             // config,
             debugger_input:String::new(),
-            buffer: Vec::new(),
+            buffer,
+            config,
         }
     }
 
@@ -170,7 +192,8 @@ impl Debugger {
                         self.buffer.push(obj);
                     },
                     Err(e) => {
-                        self.log_messages.lock().unwrap().push(format!("Error: {:?}", e));
+                        // self.log_messages.lock().unwrap().push(format!("Error: {:?}", e));
+                        error!("parser error : {:?}", e);
                     }
                 }
             }

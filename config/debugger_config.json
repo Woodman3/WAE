@@ -1,9 +1,5 @@
 {
-    "operator":false,
-    "enemy":false,
-    "timer" :[true,{
-        "global":true,
-        "subwave" : false,
-        "wave" :false
-    }]
+    "init_command":[
+        "p timer"
+    ]
 }
