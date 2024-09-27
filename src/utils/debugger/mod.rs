@@ -1,10 +1,10 @@
-pub(crate) mod debug_config;
+pub(crate) mod debugger_parser;
 
 use super::load_json_file;
 use super::render::Render;
 use crate::calculator::Calculator;
 use crate::frame::Frame;
-use debug_config::DebugConfig;
+use debugger_parser::{ parser, Pointer};
 use eframe::egui;
 use eframe::egui::{Context, TextFormat, Ui};
 use egui_extras::install_image_loaders;
@@ -13,13 +13,14 @@ use log::{Level, Metadata, Record};
 use std::path::Path;
 use std::sync::mpsc::{Receiver, Sender};
 use std::sync::{Arc, Mutex};
-pub(crate) struct Debugger {
+pub(crate) struct Debugger<'a> {
     pub(crate) c: Calculator,
     pub(crate) run: bool,
     pub(crate) paint: bool,
     pub(crate) log_receiver: Arc<Mutex<Receiver<String>>>,
     pub(crate) log_messages: Arc<Mutex<Vec<String>>>,
-    config: DebugConfig,
+    debugger_input: String,
+    buffer: Vec<Pointer<'a>>,
 }
 
 pub(crate) struct DebugLogger {
@@ -42,47 +43,49 @@ impl log::Log for DebugLogger {
     fn flush(&self) {}
 }
 
-impl Debugger {
+impl Debugger<'_> {
     pub(crate) fn new(cc: &eframe::CreationContext<'_>,c: Calculator, receiver: Receiver<String>,config_path:&Path) -> Self {
         Self::setup_custom_fonts(&cc.egui_ctx);
-        let config:DebugConfig = load_json_file(config_path).unwrap_or_default(); 
+        // let config:DebugConfig = load_json_file(config_path).unwrap_or_default(); 
         Self {
             c,
             run: false,
             paint: false,
             log_receiver: Arc::new(Mutex::new(receiver)),
             log_messages: Arc::new(Mutex::new(Vec::new())),
-            config
+            // config,
+            debugger_input:String::new(),
+            buffer: Vec::new(),
         }
     }
 
-    fn paint_info(&mut self, f: &Frame, ui: &mut Ui) {
-        let config = &mut self.config;
-        ui.checkbox(&mut config.operator, "operator");
-        ui.checkbox(&mut config.timer.0, "timer");
-        ui.checkbox(&mut config.enemy, "enemy");
-        let text_format = TextFormat::default(); 
-        if config.timer.0 {
-            let config = &mut config.timer.1;
-            ui.collapsing("timer",|ui|{
-                ui.checkbox(&mut config.global, "global");
-                if config.global {
-                    ui.label(format!("global:{}",f.timer.global));
-                }
-                ui.checkbox(&mut config.subwave, "fragment");
-                if config.subwave {
-                    ui.label(format!("subwave:{}",f.timer.subwave));
-                }
-                ui.checkbox(&mut config.wave, "wave");
-                if config.wave {
-                    ui.label(format!("wave:{}",f.timer.wave));
-                }
-            });
-        };
+    // fn paint_info(&mut self, f: &Frame, ui: &mut Ui) {
+    //     let config = &mut self.config;
+    //     ui.checkbox(&mut config.operator, "operator");
+    //     ui.checkbox(&mut config.timer.0, "timer");
+    //     ui.checkbox(&mut config.enemy, "enemy");
+    //     let text_format = TextFormat::default(); 
+    //     if config.timer.0 {
+    //         let config = &mut config.timer.1;
+    //         ui.collapsing("timer",|ui|{
+    //             ui.checkbox(&mut config.global, "global");
+    //             if config.global {
+    //                 ui.label(format!("global:{}",f.timer.global));
+    //             }
+    //             ui.checkbox(&mut config.subwave, "fragment");
+    //             if config.subwave {
+    //                 ui.label(format!("subwave:{}",f.timer.subwave));
+    //             }
+    //             ui.checkbox(&mut config.wave, "wave");
+    //             if config.wave {
+    //                 ui.label(format!("wave:{}",f.timer.wave));
+    //             }
+    //         });
+    //     };
         
-        // info.append(text.as_str(), 0.0, text_format.clone());
-        // ui.label(info);
-    }
+    //     // info.append(text.as_str(), 0.0, text_format.clone());
+    //     // ui.label(info);
+    // }
     fn paint_log(&self, ui: &mut Ui) {
         let receiver = self.log_receiver.lock().unwrap();
         while let Ok(message) = receiver.try_recv() {
@@ -135,10 +138,9 @@ impl Debugger {
         ctx.set_fonts(fonts);
     }
     
-    fn debug_window(&mut self,ui: &mut Ui){
+    fn debug_window(&mut self,ctx: &Context,ui: &mut Ui){
         ui.checkbox(&mut self.run, "run");
         ui.checkbox(&mut self.paint, "paint");
-        
         if ui.button("next").clicked() || self.run {
             self.c.step();
         };
@@ -148,15 +150,64 @@ impl Debugger {
                 std::fs::write("frame.json", j).unwrap();
             }
         }
-        let f = self.c.frame_vec.pop().unwrap();
+        ui.text_edit_singleline(&mut self.debugger_input);
+
         egui::ScrollArea::vertical().show(ui, |ui| {
-            self.paint_info(&f, ui);
+            // self.paint_info(&f, ui);
+            self.debugger_command(ctx, ui ); 
         });
-        self.c.frame_vec.push(f);
+    }
+
+    fn debugger_command(&mut self,ctx: &Context,ui:&mut Ui){
+    //     let f = self.c.frame_vec.last().unwrap();
+    //     if ctx.input(|i| i.key_pressed(egui::Key::Enter)){
+    //         match parser(&self.debugger_input.as_str(), &f){
+    //             Ok(obj) => {
+    //                 self.buffer.push(obj);
+    //             },
+    //             Err(e) => {
+    //                 self.log_messages.lock().unwrap().push(format!("Error: {:?}", e));
+    //             }
+    //         }
+    //         for p in self.buffer.iter(){
+    //             match p{
+    //                     Pointer::Frame(obj) => {
+    //                         ui.label(format!("Frame: {:?}", obj));
+    //                     },
+    //                     Pointer::Enemies(obj) => {
+    //                         ui.label(format!("Enemies: {:?}", obj));
+    //                     },
+    //                     Pointer::Operators(obj) => {
+    //                         ui.label(format!("Operators: {:?}", obj));
+    //                     },
+    //                     Pointer::Map(obj) => {
+    //                         ui.label(format!("Map: {:?}", obj));
+    //                     },
+    //                     Pointer::BulletSet(obj) => {
+    //                         ui.label(format!("BulletSet: {:?}", obj));
+    //                     },
+    //                     Pointer::Events(obj) => {
+    //                         ui.label(format!("Events: {:?}", obj));
+    //                     },
+    //                     Pointer::Usize(obj) => {
+    //                         ui.label(format!("Usize: {:?}", obj));
+    //                     },
+    //                     Pointer::U32(obj) => {
+    //                         ui.label(format!("U32: {:?}", obj));
+    //                     },
+    //                     Pointer::F32(obj) => {
+    //                         ui.label(format!("F32: {:?}", obj));
+    //                     },
+    //                     Pointer::Timer(obj) =>{
+    //                         ui.label(format!("Timer: {:?}", obj));
+    //                     } ,
+    //             }
+    //     }
+    // }
     }
 
 }
-impl eframe::App for Debugger {
+impl eframe::App for Debugger<'_> {
     fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
         egui::Context::request_repaint(ctx);
         install_image_loaders(ctx);
@@ -173,7 +224,7 @@ impl eframe::App for Debugger {
             .min_width(200.0)
             .resizable(true)
             .show(ctx, |ui| {
-                self.debug_window(ui);
+                self.debug_window(ctx,ui);
             });
         egui::CentralPanel::default().show(ctx, |ui| {
             if self.paint {
