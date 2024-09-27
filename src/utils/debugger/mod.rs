@@ -21,7 +21,8 @@ pub(crate) struct Debugger {
     pub(crate) log_receiver: Arc<Mutex<Receiver<String>>>,
     pub(crate) log_messages: Arc<Mutex<Vec<String>>>,
     debugger_input: String,
-    buffer: Vec<Pointer>,
+    paint_buffer: Vec<Pointer>,
+    watch_buffer: Vec<Pointer>,
     config: DebuggerConfig,
 }
 
@@ -76,7 +77,8 @@ impl Debugger {
             log_messages: Arc::new(Mutex::new(Vec::new())),
             // config,
             debugger_input:String::new(),
-            buffer,
+            paint_buffer: buffer,
+            watch_buffer:Vec::new(),
             config,
         }
     }
@@ -178,7 +180,7 @@ impl Debugger {
             // self.paint_info(&f, ui);
             self.debugger_command(ctx, ui ); 
             unsafe{
-                Self::show_pointer(ui,&self.buffer);
+                Self::show_pointer(ui,&self.paint_buffer);
             }
         });
     }
@@ -189,7 +191,7 @@ impl Debugger {
             unsafe{
                 match parser(&self.debugger_input.as_str(), &f){
                     Ok(obj) => {
-                        self.buffer.push(obj);
+                        self.paint_buffer.push(obj);
                     },
                     Err(e) => {
                         // self.log_messages.lock().unwrap().push(format!("Error: {:?}", e));
@@ -238,6 +240,9 @@ impl Debugger {
                 },
                 Pointer::Operator(obj) =>{
                     ui.label(format!("Operator: {:?}", obj));
+                },
+                Pointer::U64(obj) =>{
+                    ui.label(format!("U64: {:?}", **obj));
                 },
             }
         }

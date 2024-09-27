@@ -1,5 +1,5 @@
 {
     "init_command":[
-        "p timer"
+        "p timer.timestamp"
     ]
 }
