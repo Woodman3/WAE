@@ -22,7 +22,7 @@ pub(super) enum Pointer{
     F32(*const f32),
 }
 
-pub(super) unsafe fn parser(input: &str,f:& Frame)->Result<Pointer>{
+pub(super) unsafe fn parser(input: &str,f:& Frame)->Result<(String,Pointer)>{
     let re = Regex::new(r"^\s*(\w+)\s*(.*)").unwrap();
     let caps = re.captures(input).ok_or(format!("Invalid input: {}",input))?;
     let command = caps.get(1).unwrap().as_str();
@@ -59,7 +59,7 @@ pub(super) unsafe fn parser(input: &str,f:& Frame)->Result<Pointer>{
                     obj= field_parser(&obj,field)?;
                 }
             }
-            Ok(obj)
+            Ok((object.to_string(),obj))
         },
         _ => {
             Err((format!("Invalid command: {}",command)).into())

@@ -21,8 +21,8 @@ pub(crate) struct Debugger {
     pub(crate) log_receiver: Arc<Mutex<Receiver<String>>>,
     pub(crate) log_messages: Arc<Mutex<Vec<String>>>,
     debugger_input: String,
-    paint_buffer: Vec<Pointer>,
-    watch_buffer: Vec<Pointer>,
+    paint_buffer: Vec<(String,Pointer)>,
+    watch_buffer: Vec<(String,Pointer)>,
     config: DebuggerConfig,
 }
 
@@ -180,7 +180,7 @@ impl Debugger {
             // self.paint_info(&f, ui);
             self.debugger_command(ctx, ui ); 
             unsafe{
-                Self::show_pointer(ui,&self.paint_buffer);
+                self.show_pointer(ui);
             }
         });
     }
@@ -202,47 +202,47 @@ impl Debugger {
         }
     }
 
-    unsafe fn show_pointer(ui: &mut Ui,pointers:&Vec<Pointer>){
-        for p in pointers.iter(){
+    unsafe fn show_pointer(&self,ui: &mut Ui){
+        for (o,p) in self.paint_buffer.iter(){
             match p{
                 Pointer::Frame(obj) => {
-                    ui.label(format!("Frame: {:?}", **obj));
+                    ui.label(format!("{o}: {:?}", **obj));
                 },
                 Pointer::Enemies(obj) => {
-                    ui.label(format!("Enemies: {:?}", **obj));
+                    ui.label(format!("{o}: {:?}", **obj));
                 },
                 Pointer::Operators(obj) => {
-                    ui.label(format!("Operators: {:?}", **obj));
+                    ui.label(format!("{o}: {:?}", **obj));
                 },
                 Pointer::Map(obj) => {
-                    ui.label(format!("Map: {:?}", **obj));
+                    ui.label(format!("{o}: {:?}", **obj));
                 },
                 Pointer::BulletSet(obj) => {
-                    ui.label(format!("BulletSet: {:?}", **obj));
+                    ui.label(format!("{o}: {:?}", **obj));
                 },
                 Pointer::Events(obj) => {
-                    ui.label(format!("Events: {:?}", **obj));
+                    ui.label(format!("{o}: {:?}", **obj));
                 },
                 Pointer::Usize(obj) => {
-                    ui.label(format!("Usize: {:?}", **obj));
+                    ui.label(format!("{o}: {:?}", **obj));
                 },
                 Pointer::U32(obj) => {
-                    ui.label(format!("U32: {:?}", **obj));
+                    ui.label(format!("{o}: {:?}", **obj));
                 },
                 Pointer::F32(obj) => {
-                    ui.label(format!("F32: {:?}", **obj));
+                    ui.label(format!("{o}: {:?}", **obj));
                 },
                 Pointer::Timer(obj) =>{
-                    ui.label(format!("Timer: {:?}", **obj));
+                    ui.label(format!("{o}: {:?}", **obj));
                 } ,
                 Pointer::Enemy(obj) =>{
-                    ui.label(format!("Enemy: {:?}", obj));
+                    ui.label(format!("{o}: {:?}", obj));
                 },
                 Pointer::Operator(obj) =>{
-                    ui.label(format!("Operator: {:?}", obj));
+                    ui.label(format!("{o}: {:?}", obj));
                 },
                 Pointer::U64(obj) =>{
-                    ui.label(format!("U64: {:?}", **obj));
+                    ui.label(format!("{o}: {:?}", **obj));
                 },
             }
         }
