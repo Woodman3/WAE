@@ -188,15 +188,13 @@ impl Debugger {
     fn debugger_command(&mut self,ctx: &Context,ui:&mut Ui){
         let f = self.c.frame_vec.last().unwrap();
         if ctx.input(|i| i.key_pressed(egui::Key::Enter)){
-            unsafe{
-                match parser(&self.debugger_input.as_str(), &f){
-                    Ok(obj) => {
-                        self.paint_buffer.push(obj);
-                    },
-                    Err(e) => {
-                        // self.log_messages.lock().unwrap().push(format!("Error: {:?}", e));
-                        error!("parser error : {:?}", e);
-                    }
+            match parser(&self.debugger_input.as_str(), &f){
+                Ok(obj) => {
+                    self.paint_buffer.push(obj);
+                },
+                Err(e) => {
+                    // self.log_messages.lock().unwrap().push(format!("Error: {:?}", e));
+                    error!("parser error : {:?}", e);
                 }
             }
         }
@@ -243,6 +241,9 @@ impl Debugger {
                 },
                 Pointer::U64(obj) =>{
                     ui.label(format!("{o}: {:?}", **obj));
+                },
+                Pointer::None => {
+                    ui.label(format!("{o}"));
                 },
             }
         }

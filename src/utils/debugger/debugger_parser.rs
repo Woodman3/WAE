@@ -20,52 +20,87 @@ pub(super) enum Pointer{
     U32(*const u32),
     U64(*const u64),
     F32(*const f32),
+    None,
 }
 
-pub(super) unsafe fn parser(input: &str,f:& Frame)->Result<(String,Pointer)>{
+pub(super) fn parser(input: &str,f:& Frame)-> Result<(String,Pointer)>{
     let re = Regex::new(r"^\s*(\w+)\s*(.*)").unwrap();
     let caps = re.captures(input).ok_or(format!("Invalid input: {}",input))?;
     let command = caps.get(1).unwrap().as_str();
-    let object = caps.get(2).unwrap().as_str();
     match command{
         "p" => {
-            let mut obj = Pointer::Frame(f as *const Frame);
-            for field in object.split('.'){
-                if field.ends_with("]") {
-                    let re = Regex::new(r"(\w+)\[(.*)\]").unwrap();
-                    let caps = re.captures(field).ok_or(format!("can't parse field: {}",field))?;
-                    let field = caps.get(1).unwrap().as_str();
-                    let index = caps.get(2).unwrap().as_str();
-                    obj = match obj {
-                        Pointer::Frame(f) => {
-                            match field{
-                                "enemy" => {
-                                    let index: usize = index.parse().unwrap();
-                                    Pointer::Enemy(Rc::clone(&(*f).enemy_set[index]))
-                                },
-                                "operator" => {
-                                    Pointer::Operator(Rc::clone(&(*f).operator_deploy[index]))
-                                },
-                                _ => {
-                                    return Err("Invalid field".into())
-                                }
-                            }
-                        },
-                        _ => {
-                            return Err(format!("Invalid field: {}",field).into())
-                        }
-                    }
-                }else{
-                    obj= field_parser(&obj,field)?;
-                }
+            unsafe{
+                let object = caps.get(2).unwrap().as_str();
+                object_parser(object,f)
             }
-            Ok((object.to_string(),obj))
         },
+        "h" => {
+            Ok(("help".to_string(),Pointer::None))
+        },
+        "l" => {
+            let object = caps.get(2).unwrap().as_str();
+            let info = match object {
+                "enemy" | "e" => {
+                    let mut info = "enemy".to_string();
+                    for e in f.enemy_set.iter(){
+                        info.push_str(&format!("\n{:?}",e.borrow().name)); 
+                    }
+                    info
+                },
+                "operator" | "o" => {
+                    let mut info = "operator".to_string();
+                    for o in f.operator_deploy.values(){
+                        info.push_str(&format!("\n{:?}",o.borrow().name)); 
+                    }
+                    info
+                },
+                _ => {
+                    return Err(format!("Invalid object: {}",object).into())
+                }
+            };
+            Ok((info,Pointer::None))
+        }
         _ => {
-            Err((format!("Invalid command: {}",command)).into())
+            Err(format!("Invalid command: {}",command).into())
         }
     }
 }
+
+unsafe fn object_parser(object: &str,f:& Frame)->Result<(String,Pointer)>{
+    let mut obj = Pointer::Frame(f as *const Frame);
+    for field in object.split('.'){
+        if field.ends_with("]") {
+            let re = Regex::new(r"(\w+)\[(.*)\]").unwrap();
+            let caps = re.captures(field).ok_or(format!("can't parse field: {}",field))?;
+            let field = caps.get(1).unwrap().as_str();
+            let index = caps.get(2).unwrap().as_str();
+            obj = match obj {
+                Pointer::Frame(f) => {
+                    match field{
+                        "enemy" | "e" => {
+                            let index: usize = index.parse().unwrap();
+                            Pointer::Enemy(Rc::clone(&(*f).enemy_set[index]))
+                        },
+                        "operator" | "o" => {
+                            Pointer::Operator(Rc::clone(&(*f).operator_deploy[index]))
+                        },
+                        _ => {
+                            return Err("Invalid field".into())
+                        }
+                    }
+                },
+                _ => {
+                    return Err(format!("Invalid field: {}",field).into())
+                }
+            }
+        }else{
+            obj= field_parser(&obj,field)?;
+        }
+    }
+    Ok((object.to_string(),obj))
+}
+
+
 
 macro_rules! match_field {
     ($field:expr, $($pattern:pat => $result:expr),*) => {
