@@ -4,22 +4,28 @@ use egui::Ui;
 use log::error;
 use regex::Regex;
 
-use crate::{event::Event, frame::{timer::Timer, EnemyRef, Frame, OperatorRef}, map::Map, unit::{bullet::Bullet, skill::skill_schedule::SkillSchedule, UnitInfo}, utils};
+use crate::{
+    event::Event,
+    frame::{timer::Timer, EnemyRef, Frame, OperatorRef},
+    map::Map,
+    unit::{bullet::Bullet, skill::skill_schedule::SkillSchedule, UnitInfo},
+    utils,
+};
 
 use utils::Result;
 
 #[derive(Default)]
-pub(super) struct DebuggerParser{
-    pub(super) paint_buffer: Vec<(String,Pointer)>,
-    watch_buffer: Vec<(String,Pointer)>,
+pub(super) struct DebuggerParser {
+    pub(super) paint_buffer: Vec<(String, Pointer)>,
+    watch_buffer: Vec<(String, Pointer)>,
 }
 
-pub(super) enum Pointer{
+pub(super) enum Pointer {
     Frame(*const Frame),
     Timer(*const Timer),
     Enemy(EnemyRef),
     Enemies(*const Vec<EnemyRef>),
-    Operators(*const HashMap<String,OperatorRef>),
+    Operators(*const HashMap<String, OperatorRef>),
     Operator(OperatorRef),
     Map(*const Map),
     BulletSet(*const Vec<Bullet>),
@@ -36,155 +42,146 @@ pub(super) enum Pointer{
     None,
 }
 
-impl DebuggerParser{
-    
-    pub(super) fn parse(&mut self,input:&str,f:&Frame){
-        match self.parse_command(input,f){
-            Ok(_) => {},
+impl DebuggerParser {
+    pub(super) fn parse(&mut self, input: &str, f: &Frame) {
+        match self.parse_command(input, f) {
+            Ok(_) => {}
             Err(e) => {
                 error!("parser error : {:?}", e);
             }
         }
     }
-    
-    fn parse_command(&mut self,input: &str,f:& Frame)->Result<()>{
+
+    fn parse_command(&mut self, input: &str, f: &Frame) -> Result<()> {
         let re = Regex::new(r"^\s*(\w+)\s*(.*)").unwrap();
-        let caps = re.captures(input).ok_or(format!("Invalid input: {}",input))?;
+        let caps = re
+            .captures(input)
+            .ok_or(format!("Invalid input: {}", input))?;
         let command = caps.get(1).unwrap().as_str();
-        match command{
-            "p" | "w" => {
-                unsafe{
-                    let object = caps.get(2).unwrap().as_str();
-                    let obj = self.parse_object(object,f)?;
-                    if command == "p"{
-                        self.paint_buffer.push(obj);
-                    }else {
-                        self.watch_buffer.push(obj);
-                    }
-                    Ok(())
+        match command {
+            "p" | "w" => unsafe {
+                let object = caps.get(2).unwrap().as_str();
+                let obj = self.parse_object(object, f)?;
+                if command == "p" {
+                    self.paint_buffer.push(obj);
+                } else {
+                    self.watch_buffer.push(obj);
                 }
-            },
-            "h" => {
-                self.paint_buffer.push(("help".to_string(),Pointer::None));
                 Ok(())
             },
+            "h" => {
+                self.paint_buffer.push(("help".to_string(), Pointer::None));
+                Ok(())
+            }
             "l" => {
                 let object = caps.get(2).unwrap().as_str();
                 let info = match object {
                     "enemy" | "e" => {
                         let mut info = "enemy".to_string();
-                        for e in f.enemy_set.iter(){
-                            info.push_str(&format!("\n{:?}",e.borrow().name)); 
+                        for e in f.enemy_set.iter() {
+                            info.push_str(&format!("\n{:?}", e.borrow().name));
                         }
                         info
-                    },
+                    }
                     "operator" | "o" => {
                         let mut info = "operator".to_string();
-                        for o in f.operator_deploy.values(){
-                            info.push_str(&format!("\n{:?}",o.borrow().name)); 
+                        for o in f.operator_deploy.values() {
+                            info.push_str(&format!("\n{:?}", o.borrow().name));
                         }
                         info
-                    },
-                    _ => {
-                        return Err(format!("Invalid object: {}",object).into())
                     }
+                    _ => return Err(format!("Invalid object: {}", object).into()),
                 };
-                self.paint_buffer.push((info,Pointer::None));
+                self.paint_buffer.push((info, Pointer::None));
                 Ok(())
             }
-            _ => {
-                Err(format!("Invalid command: {}",command).into())
-            }
+            _ => Err(format!("Invalid command: {}", command).into()),
         }
     }
-    unsafe fn parse_object(&mut self,object: &str,f:& Frame)->Result<(String,Pointer)>{
+    unsafe fn parse_object(&mut self, object: &str, f: &Frame) -> Result<(String, Pointer)> {
         let mut obj = Pointer::Frame(f as *const Frame);
-        for field in object.split('.'){
+        for field in object.split('.') {
             if field.ends_with("]") {
                 let re = Regex::new(r"(\w+)\[(.*)\]").unwrap();
-                let caps = re.captures(field).ok_or(format!("can't parse field: {}",field))?;
+                let caps = re
+                    .captures(field)
+                    .ok_or(format!("can't parse field: {}", field))?;
                 let field = caps.get(1).unwrap().as_str();
                 let index = caps.get(2).unwrap().as_str();
                 obj = match obj {
-                    Pointer::Frame(f) => {
-                        match field{
-                            "enemy" | "e" => {
-                                let index: usize = index.parse().unwrap();
-                                Pointer::Enemy(Rc::clone(&(*f).enemy_set[index]))
-                            },
-                            "operator" | "o" => {
-                                Pointer::Operator(Rc::clone(&(*f).operator_deploy[index]))
-                            },
-                            _ => {
-                                return Err("Invalid field".into())
-                            }
+                    Pointer::Frame(f) => match field {
+                        "enemy" | "e" => {
+                            let index: usize = index.parse().unwrap();
+                            Pointer::Enemy(Rc::clone(&(*f).enemy_set[index]))
                         }
+                        "operator" | "o" => {
+                            Pointer::Operator(Rc::clone(&(*f).operator_deploy[index]))
+                        }
+                        _ => return Err("Invalid field".into()),
                     },
-                    _ => {
-                        return Err(format!("Invalid field: {}",field).into())
-                    }
+                    _ => return Err(format!("Invalid field: {}", field).into()),
                 }
-            }else{
-                obj= parse_field(&obj,field)?;
+            } else {
+                obj = parse_field(&obj, field)?;
             }
         }
-        Ok((object.to_string(),obj))
+        Ok((object.to_string(), obj))
     }
 
-    pub(super) unsafe fn show_pointer(&self,ui: &mut Ui){
-        for (o,p) in self.paint_buffer.iter().chain(self.watch_buffer.iter()){
-            match p{
+    pub(super) unsafe fn show_pointer(&self, ui: &mut Ui) {
+        for (o, p) in self.paint_buffer.iter().chain(self.watch_buffer.iter()) {
+            match p {
                 Pointer::Frame(obj) => {
                     ui.label(format!("{o}: {:?}", **obj));
-                },
+                }
                 Pointer::Enemies(obj) => {
                     ui.label(format!("{o}: {:?}", **obj));
-                },
+                }
                 Pointer::Operators(obj) => {
                     ui.label(format!("{o}: {:?}", **obj));
-                },
+                }
                 Pointer::Map(obj) => {
                     ui.label(format!("{o}: {:?}", **obj));
-                },
+                }
                 Pointer::BulletSet(obj) => {
                     ui.label(format!("{o}: {:?}", **obj));
-                },
+                }
                 Pointer::Events(obj) => {
                     ui.label(format!("{o}: {:?}", **obj));
-                },
+                }
                 Pointer::Usize(obj) => {
                     ui.label(format!("{o}: {:?}", **obj));
-                },
+                }
                 Pointer::U32(obj) => {
                     ui.label(format!("{o}: {:?}", **obj));
-                },
+                }
                 Pointer::F32(obj) => {
                     ui.label(format!("{o}: {:?}", **obj));
-                },
-                Pointer::Timer(obj) =>{
+                }
+                Pointer::Timer(obj) => {
                     ui.label(format!("{o}: {:?}", **obj));
-                } ,
-                Pointer::Enemy(obj) =>{
+                }
+                Pointer::Enemy(obj) => {
                     ui.label(format!("{o}: {:?}", obj));
-                },
-                Pointer::Operator(obj) =>{
+                }
+                Pointer::Operator(obj) => {
                     ui.label(format!("{o}: {:?}", obj));
-                },
-                Pointer::U64(obj) =>{
+                }
+                Pointer::U64(obj) => {
                     ui.label(format!("{o}: {:?}", **obj));
-                },
-                Pointer::I64(obj) =>{
+                }
+                Pointer::I64(obj) => {
                     ui.label(format!("{o}: {:?}", **obj));
-                },
-                Pointer::UnitInfo(obj) =>{
+                }
+                Pointer::UnitInfo(obj) => {
                     ui.label(format!("{o}: {:?}", **obj));
-                },
-                Pointer::Skills(obj) =>{
+                }
+                Pointer::Skills(obj) => {
                     ui.label(format!("{o}: {:?}", **obj));
-                },
-                Pointer::String(obj) =>{
+                }
+                Pointer::String(obj) => {
                     ui.label(format!("{o}: {:?}", obj));
-                },
+                }
                 Pointer::None => {
                     ui.label(format!("{o}"));
                 }
@@ -212,12 +209,12 @@ unsafe fn parse_field(obj: &Pointer, field: &str) -> Result<Pointer> {
                 "operator" => Pointer::Operators(&(**f).operator_deploy),
                 "timer" => Pointer::Timer(&(**f).timer)
             )
-        },
+        }
         Pointer::Timer(t) => {
             match_field!(field,
                 "timestamp" => Pointer::U64(&(**t).timestamp)
             )
-        },
+        }
         Pointer::Enemy(e) => {
             match_field!(field,
                 "name" => Pointer::String(e.borrow().name.clone()),

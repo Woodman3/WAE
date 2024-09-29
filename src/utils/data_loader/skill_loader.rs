@@ -1,9 +1,8 @@
-use std::default;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug,Default,Deserialize,Serialize,Clone,PartialEq,Eq,Hash,Copy)]
+#[derive(Debug, Default, Deserialize, Serialize, Clone, PartialEq, Eq, Hash, Copy)]
 #[serde(rename_all = "snake_case")]
-pub(super) enum SkillKey{
+pub(super) enum SkillKey {
     Atk,
     /// 攻击力倍率
     AtkScale,
@@ -12,7 +11,7 @@ pub(super) enum SkillKey{
     Times,
     #[default]
     #[serde(other)]
-    None
+    None,
 }
 
 #[derive(Deserialize, Default, Debug)]

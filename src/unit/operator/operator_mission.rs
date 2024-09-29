@@ -55,7 +55,7 @@ impl Operator {
         let sv = self.skills.step(f);
         for s in sv.iter() {
             s.shoot(f, self.location.into());
-            if matches!(s.extra,Some(SkillExtra::DefaultAttack) ) {
+            if matches!(s.extra, Some(SkillExtra::DefaultAttack)) {
                 self.skills.message_buffer.push(SkillMessage::Attack);
             }
         }

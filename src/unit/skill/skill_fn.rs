@@ -149,8 +149,8 @@ impl Skill {
 //     }
 // }
 
-impl Display for SpData{
+impl Display for SpData {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        writeln!(f,"sp_cost:{}",self.sp_cost)
+        writeln!(f, "sp_cost:{}", self.sp_cost)
     }
 }

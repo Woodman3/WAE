@@ -3,13 +3,12 @@ pub(crate) mod debugger_parser;
 use super::load_json_file;
 use super::render::Render;
 use crate::calculator::Calculator;
-use crate::frame::Frame;
-use debugger_parser::{DebuggerParser, Pointer};
+use debugger_parser::DebuggerParser;
 use eframe::egui;
-use eframe::egui::{Context, TextFormat, Ui};
+use eframe::egui::{Context, Ui};
 use egui_extras::install_image_loaders;
 
-use log::{error, Level, Metadata, Record};
+use log::{Level, Metadata, Record};
 use serde::{Deserialize, Serialize};
 use std::path::Path;
 use std::sync::mpsc::{Receiver, Sender};
@@ -26,9 +25,9 @@ pub(crate) struct Debugger {
 }
 
 #[derive(Debug, Default, Deserialize, Serialize)]
-struct DebuggerConfig{
-    init_command:Vec<String>,
-} 
+struct DebuggerConfig {
+    init_command: Vec<String>,
+}
 
 pub(crate) struct DebugLogger {
     pub(crate) sender: Sender<String>,
@@ -51,13 +50,18 @@ impl log::Log for DebugLogger {
 }
 
 impl Debugger {
-    pub(crate) fn new(cc: &eframe::CreationContext<'_>,c: Calculator, receiver: Receiver<String>,config_path:&Path) -> Self {
+    pub(crate) fn new(
+        cc: &eframe::CreationContext<'_>,
+        c: Calculator,
+        receiver: Receiver<String>,
+        config_path: &Path,
+    ) -> Self {
         Self::setup_custom_fonts(&cc.egui_ctx);
-        let config:DebuggerConfig = load_json_file(config_path).unwrap_or_default(); 
+        let config: DebuggerConfig = load_json_file(config_path).unwrap_or_default();
         let f = c.frame_vec.last().unwrap();
         let mut parser = DebuggerParser::default();
-        for command in config.init_command.iter(){
-            parser.parse(command,f);
+        for command in config.init_command.iter() {
+            parser.parse(command, f);
         }
         Self {
             c,
@@ -66,7 +70,7 @@ impl Debugger {
             log_receiver: Arc::new(Mutex::new(receiver)),
             log_messages: Arc::new(Mutex::new(Vec::new())),
             // config,
-            debugger_input:String::new(),
+            debugger_input: String::new(),
             parser,
             config,
         }
@@ -77,7 +81,7 @@ impl Debugger {
     //     ui.checkbox(&mut config.operator, "operator");
     //     ui.checkbox(&mut config.timer.0, "timer");
     //     ui.checkbox(&mut config.enemy, "enemy");
-    //     let text_format = TextFormat::default(); 
+    //     let text_format = TextFormat::default();
     //     if config.timer.0 {
     //         let config = &mut config.timer.1;
     //         ui.collapsing("timer",|ui|{
@@ -95,7 +99,7 @@ impl Debugger {
     //             }
     //         });
     //     };
-        
+
     //     // info.append(text.as_str(), 0.0, text_format.clone());
     //     // ui.label(info);
     // }
@@ -150,13 +154,13 @@ impl Debugger {
         // Tell egui to use these fonts:
         ctx.set_fonts(fonts);
     }
-    
-    fn debug_window(&mut self,ctx: &Context,ui: &mut Ui){
+
+    fn debug_window(&mut self, ctx: &Context, ui: &mut Ui) {
         ui.checkbox(&mut self.run, "run");
         ui.checkbox(&mut self.paint, "paint");
         if ui.button("next").clicked() || self.run {
             self.c.step();
-            self.parser.paint_buffer.clear(); 
+            self.parser.paint_buffer.clear();
         };
         if ui.button("save_frame").clicked() {
             if let Some(f) = self.c.get_frame() {
@@ -168,21 +172,20 @@ impl Debugger {
 
         egui::ScrollArea::vertical().show(ui, |ui| {
             // self.paint_info(&f, ui);
-            self.debugger_command(ctx, ui ); 
-            unsafe{
+            self.debugger_command(ctx, ui);
+            unsafe {
                 self.parser.show_pointer(ui);
             }
         });
     }
 
-    fn debugger_command(&mut self,ctx: &Context,ui:&mut Ui){
+    fn debugger_command(&mut self, ctx: &Context, ui: &mut Ui) {
         let f = self.c.frame_vec.last().unwrap();
-        if ctx.input(|i| i.key_pressed(egui::Key::Enter)){
+        if ctx.input(|i| i.key_pressed(egui::Key::Enter)) {
             self.parser.parse(&self.debugger_input, f);
             self.debugger_input.clear();
         }
     }
-
 }
 impl eframe::App for Debugger {
     fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
@@ -201,7 +204,7 @@ impl eframe::App for Debugger {
             .min_width(200.0)
             .resizable(true)
             .show(ctx, |ui| {
-                self.debug_window(ctx,ui);
+                self.debug_window(ctx, ui);
             });
         egui::CentralPanel::default().show(ctx, |ui| {
             if self.paint {

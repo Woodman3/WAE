@@ -1,5 +1,5 @@
-use super::Loader;
 use super::skill_loader::OfficialBlackBoard;
+use super::Loader;
 use super::Result;
 use crate::unit::operator::Operator;
 use crate::unit::scope::Scope;

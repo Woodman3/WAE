@@ -16,8 +16,8 @@ pub(crate) struct SkillSchedule {
     pub(crate) message_buffer: Vec<SkillMessage>,
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize,Copy)]
-pub(crate) enum SkillMessage{
+#[derive(Clone, Debug, Deserialize, Serialize, Copy)]
+pub(crate) enum SkillMessage {
     Attack,
 }
 
@@ -27,15 +27,15 @@ impl SkillSchedule {
         self.skill_block.retain_mut(|s| {
             match s.sp_data.charge_type {
                 ChargeType::Time => s.charge(PERIOD),
-                ChargeType::Attack =>{
-                    for m in self.message_buffer.iter(){
-                        if matches!(m,SkillMessage::Attack){
+                ChargeType::Attack => {
+                    for m in self.message_buffer.iter() {
+                        if matches!(m, SkillMessage::Attack) {
                             s.charge(1.0);
                         }
-                    };
-                } ,
+                    }
+                }
                 ChargeType::BeHit => todo!(),
-                ChargeType::None => {},
+                ChargeType::None => {}
             }
             if s.ready() {
                 self.skill_ready.push(std::mem::take(s));

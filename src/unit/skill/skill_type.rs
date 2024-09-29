@@ -1,5 +1,3 @@
-use std::default;
-
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Deserialize, Debug, Default, PartialEq, Serialize)]
@@ -44,7 +42,7 @@ pub(super) enum SkillStage {
 }
 
 #[derive(Clone, Deserialize, Debug, Default, Serialize)]
-pub(crate) enum SkillExtra{
+pub(crate) enum SkillExtra {
     #[default]
     DefaultAttack,
 }

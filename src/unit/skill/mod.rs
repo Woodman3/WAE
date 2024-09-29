@@ -21,7 +21,7 @@ pub(crate) struct Skill {
     ///if in skill ,it show time remain,or is 0
     pub(crate) last: f32,
     pub(crate) skill_entity: SkillEntity,
-    pub(crate) extra:Option<SkillExtra>
+    pub(crate) extra: Option<SkillExtra>,
 }
 
 #[derive(Clone, Deserialize, Debug, Default, Serialize)]

@@ -1,8 +1,6 @@
 // use std::cell::RefCell;
 // use std::rc::Rc
 
-use serde_json::json;
-
 use super::*;
 
 #[test]
@@ -126,7 +124,7 @@ fn load_level_test() {
 
 #[test]
 fn test_skill() {
-    let mut l: Loader = Loader::new("./ArknightsGameData").unwrap();
+    let l: Loader = Loader::new("./ArknightsGameData").unwrap();
     let mut list = HashMap::new();
     let mut fail_skill = vec![];
     let mut fail_o = vec![];
@@ -134,7 +132,8 @@ fn test_skill() {
         if let Ok(o) = from_value::<operator_loader::OfficialOperator>(v.clone()) {
             for sk in o.skills {
                 match serde_path_to_error::deserialize::<Value, Vec<operator_loader::OfficialSkill>>(
-                l.skill_table[sk.skill_id.clone()]["levels"].clone()){
+                    l.skill_table[sk.skill_id.clone()]["levels"].clone(),
+                ) {
                     Ok(sv) => {
                         for s in sv {
                             for b in s.blackboard {
@@ -146,9 +145,9 @@ fn test_skill() {
                                 }
                             }
                         }
-                    },
+                    }
                     Err(e) => {
-                        fail_skill.push((sk.skill_id,e.path().to_string()));
+                        fail_skill.push((sk.skill_id, e.path().to_string()));
                     }
                 };
             }
@@ -170,6 +169,4 @@ fn single_test() {
     let path = "./ArknightsGameData";
     let loader = Loader::new(path).unwrap();
     loader.load_operator("芙蓉".into(), 0, 1, 1, 1).unwrap();
-
 }
-
