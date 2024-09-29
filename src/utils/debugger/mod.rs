@@ -4,7 +4,7 @@ use super::load_json_file;
 use super::render::Render;
 use crate::calculator::Calculator;
 use crate::frame::Frame;
-use debugger_parser::{ parser, Pointer};
+use debugger_parser::{DebuggerParser, Pointer};
 use eframe::egui;
 use eframe::egui::{Context, TextFormat, Ui};
 use egui_extras::install_image_loaders;
@@ -21,8 +21,7 @@ pub(crate) struct Debugger {
     pub(crate) log_receiver: Arc<Mutex<Receiver<String>>>,
     pub(crate) log_messages: Arc<Mutex<Vec<String>>>,
     debugger_input: String,
-    paint_buffer: Vec<(String,Pointer)>,
-    watch_buffer: Vec<(String,Pointer)>,
+    parser: DebuggerParser,
     config: DebuggerConfig,
 }
 
@@ -56,18 +55,9 @@ impl Debugger {
         Self::setup_custom_fonts(&cc.egui_ctx);
         let config:DebuggerConfig = load_json_file(config_path).unwrap_or_default(); 
         let f = c.frame_vec.last().unwrap();
-        let mut buffer = Vec::new();
+        let mut parser = DebuggerParser::default();
         for command in config.init_command.iter(){
-            unsafe{
-                match parser(command, &f){
-                    Ok(obj) => {
-                        buffer.push(obj);
-                    },
-                    Err(e) => {
-                        error!("parser error : {:?}", e);
-                    }
-                }
-            }
+            parser.parse(command,f);
         }
         Self {
             c,
@@ -77,8 +67,7 @@ impl Debugger {
             log_messages: Arc::new(Mutex::new(Vec::new())),
             // config,
             debugger_input:String::new(),
-            paint_buffer: buffer,
-            watch_buffer:Vec::new(),
+            parser,
             config,
         }
     }
@@ -167,6 +156,7 @@ impl Debugger {
         ui.checkbox(&mut self.paint, "paint");
         if ui.button("next").clicked() || self.run {
             self.c.step();
+            self.parser.paint_buffer.clear(); 
         };
         if ui.button("save_frame").clicked() {
             if let Some(f) = self.c.get_frame() {
@@ -180,7 +170,7 @@ impl Debugger {
             // self.paint_info(&f, ui);
             self.debugger_command(ctx, ui ); 
             unsafe{
-                self.show_pointer(ui);
+                self.parser.show_pointer(ui);
             }
         });
     }
@@ -188,64 +178,8 @@ impl Debugger {
     fn debugger_command(&mut self,ctx: &Context,ui:&mut Ui){
         let f = self.c.frame_vec.last().unwrap();
         if ctx.input(|i| i.key_pressed(egui::Key::Enter)){
-            match parser(&self.debugger_input.as_str(), &f){
-                Ok(obj) => {
-                    self.paint_buffer.push(obj);
-                },
-                Err(e) => {
-                    // self.log_messages.lock().unwrap().push(format!("Error: {:?}", e));
-                    error!("parser error : {:?}", e);
-                }
-            }
-        }
-    }
-
-    unsafe fn show_pointer(&self,ui: &mut Ui){
-        for (o,p) in self.paint_buffer.iter(){
-            match p{
-                Pointer::Frame(obj) => {
-                    ui.label(format!("{o}: {:?}", **obj));
-                },
-                Pointer::Enemies(obj) => {
-                    ui.label(format!("{o}: {:?}", **obj));
-                },
-                Pointer::Operators(obj) => {
-                    ui.label(format!("{o}: {:?}", **obj));
-                },
-                Pointer::Map(obj) => {
-                    ui.label(format!("{o}: {:?}", **obj));
-                },
-                Pointer::BulletSet(obj) => {
-                    ui.label(format!("{o}: {:?}", **obj));
-                },
-                Pointer::Events(obj) => {
-                    ui.label(format!("{o}: {:?}", **obj));
-                },
-                Pointer::Usize(obj) => {
-                    ui.label(format!("{o}: {:?}", **obj));
-                },
-                Pointer::U32(obj) => {
-                    ui.label(format!("{o}: {:?}", **obj));
-                },
-                Pointer::F32(obj) => {
-                    ui.label(format!("{o}: {:?}", **obj));
-                },
-                Pointer::Timer(obj) =>{
-                    ui.label(format!("{o}: {:?}", **obj));
-                } ,
-                Pointer::Enemy(obj) =>{
-                    ui.label(format!("{o}: {:?}", obj));
-                },
-                Pointer::Operator(obj) =>{
-                    ui.label(format!("{o}: {:?}", obj));
-                },
-                Pointer::U64(obj) =>{
-                    ui.label(format!("{o}: {:?}", **obj));
-                },
-                Pointer::None => {
-                    ui.label(format!("{o}"));
-                },
-            }
+            self.parser.parse(&self.debugger_input, f);
+            self.debugger_input.clear();
         }
     }
 
