@@ -177,7 +177,7 @@ impl DebuggerParser {
                     ui.label(format!("{o}: {:?}", **obj));
                 }
                 Pointer::Skills(obj) => {
-                    ui.label(format!("{o}: {:?}", **obj));
+                    ui.label(format!("{o}: {}", **obj));
                 }
                 Pointer::String(obj) => {
                     ui.label(format!("{o}: {:?}", obj));

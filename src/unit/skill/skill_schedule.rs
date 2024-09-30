@@ -67,16 +67,26 @@ impl SkillSchedule {
 
 impl Display for SkillSchedule {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "\
-        skill_block:{}\n\
-        skill_ready:{}\n\
-        skill_running:{}\n\
-        ",
-            self.skill_block.len(),
-            self.skill_ready.len(),
-            self.skill_running.len()
-        )
+        // write!(
+        //     f,
+        //     "\
+        // skill_block:{}\n\
+        // skill_ready:{}\n\
+        // skill_running:{}\n\
+        // ",
+        //     self.skill_block,
+        //     self.skill_ready.len(),
+        //     self.skill_running.len()
+        // )
+        for s in self.skill_block.iter() {
+            writeln!(f, "{}", s)?;
+        }
+        for s in self.skill_ready.iter() {
+            writeln!(f, "{}", s)?;
+        }
+        for s in self.skill_running.iter() {
+            writeln!(f, "{}", s)?;
+        }
+        Ok(())
     }
 }

@@ -40,39 +40,6 @@ impl ToOperatorSkill {
     }
 }
 
-impl Display for ToEnemySkill {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "\
-        target_find{}\n\
-        ",
-            self.target.len()
-        )
-    }
-}
-
-impl Display for Skill {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "\
-        duration:{}\n\
-        last:{}\n\
-        ",
-            self.duration, self.last
-        )?;
-        match &self.skill_entity {
-            SkillEntity::ToEnemySkill(se) => {
-                write!(f, "{}\n", se)
-            }
-            _ => {
-                write!(f, "")
-            }
-        }
-    }
-}
-
 impl Skill {
     pub(super) fn ready(&self) -> bool {
         self.last != 0.0 && self.sp_data.sp >= self.sp_data.sp_cost
@@ -143,11 +110,40 @@ impl Skill {
     }
 }
 
-// impl Display for Skill{
-//     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-//         writeln!(f,format!(""))
-//     }
-// }
+
+impl Display for ToEnemySkill {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "\
+        target_find{}\n\
+        ",
+            self.target.len()
+        )
+    }
+}
+
+impl Display for Skill {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "\
+        duration:{}\n\
+        last:{}\n\
+        sp_data{}\n\
+        ",
+            self.duration, self.last,self.sp_data
+        )?;
+        match &self.skill_entity {
+            SkillEntity::ToEnemySkill(se) => {
+                write!(f, "{}\n", se)
+            }
+            _ => {
+                write!(f, "")
+            }
+        }
+    }
+}
 
 impl Display for SpData {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
