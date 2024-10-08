@@ -128,65 +128,67 @@ impl DebuggerParser {
         Ok((object.to_string(), obj))
     }
 
-    pub(super) unsafe fn show_pointer(&self, ui: &mut Ui) {
+    pub(super) unsafe fn show_pointer(&self)->String {
+        let mut r = String::new();
         for (o, p) in self.paint_buffer.iter().chain(self.watch_buffer.iter()) {
             match p {
                 Pointer::Frame(obj) => {
-                    ui.label(format!("{o}:\n {:?}", **obj));
+                    r.push_str(&format!("{o}:\n {:?}\n", **obj));
                 }
                 Pointer::Enemies(obj) => {
-                    ui.label(format!("{o}:\n {:?}", **obj));
+                    r.push_str(&format!("{o}:\n {:?}\n", **obj));
                 }
                 Pointer::Operators(obj) => {
-                    ui.label(format!("{o}:\n {:?}", **obj));
+                    r.push_str(&format!("{o}:\n {:?}\n", **obj));
                 }
                 Pointer::Map(obj) => {
-                    ui.label(format!("{o}:\n {:?}", **obj));
+                    r.push_str(&format!("{o}:\n {:?}\n", **obj));
                 }
                 Pointer::BulletSet(obj) => {
-                    ui.label(format!("{o}:\n {:?}", **obj));
+                    r.push_str(&format!("{o}:\n {:?}\n", **obj));
                 }
                 Pointer::Events(obj) => {
-                    ui.label(format!("{o}:\n {:?}", **obj));
+                    r.push_str(&format!("{o}:\n {:?}\n", **obj));
                 }
                 Pointer::Usize(obj) => {
-                    ui.label(format!("{o}:\n {:?}", **obj));
+                    r.push_str(&format!("{o}:\n {:?}\n", **obj));
                 }
                 Pointer::U32(obj) => {
-                    ui.label(format!("{o}:\n {:?}", **obj));
+                    r.push_str(&format!("{o}:\n {:?}\n", **obj));
                 }
                 Pointer::F32(obj) => {
-                    ui.label(format!("{o}:\n {:?}", **obj));
+                    r.push_str(&format!("{o}:\n {:?}\n", **obj));
                 }
                 Pointer::Timer(obj) => {
-                    ui.label(format!("{o}:\n {:?}", **obj));
+                    r.push_str(&format!("{o}:\n {:?}\n", **obj));
                 }
                 Pointer::Enemy(obj) => {
-                    ui.label(format!("{o}:\n {:?}", obj));
+                    r.push_str(&format!("{o}:\n {:?}\n", obj));
                 }
                 Pointer::Operator(obj) => {
-                    ui.label(format!("{o}:\n {:?}", obj));
+                    r.push_str(&format!("{o}:\n {:?}\n", obj));
                 }
                 Pointer::U64(obj) => {
-                    ui.label(format!("{o}:\n {:?}", **obj));
+                    r.push_str(&format!("{o}:\n {:?}\n", **obj));
                 }
                 Pointer::I64(obj) => {
-                    ui.label(format!("{o}:\n {:?}", **obj));
+                    r.push_str(&format!("{o}:\n {:?}\n", **obj));
                 }
                 Pointer::UnitInfo(obj) => {
-                    ui.label(format!("{o}:\n {:?}", **obj));
+                    r.push_str(&format!("{o}:\n {:?}\n", **obj));
                 }
                 Pointer::Skills(obj) => {
-                    ui.label(format!("{o}:\n {}", **obj));
+                    r.push_str(&format!("{o}:\n {}\n", **obj));
                 }
                 Pointer::String(obj) => {
-                    ui.label(format!("{o}:\n {:?}", obj));
+                    r.push_str(&format!("{o}:\n {:?}\n", obj));
                 }
                 Pointer::None => {
-                    ui.label(format!("{o}"));
+                    r.push_str(&format!("{o}\n"));
                 }
             }
         }
+        r
     }
 }
 

@@ -169,12 +169,12 @@ impl Debugger {
             }
         }
         ui.text_edit_singleline(&mut self.debugger_input);
-
+        self.debugger_command(ctx, ui);
         egui::ScrollArea::vertical().show(ui, |ui| {
             // self.paint_info(&f, ui);
-            self.debugger_command(ctx, ui);
             unsafe {
-                self.parser.show_pointer(ui);
+                let message = self.parser.show_pointer();
+                ui.label(message);
             }
         });
     }
