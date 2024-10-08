@@ -3,6 +3,7 @@ use std::{collections::HashMap, rc::Rc};
 use egui::Ui;
 use log::error;
 use regex::Regex;
+use tiny_skia::Paint;
 
 use crate::{
     event::Event,
@@ -18,6 +19,8 @@ use utils::Result;
 pub(super) struct DebuggerParser {
     pub(super) paint_buffer: Vec<(String, Pointer)>,
     watch_buffer: Vec<(String, Pointer)>,
+    history: Vec<String>,
+    history_index: usize,
 }
 
 pub(super) enum Pointer {
@@ -42,14 +45,34 @@ pub(super) enum Pointer {
     None,
 }
 
+#[derive(Debug,PartialEq,Eq)]
+enum Command{
+    Paint,
+    Watch,
+    Help,
+    List,
+}
+
 impl DebuggerParser {
-    pub(super) fn parse(&mut self, input: &str, f: &Frame) {
-        match self.parse_command(input, f) {
-            Ok(_) => {}
-            Err(e) => {
-                error!("parser error : {:?}", e);
-            }
+
+    pub(super) fn history_up(&mut self) -> Option<&String> {
+        if self.history_index > 0 {
+            self.history_index -= 1;
         }
+        self.history.get(self.history_index)
+    }
+
+    pub(super) fn history_down(&mut self) -> Option<&String> {
+        if self.history_index < self.history.len() - 1 {
+            self.history_index += 1;
+        }
+        self.history.get(self.history_index)
+    }
+    pub(super) fn parse(&mut self, input: &str, f: &Frame) -> Result<()>{
+        let r= self.parse_command(input, f);
+        self.history.push(input.to_string());
+        self.history_index = self.history.len();
+        r
     }
 
     fn parse_command(&mut self, input: &str, f: &Frame) -> Result<()> {
@@ -57,23 +80,23 @@ impl DebuggerParser {
         let caps = re
             .captures(input)
             .ok_or(format!("Invalid input: {}", input))?;
-        let command = caps.get(1).unwrap().as_str();
+        let command: Command = caps.get(1).unwrap().as_str().into();
         match command {
-            "p" | "w" => unsafe {
+            Command::Paint | Command::Watch => unsafe {
                 let object = caps.get(2).unwrap().as_str();
                 let obj = self.parse_object(object, f)?;
-                if command == "p" {
+                if command == Command::Paint {
                     self.paint_buffer.push(obj);
                 } else {
                     self.watch_buffer.push(obj);
                 }
                 Ok(())
             },
-            "h" => {
+            Command::Help => {
                 self.paint_buffer.push(("help".to_string(), Pointer::None));
                 Ok(())
             }
-            "l" => {
+            Command::List => {
                 let object = caps.get(2).unwrap().as_str();
                 let info = match object {
                     "enemy" | "e" => {
@@ -95,7 +118,6 @@ impl DebuggerParser {
                 self.paint_buffer.push((info, Pointer::None));
                 Ok(())
             }
-            _ => Err(format!("Invalid command: {}", command).into()),
         }
     }
     unsafe fn parse_object(&mut self, object: &str, f: &Frame) -> Result<(String, Pointer)> {
@@ -115,7 +137,8 @@ impl DebuggerParser {
                             Pointer::Enemy(Rc::clone(&(*f).enemy_set[index]))
                         }
                         "operator" | "o" => {
-                            Pointer::Operator(Rc::clone(&(*f).operator_deploy[index]))
+                            let o = (*f).operator_deploy.get(index).ok_or(format!("invalid index: {}",index))?;
+                            Pointer::Operator(Rc::clone(o))
                         }
                         _ => return Err("Invalid field".into()),
                     },
@@ -231,5 +254,20 @@ unsafe fn parse_field(obj: &Pointer, field: &str) -> Result<Pointer> {
             )
         }
         _ => Err("Invalid object".into()),
+    }
+}
+
+impl From<&str> for Command{
+    fn from(value: &str) -> Self {
+        match value {
+            "p" => Command::Paint,
+            "w" => Command::Watch,
+            "h" => Command::Help,
+            "l" => Command::List,
+            _ => {
+                error!("Invalid command: {}", value);
+                Command::Help
+            },
+        }
     }
 }

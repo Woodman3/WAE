@@ -10,9 +10,10 @@ use crate::unit::skill::{Skill, SpData};
 use crate::unit::UnitInfo;
 use crate::utils::math::Grid;
 use crate::utils::math::GridRect;
+use log::warn;
 use serde::Deserialize;
 use serde_json::{from_value, Value};
-
+use log::error;
 #[derive(Deserialize, Default, Debug)]
 #[serde(rename_all = "camelCase")]
 pub(super) struct OfficialOperator {
@@ -93,6 +94,7 @@ pub(super) struct OfficialSkill {
 #[serde(rename_all = "camelCase")]
 pub(super) struct OfficialSpData {
     // 这个字段有可能是数字也有可能是字符串
+    // String("INCREASE_WITH_TIME"), String("INCREASE_WHEN_ATTACK"), Number(8), String("INCREASE_WHEN_TAKEN_DAMAGE"
     pub(super) sp_type: Value,
     pub(super) level_up_cost: Option<u32>,
     pub(super) max_charge_time: u32,
@@ -147,13 +149,19 @@ impl Into<SpData> for OfficialSpData {
                     if n.as_u64().unwrap() == 8 {
                         ChargeType::None
                     } else {
+                        warn!("sp_type load wrong, sp_type is {n}");
                         ChargeType::Time
                     }
                 }
                 Value::String(s) => match s.as_str() {
-                    "AUTO" => ChargeType::Time,
-                    "MANUAL" => ChargeType::Attack,
-                    _ => ChargeType::default(),
+                    "INCREASE_WITH_TIME" => ChargeType::Time,
+                    "INCREASE_WHEN_ATTACK" => ChargeType::Attack,
+                    "INCREASE_WHEN_TAKEN_DAMAGE" => ChargeType::BeHit,
+                    _ => {
+                        warn!("sp_type load wrong, sp_type is {s}");
+                        ChargeType::Time
+                    }
+
                 },
                 _ => ChargeType::default(),
             },

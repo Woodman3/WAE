@@ -1,5 +1,6 @@
 {
     "init_command":[
-        "w timer.timestamp"
+        "w timer.timestamp",
+        "w o[克洛丝].skills"
     ]
 }

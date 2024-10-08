@@ -145,8 +145,8 @@ fn test_skill() {
                                     list.insert(key, 1);
                                 }
                             }
-                            if !temp.contains(&s.skill_type){
-                                temp.push(s.skill_type.clone());
+                            if !temp.contains(&s.sp_data.sp_type){
+                                temp.push(s.sp_data.sp_type.clone());
                             }
                         }
                     }

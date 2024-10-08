@@ -8,7 +8,7 @@ use eframe::egui;
 use eframe::egui::{Context, Ui};
 use egui_extras::install_image_loaders;
 
-use log::{Level, Metadata, Record};
+use log::{error, Level, Metadata, Record};
 use serde::{Deserialize, Serialize};
 use std::path::Path;
 use std::sync::mpsc::{Receiver, Sender};
@@ -61,7 +61,9 @@ impl Debugger {
         let f = c.frame_vec.last().unwrap();
         let mut parser = DebuggerParser::default();
         for command in config.init_command.iter() {
-            parser.parse(command, f);
+            if matches!(parser.parse(command, f), Err(_)) {
+                error!("init command error:{}", command);
+            }
         }
         Self {
             c,
@@ -181,9 +183,29 @@ impl Debugger {
 
     fn debugger_command(&mut self, ctx: &Context, ui: &mut Ui) {
         let f = self.c.frame_vec.last().unwrap();
-        if ctx.input(|i| i.key_pressed(egui::Key::Enter)) {
-            self.parser.parse(&self.debugger_input, f);
-            self.debugger_input.clear();
+        if ctx.input(|i| 
+            i.key_pressed(egui::Key::Enter)) {
+            match self.parser.parse(&self.debugger_input, f) {
+                Ok(_) => {
+                    self.debugger_input.clear();
+                    
+                }
+                Err(e) => {
+                    error!("parser error : {:?}", e);
+                }
+            }
+        }
+        if ctx.input(|i| i.key_pressed(egui::Key::ArrowUp)) {
+            // Navigate up in history
+            if let Some(last_command) = self.parser.history_up() {
+                self.debugger_input = last_command.clone();
+            }
+        }
+        if ctx.input(|i| i.key_pressed(egui::Key::ArrowDown)) {
+            // Navigate down in history
+            if let Some(next_command) = self.parser.history_down() {
+                self.debugger_input = next_command.clone();
+            }
         }
     }
 }
