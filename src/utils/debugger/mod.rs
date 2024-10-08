@@ -62,7 +62,7 @@ impl Debugger {
         let mut parser = DebuggerParser::default();
         for command in config.init_command.iter() {
             if matches!(parser.parse(command, f), Err(_)) {
-                error!("init command error:{}", command);
+                warn!("init command error:{}", command);
             }
         }
         Self {

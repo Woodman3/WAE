@@ -4,7 +4,7 @@ use crate::unit::operator::OperatorShared;
 use crate::unit::scope::Toward;
 use crate::utils::error::ConfigParseError;
 use crate::utils::math::Grid;
-use log::error;
+use log::{error, info};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::rc::Rc;
@@ -85,6 +85,7 @@ impl OperatorDeployEvent {
         } else {
             error!("cost not enough");
         }
+        info!("{} has deploy", self.operator_key);
     }
 }
 
