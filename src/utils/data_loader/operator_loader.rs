@@ -80,7 +80,9 @@ pub(super) struct OfficialSkillsDescription {
 #[serde(rename_all = "camelCase")]
 pub(super) struct OfficialSkill {
     pub(super) range_id: Option<String>,
+    /// skill_type: "AUTO" or "MANUAL" or "PASSIVE"
     pub(super) skill_type: String,
+    /// duration_type: "AMMO" or "NONE"
     pub(super) duration_type: String,
     pub(super) duration: f32,
     pub(super) sp_data: OfficialSpData,
@@ -126,6 +128,7 @@ impl Into<Skill> for OfficialSkill {
             _ => TriggerType::None,
         };
         Skill {
+            // 
             duration: self.duration as f32,
             trigger_type,
             sp_data: self.sp_data.into(),

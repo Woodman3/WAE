@@ -27,7 +27,7 @@ fn main() {
     let (sender, receiver) = mpsc::channel();
     let logger = DebugLogger { sender };
     log::set_boxed_logger(Box::new(logger)).unwrap();
-    log::set_max_level(LevelFilter::Debug);
+    log::set_max_level(LevelFilter::Info);
 
     // let l = Loader::new("ArknightsGameData").unwrap();
     // let ca = l.load_level("main_01-01".to_string()).unwrap();
@@ -56,9 +56,10 @@ mod test {
     fn test_loader() {
         env_logger::init();
         let mut ca = Copilot::build_calculator("./copilot.json", "./ArknightsGameData").unwrap();
-        let mut f = ca.frame_vec.pop().unwrap();
-        let r = f.enemy_set[0].borrow().route.clone();
-        let dis = f.map.spfa((0, 10).into(), (2, 0).into());
-        println!("{:?}", dis);
+        ca.goto_end();
+        // let mut f = ca.frame_vec.pop().unwrap();
+        // let r = f.enemy_set[0].borrow().route.clone();
+        // let dis = f.map.spfa((0, 10).into(), (2, 0).into());
+        // println!("{:?}", dis);
     }
 }

@@ -79,13 +79,13 @@ impl Display for SkillSchedule {
         //     self.skill_running.len()
         // )
         for s in self.skill_block.iter() {
-            writeln!(f, "{}", s)?;
+            writeln!(f, "skills_block:\n{}", s)?;
         }
         for s in self.skill_ready.iter() {
-            writeln!(f, "{}", s)?;
+            writeln!(f, "skill_ready:\n{}", s)?;
         }
         for s in self.skill_running.iter() {
-            writeln!(f, "{}", s)?;
+            writeln!(f, "skill_running:\n{}", s)?;
         }
         Ok(())
     }

@@ -128,6 +128,7 @@ fn test_skill() {
     let mut list = HashMap::new();
     let mut fail_skill = vec![];
     let mut fail_o = vec![];
+    let mut temp = Vec::new();
     for (_, v) in l.character_table.as_object().unwrap() {
         if let Ok(o) = from_value::<operator_loader::OfficialOperator>(v.clone()) {
             for sk in o.skills {
@@ -143,6 +144,9 @@ fn test_skill() {
                                 } else {
                                     list.insert(key, 1);
                                 }
+                            }
+                            if !temp.contains(&s.skill_type){
+                                temp.push(s.skill_type.clone());
                             }
                         }
                     }
@@ -162,6 +166,8 @@ fn test_skill() {
     println!("fail skill :{:?}", fail_skill);
     println!("-------------------");
     println!("fail operator :{:?}", fail_o);
+    println!("-------------------");
+    println!("skill type :{:?}", temp);
 }
 
 #[test]

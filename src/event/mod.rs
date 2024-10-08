@@ -59,6 +59,7 @@ impl Event {
                 f.life_point -= 1;
                 if f.life_point <= 0 {
                     c.star = 0;
+                    info!("life_point reduce to 0, game over");
                 }
                 info!("an enemy enter end");
             }
